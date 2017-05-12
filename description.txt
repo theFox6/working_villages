@@ -1,2 +1,2 @@
 A mod adding villager NPCs performing working. Right now it hasn't got many features.
-See [minetest]/mods/working_villages/README.md for more infos.
+See working_villages/README.md for more infos.
