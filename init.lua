@@ -1,9 +1,12 @@
+print("loading [working_villages]")
 working_villages={
-modpath=minetest.get_modpath("working_villages"),
-debug_logging=true
+	modpath=minetest.get_modpath("working_villages"),
+	debug_logging=true
+	func = {}
 }
 
 --base
+dofile(working_villages.modpath.."/pathfinder.lua")
 dofile(working_villages.modpath.."/homes.lua")
 dofile(working_villages.modpath.."/api.lua")
 dofile(working_villages.modpath.."/register.lua")

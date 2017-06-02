@@ -1,0 +1,55 @@
+read jobs/util_description.txt for simpler job registration and more functions
+
+I am using the maidroid api, but I have already modified many things.
+
+-- registering villagers
+-- functions for moving etc.
+
+To register a new job you use:
+
+working_villages.register_job("[itemstring for the job item]", {
+	description      = "[description for the job item]",
+	inventory_image  = "[texture for the job item]",
+	on_start         = [function for initializing](self),
+	on_stop          = [function to stop all actions](self),
+	on_resume        = [the same as on_start can be used](self),
+	on_pause         = [the same as on_stop can be used](self),
+	on_step          = [function for the actions we are doing every step](self, deltaTime),
+})
+
+for example:
+
+working_villages.register_job("working_villages:example_job", {
+	description      = "working_villages job : example",
+	inventory_image  = "default_paper.png^memorandum_letters.png",
+	on_start         = function(self)
+		self.object:setacceleration{x = 0, y = -10, z = 0}
+		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.state = state.WALK_RANDOMLY
+		self.time_counters = {}
+		self.path = nil
+		to_walk_randomly(self)
+	end,
+	on_stop          = function(self)
+		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.state = nil
+		self.time_counters = nil
+		self.path = nil
+		self:set_animation(working_villages.animation_frames.STAND)
+	end,
+	on_resume        = [same as on_start],
+	on_pause         = [same as on_stop],
+	on_step          = function (self, dtime)
+		if self.state == state.WALK_RANDOMLY then
+			walk_randomly(self, dtime)
+		elseif self.state == state.WALK_TO_PLANT or self.state == state.WALK_TO_MOW then
+			walk_to_plant_and_mow_common(self, dtime)
+		elseif self.state == state.PLANT then
+			plant(self, dtime)
+		elseif self.state == state.MOW then
+			mow(self, dtime)
+		end
+	end,
+})
+
+("state" must be a table containing ids for every state in this case)
