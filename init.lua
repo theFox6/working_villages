@@ -1,7 +1,7 @@
 print("loading [working_villages]")
 working_villages={
 	modpath=minetest.get_modpath("working_villages"),
-	debug_logging=true
+	debug_logging=true,
 	func = {}
 }
 
