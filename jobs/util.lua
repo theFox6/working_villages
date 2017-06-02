@@ -1,5 +1,3 @@
-working_villages.func = {}
-
 function working_villages.func.handle_obstacles(self,ignore_fence)
 	local velocity = self.object:getvelocity()
 	local inside_node = minetest.get_node(self.object:getpos())
