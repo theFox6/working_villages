@@ -3,9 +3,9 @@ working_villages.home = {}
 minetest.register_node("working_villages:home_marker", {
 	description = "home marker for working_villages",
 	drawtype = "nodebox",
-	tiles = {"default_sign.png"},
-	inventory_image = "default_sign_wall.png",
-	wield_image = "default_sign_wall.png",
+	tiles = {"default_sign_wall_wood.png"},
+	inventory_image = "default_sign_wood.png",
+	wield_image = "default_sign_wood.png",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
 	sunlight_propagates = true,

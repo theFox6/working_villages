@@ -1,6 +1,4 @@
-if pathfinder==nil then
-	pathfinder = {}
-end
+working_villages.pathfinder = {}
 
 --[[
 minetest.get_content_id(name)
@@ -47,14 +45,18 @@ local function get_distance_to_neighbor(start_pos, end_pos)
 	end
 end
 local function walkable(node)
-		return minetest.registered_nodes[node.name].walkable
+		if string.find(node.name,"doors:door") then
+			return false
+		else
+			return minetest.registered_nodes[node.name].walkable			
+		end
 end
 
 local function check_clearance(cpos, x, z, height)
 	for i = 1, height do
 		local n_name = minetest.get_node({x = cpos.x + x, y = cpos.y + i, z = cpos.z + z}).name
 		local c_name = minetest.get_node({x = cpos.x, y = cpos.y + i, z = cpos.z}).name
-		--~ print(i, n_name, c_name)
+		--print(i, n_name, c_name)
 		if walkable(n_name) or walkable(c_name) then
 			return false
 		end
@@ -73,7 +75,7 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 			end
 			pos.y = pos.y + 1
 			node = minetest.get_node(pos)
-		until not walkable(node)
+		until not(walkable(node))
 		return pos
 	else
 		repeat
@@ -88,8 +90,8 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 	end
 end
 
-if pathfinder.find_path==nil then
-function pathfinder.find_path(pos, endpos, entity)
+function working_villages.pathfinder.find_path(pos, endpos, entity)
+	--print("searching for a path to:" .. endpos.x .. ",".. endpos.y .. ",".. endpos.z)
 	local start_index = minetest.hash_node_position(pos)
 	local target_index = minetest.hash_node_position(endpos)
 	local count = 1
@@ -129,24 +131,24 @@ function pathfinder.find_path(pos, endpos, entity)
 		count = count - 1
 
 		if current_index == target_index then
-			-- print("Success")
+			--print("Found path")
 			local path = {}
 			local reverse_path = {}
 			repeat
-				if not closedSet[current_index] then
-					return
+				if not(closedSet[current_index]) then
+					return {endpos} --was empty return
 				end
 				table.insert(path, closedSet[current_index].pos)
 				current_index = closedSet[current_index].parent
 				if #path > 100 then
-					-- print("path to long")
+					--print("path to long")
 					return
 				end
 			until start_index == current_index
 			repeat
 				table.insert(reverse_path, table.remove(path))
 			until #path == 0
-			-- print("path lenght: "..#reverse_path)
+			--print("path length: "..#reverse_path)
 			return reverse_path
 		end
 
@@ -165,7 +167,7 @@ function pathfinder.find_path(pos, endpos, entity)
 				-- minetest.set_node(neighbor_ground_level, {name = "default:dry_shrub"})
 				local node_above_head = minetest.get_node(
 						{x = current_pos.x, y = current_pos.y + entity_height, z = current_pos.z})
-				if neighbor_ground_level.y - current_pos.y > 0 and not walkable(node_above_head) then
+				if neighbor_ground_level.y - current_pos.y > 0 and not(walkable(node_above_head)) then
 					local height = -1
 					repeat
 						height = height + 1
@@ -220,7 +222,7 @@ function pathfinder.find_path(pos, endpos, entity)
 			-- don't cut corners
 			local cut_corner = false
 			if id == 1 then
-				if not neighbors[id + 1].clear or not neighbors[id + 3].clear
+				if not(neighbors[id + 1].clear) or not(neighbors[id + 3].clear)
 					or neighbors[id + 1].walkable or neighbors[id + 3].walkable then
 					cut_corner = true
 				end
@@ -263,14 +265,15 @@ function pathfinder.find_path(pos, endpos, entity)
 			end
 		end
 		if count > 100 then
-			-- print("fail")
+			print("failed finding a path to:" .. endpos.x .. ",".. endpos.y .. ",".. endpos.z)
 			return
 		end
 	until count < 1
-	-- print("count < 1")
-	return {pos}
-end
+	--print("count < 1")
+	return {endpos}
 end
 
-working_villages.func.walkable = walkable
-working_villages.func.get_ground_level = get_neighbor_ground_level
+working_villages.pathfinder.walkable = walkable
+function working_villages.pathfinder.get_ground_level(pos)
+	return get_neighbor_ground_level(pos, 30927, 30927)
+end

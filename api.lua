@@ -110,6 +110,34 @@ function working_villages.villager.get_front_node(self)
 	return minetest.get_node(front)
 end
 
+-- working_villages.villager.get_back returns a position behind the villager.
+function working_villages.villager.get_back(self)
+	local direction = self:get_look_direction()
+	if math.abs(direction.x) >= 0.5 then
+		if direction.x > 0 then	direction.x = -1
+		else direction.x = 1 end
+	else
+		direction.x = 0
+	end
+
+	if math.abs(direction.z) >= 0.5 then
+		if direction.z > 0 then	direction.z = -1
+		else direction.z = 1 end
+	else
+		direction.z = 0
+	end
+	
+	direction.y = direction.y - 1
+
+	return vector.add(vector.round(self.object:getpos()), direction)
+end
+
+-- working_villages.villager.get_back_node returns a node that exists behind the villager.
+function working_villages.villager.get_back_node(self)
+	local back = self:get_back()
+	return minetest.get_node(back)
+end
+
 -- working_villages.villager.get_look_direction returns a normalized vector that is
 -- the villagers's looking direction.
 function working_villages.villager.get_look_direction(self)
@@ -662,11 +690,13 @@ function working_villages.register_villager(product_name, def)
 
 		-- extra methods.
 		get_inventory                = working_villages.villager.get_inventory,
-		get_job                     = working_villages.villager.get_job,
-		get_job_name                = working_villages.villager.get_job_name,
+		get_job                      = working_villages.villager.get_job,
+		get_job_name                 = working_villages.villager.get_job_name,
 		get_nearest_player           = working_villages.villager.get_nearest_player,
 		get_front                    = working_villages.villager.get_front,
 		get_front_node               = working_villages.villager.get_front_node,
+		get_back                     = working_villages.villager.get_back,
+		get_back_node                = working_villages.villager.get_back_node,
 		get_look_direction           = working_villages.villager.get_look_direction,
 		set_animation                = working_villages.villager.set_animation,
 		set_yaw_by_direction         = working_villages.villager.set_yaw_by_direction,
