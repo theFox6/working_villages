@@ -14,6 +14,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				self.target = target
 				self.time_counters[1] = 0 -- find path interval
 				self.time_counters[2] = 0
+				self.time_counters[3] = 0
 				if self.path ~= nil then
 					self:change_direction(self.path[1])
 				else
@@ -26,7 +27,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 					return true
 				end
 				local MAX_WALK_TIME = 800
-				local FIND_PATH_TIME_INTERVAL = 50
+				local FIND_PATH_TIME_INTERVAL = 200
 				if self.time_counters[2] >= MAX_WALK_TIME then -- time over.
 					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
 					working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
@@ -35,13 +36,20 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 
 				self.time_counters[1] = self.time_counters[1] + 1
 				self.time_counters[2] = self.time_counters[2] + 1
+				self.time_counters[3] = self.time_counters[3] + 1
+
+				if self.time_counters[3] >= 30 then
+					self.time_counters[3] = 0
+					self:change_direction(self.path[1])
+				end
 
 				if self.time_counters[1] >= FIND_PATH_TIME_INTERVAL then
 					self.time_counters[1] = 0
 					local val_pos = working_villages.func.validate_pos(self.object:getpos())
-					local path = minetest.find_path(val_pos, self.destination, 10, 1, 1, "A*")
+					local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
 					if path == nil then
-						path = minetest.find_path(val_pos, {x=self.destination.x,y=val_pos.y,z=self.destination.z}, 10, 1, 1, "A*")
+						--print("looking for a new path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. val_pos.y .. "," .. destination.z)
+						path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z}), self)
 					end
 					if path == nil then
 						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
@@ -105,6 +113,7 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 				self.target = target
 				self.time_counters[1] = 0 -- folow path interval
 				self.time_counters[2] = 0
+				self.time_counters[3] = 0
 				if self.path ~= nil then
 					self:change_direction(self.path[1])
 				else
@@ -117,7 +126,7 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 					return true
 				end
 				local MAX_WALK_TIME = 800
-				local FIND_PATH_TIME_INTERVAL = 50
+				local FIND_PATH_TIME_INTERVAL = 200
 				if self.time_counters[2] >= MAX_WALK_TIME then 
 					--print("time over: back to searching")
 					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
@@ -127,15 +136,21 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 
 				self.time_counters[1] = self.time_counters[1] + 1
 				self.time_counters[2] = self.time_counters[2] + 1
+				self.time_counters[3] = self.time_counters[3] + 1
+
+				if self.time_counters[3] >= 30 then
+					self.time_counters[3] = 0
+					self:change_direction(self.path[1])
+				end
 
 				if self.time_counters[1] >= FIND_PATH_TIME_INTERVAL then
 					self.time_counters[1] = 0
 					--print("looking for a new path")
 					local val_pos = working_villages.func.validate_pos(self.object:getpos())
-					local path = minetest.find_path(val_pos, self.destination, 10, 1, 1, "A*")
-					if path == nil then
-						path = minetest.find_path(val_pos, {x=self.destination.x,y=val_pos.y,z=self.destination.z}, 10, 1, 1, "A*")
-					end
+					local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
+						if path == nil then
+							path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z}), self)
+						end
 					if path == nil then
 						--print("no new path found: back to searching")
 						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
