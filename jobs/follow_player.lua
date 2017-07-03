@@ -29,13 +29,7 @@ actions.ACCOMPANY={self_condition=function(self)
 				self:set_yaw_by_direction(direction)
 
 				--if villager is stoped by obstacle, the villager must jump.
-				if velocity.y == 0 then
-					local front_node = self:get_front_node()
-					if front_node.name ~= "air" and minetest.registered_nodes[front_node.name] ~= nil
-					and minetest.registered_nodes[front_node.name].walkable then
-						self.object:setvelocity{x = direction.x, y = 5, z = direction.z}
-					end
-				end
+				working_villages.func.handle_obstacles(self,true)
 			end,
 			to_state = function(self)
 				self:set_animation(working_villages.animation_frames.WALK)

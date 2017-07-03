@@ -75,15 +75,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 					end
 				else
 					-- if villager is stopped by obstacles, the villager must jump.
-					local velocity = self.object:getvelocity()
-					if velocity.y == 0 then
-						local front_node = self:get_front_node()
-						if front_node.name ~= "air" and minetest.registered_nodes[front_node.name] ~= nil
-						and minetest.registered_nodes[front_node.name].walkable
-						and not (minetest.get_item_group(front_node.name, "fence") > 0) then
-							self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
-						end
-					end
+					working_villages.func.handle_obstacles(self,false)
 				end
 			end,
 			self_condition=function(self)
