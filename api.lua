@@ -598,17 +598,20 @@ function working_villages.register_villager(product_name, def)
 		local all_objects = minetest.get_objects_inside_radius(pos, radius)
 
 		for _, obj in ipairs(all_objects) do
-			if not obj:is_player() and obj:get_luaentity() then
+			if not obj:is_player() and obj:get_luaentity() and obj:get_luaentity().itemstring then
 				local itemstring = obj:get_luaentity().itemstring
+				local stack = ItemStack(itemstring)
+				if stack and stack:to_table() then
+					local name = stack:to_table().name
 
-				if minetest.registered_items[itemstring] ~= nil then
-					local inv = self:get_inventory()
-					local stack = ItemStack(itemstring)
-					local leftover = inv:add_item("main", stack)
+					if minetest.registered_items[name] ~= nil then
+						local inv = self:get_inventory()
+						local leftover = inv:add_item("main", stack)
 
-					minetest.add_item(obj:getpos(), leftover)
-					obj:get_luaentity().itemstring = ""
-					obj:remove()
+						minetest.add_item(obj:getpos(), leftover)
+						obj:get_luaentity().itemstring = ""
+						obj:remove()
+					end
 				end
 			end
 		end
