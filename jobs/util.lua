@@ -1,4 +1,4 @@
-function working_villages.func.handle_obstacles(self,ignore_fence)
+function working_villages.func.handle_obstacles(self,ignore_fence,ignore_doors)
 	local velocity = self.object:getvelocity()
 	local inside_node = minetest.get_node(self.object:getpos())
 	if inside_node.name == "doors:door_wood_a"
@@ -13,7 +13,7 @@ function working_villages.func.handle_obstacles(self,ignore_fence)
 		above_node = minetest.get_node(above_node)
 		if minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence) then
 			self:change_direction_randomly()
-		elseif string.find(front_node.name,"doors:door") then
+		elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
 			local door_state = minetest.get_meta(self:get_front()):get_int("state")
 			if door_state %2 == 0 then
 				minetest.registered_nodes[front_node.name].on_rightclick(self:get_front(),nil,nil)
@@ -21,11 +21,13 @@ function working_villages.func.handle_obstacles(self,ignore_fence)
 		elseif minetest.registered_nodes[front_node.name].walkable and not(minetest.registered_nodes[above_node.name].walkable) then
 			self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
 		end
-		local back_node = self:get_back_node()
-		if string.find(back_node.name,"doors:door") then
-			local door_state = minetest.get_meta(self:get_back()):get_int("state")
-			if door_state %2 == 1 then
-				minetest.registered_nodes[back_node.name].on_rightclick(self:get_back(),nil,nil)
+		if not ignore_doors then
+			local back_node = self:get_back_node()
+			if string.find(back_node.name,"doors:door") then
+				local door_state = minetest.get_meta(self:get_back()):get_int("state")
+				if door_state %2 == 1 then
+					minetest.registered_nodes[back_node.name].on_rightclick(self:get_back(),nil,nil)
+				end
 			end
 		end
 	end

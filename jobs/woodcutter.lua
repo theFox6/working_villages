@@ -7,6 +7,96 @@ local function find_tree(p)
 end
 
 actions={}
+actions.COLLECT = {to_state=function(self, path, destination, target)
+				self.path = path
+				self.destination = destination
+				self.target = target
+				self.time_counters[1] = 0 -- find path interval
+				self.time_counters[2] = 0
+				self.time_counters[3] = 0
+				if self.path ~= nil then
+					self:change_direction(self.path[1])
+				else
+					self:change_direction(self.destination)
+				end
+				self:set_animation(working_villages.animation_frames.WALK)
+			end,
+			func = function(self)
+				if working_villages.func.is_near(self, {x=self.destination.x,y=self.object:getpos().y,z=self.destination.z}, 0.5) then
+					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
+				working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+				end
+				local MAX_WALK_TIME = 800
+				local FIND_PATH_TIME_INTERVAL = 200
+				if self.time_counters[2] >= MAX_WALK_TIME then -- time over.
+					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
+					working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+					return
+				end
+
+				self.time_counters[1] = self.time_counters[1] + 1
+				self.time_counters[2] = self.time_counters[2] + 1
+				self.time_counters[3] = self.time_counters[3] + 1
+
+				if self.time_counters[3] >= 30 then
+					self.time_counters[3] = 0
+					self:change_direction(self.path[1])
+				end
+
+				if self.time_counters[1] >= FIND_PATH_TIME_INTERVAL then
+					self.time_counters[1] = 0
+					local val_pos = working_villages.func.validate_pos(self.object:getpos())
+					local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
+					if path == nil then
+						--print("looking for a new path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. val_pos.y .. "," .. destination.z)
+						path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z}), self)
+					end
+					if path == nil then
+						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
+						working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+						return
+					end
+					self.path = path
+				end
+
+				-- follow path
+				if self.path == nil then
+					self.path={}
+					self.path[1]=self.destination
+				end
+				if working_villages.func.is_near(self, self.path[1], 0.5) then
+					table.remove(self.path, 1)
+
+					if #self.path == 0 then -- end of path
+						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
+				working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+					else -- else next step, follow next path.
+						self:change_direction(self.path[1])
+						self.time_counters[1] = 0
+					end
+				else
+					-- if villager is stopped by obstacles, the villager must jump.
+					working_villages.func.handle_obstacles(self,false,true)
+				end
+			end,
+			search_condition=function(pos)
+				local all_objects = minetest.get_objects_inside_radius(pos, 1)
+				local _,obj
+				for _,obj in ipairs(all_objects) do
+					if not obj:is_player() and obj:get_luaentity() and obj:get_luaentity().name == "__builtin:item" then
+						local name = ItemStack(obj:get_luaentity().itemstring):to_table()
+						if name then
+							name=name.name
+							return minetest.get_item_group(name, "sapling") > 0
+						end
+					end
+				end
+				return false
+			end,
+			self_condition=function(self)
+				local inv=self:get_inventory()
+				return inv:room_for_item("main", ItemStack("default:sappling 99"))
+			end,}
 actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				--print("found place to plant at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
 				self.path = path
@@ -75,7 +165,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 					end
 				else
 					-- if villager is stopped by obstacles, the villager must jump.
-					working_villages.func.handle_obstacles(self,false)
+					working_villages.func.handle_obstacles(self,false,true)
 				end
 			end,
 			self_condition=function(self)
