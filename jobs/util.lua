@@ -14,20 +14,16 @@ function working_villages.func.handle_obstacles(self,ignore_fence,ignore_doors)
 		if minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence) then
 			self:change_direction_randomly()
 		elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
-			local door_state = minetest.get_meta(self:get_front()):get_int("state")
-			if door_state %2 == 0 then
-				minetest.registered_nodes[front_node.name].on_rightclick(self:get_front(),nil,nil)
-			end
+			local door = doors.get(self:get_front())
+			door:open()
 		elseif minetest.registered_nodes[front_node.name].walkable and not(minetest.registered_nodes[above_node.name].walkable) then
 			self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
 		end
 		if not ignore_doors then
-			local back_node = self:get_back_node()
-			if string.find(back_node.name,"doors:door") then
-				local door_state = minetest.get_meta(self:get_back()):get_int("state")
-				if door_state %2 == 1 then
-					minetest.registered_nodes[back_node.name].on_rightclick(self:get_back(),nil,nil)
-				end
+			local back_pos = self:get_back()
+			if string.find(minetest.get_node(back_pos).name,"doors:door") then
+				local door = doors.get(back_pos)
+				door:close()
 			end
 		end
 	end
@@ -163,7 +159,6 @@ function working_villages.func.find_adjacent_pos(pos,pred)
 end
 
 function working_villages.func.villager_state_machine_job(job_name,job_description,actions, sprop)
-	--basic states
 	--special properties
 	if sprop.night_active ~= true then
 		sprop.night_active = false
@@ -174,24 +169,31 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	if sprop.searching_range == nil or sprop.searching_range == {} then
 		sprop.searching_range = {x = 10, y = 3, z = 10}
 	end
-	--controlling state
+
+	--basic states
 	local night_active = sprop.night_active
 	local search_idle = sprop.search_idle
 	local searching_range = sprop.searching_range
 	local MAX_WALK_TIME = 120
+
+	--controlling state
 	local function walk_randomly(self)
 		local CHANGE_DIRECTION_TIME_INTERVAL = 50
-		if self.time_counters[1] >= 20 then
-			self.time_counters[1] = 0
-			self.time_counters[2] = self.time_counters[2] + 1
+		if self:timer_exceeded(1,20) then
+			self:count_timer(2)
 			local myJob = self:get_job()
+			if myJob.states.WALK_HOME and myJob.states.WALK_HOME.self_condition(self) then
+				myJob.states.WALK_HOME.to_state(self)
+				self.state=myJob.states.WALK_HOME
+				return
+			end
 			for _,search_state in pairs(myJob.states) do
 				local self_cond = false
 				if search_state.self_condition then
 					if search_state.self_condition(self) then
 						self_cond=true
 					end
-				elseif search_state.search_condition ~= nil then
+				elseif search_state.search_condition ~= nil or search_state.target_getter ~= nil then
 					self_cond=true
 				end
 				if search_state.search_condition ~= nil and self_cond then
@@ -218,6 +220,35 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 							return
 						end
 					end
+				elseif search_state.target_getter ~= nil and self_cond then
+					local target = search_state.target_getter(self, searching_range)
+					if target ~= nil then
+						local distance = vector.subtract(target, self.object:getpos())
+						if distance.x<=searching_range.x and distance.y<=searching_range.y and distance.z<=searching_range.z then
+							local destination = working_villages.func.validate_pos(target)
+							local val_pos = working_villages.func.validate_pos(self.object:getpos())
+							--print("looking for a path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+							local path = working_villages.pathfinder.find_path(val_pos, destination, self)
+							if path == nil then
+								local node = minetest.get_node(destination)
+								if minetest.registered_nodes[node.name].walkable then
+									destination.y = destination.y + 1
+								else
+									destination.y = destination.y - 1
+								end
+								--print("looking for a new path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+								path = working_villages.pathfinder.find_path(val_pos, destination, self)
+							end
+							if path ~= nil then
+								--print("path found to: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+								if search_state.to_state then
+									search_state.to_state(self, path, destination, target)
+								end
+								self.state=search_state
+								return
+							end
+						end
+					end
 				elseif self_cond then
 					if search_state.to_state then
 						search_state.to_state(self)
@@ -226,14 +257,13 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 					return
 				end
 			end
-		elseif self.time_counters[2] >= CHANGE_DIRECTION_TIME_INTERVAL then
-			self.time_counters[1] = self.time_counters[1] + 1
-			self.time_counters[2] = 0
+		elseif self:timer_exceeded(2,CHANGE_DIRECTION_TIME_INTERVAL) then
+			self:count_timer(1)
 			self:change_direction_randomly()
 			return
 		else
-			self.time_counters[1] = self.time_counters[1] + 1
-			self.time_counters[2] = self.time_counters[2] + 1
+			self:count_timer(1)
+			self:count_timer(2)
 
 			working_villages.func.handle_obstacles(self,false)
 			return
@@ -241,15 +271,15 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	end
 
 	local function to_walk_randomly(self)
-		self.time_counters[1] = 20
-		self.time_counters[2] = 0
+		self:set_timer(1,20)
+		self:set_timer(2,0)
 		self:set_animation(working_villages.animation_frames.WALK)
 	end
 
 	local function s_search_idle(self)
 		local searching_range = {x = 10, y = 10, z = 10}
-		if self.time_counters[1] >= 20 then
-			self.time_counters[1] = 0
+		if self:timer_exceeded(1,20) then
+			self:set_timer(1,0)
 			local myJob = self:get_job()
 			for _,search_state in pairs(myJob.states) do
 				local self_cond = false
@@ -289,14 +319,14 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 				end
 			end
 		else
-			self.time_counters[1] = self.time_counters[1] + 1
+			self:count_timer(1)
 			return
 		end
 	end
 
 	local function to_search_idle(self)
-		self.time_counters[1] = 0
-		self.time_counters[2] = 0
+		self:set_timer(1,0)
+		self:set_timer(2,0)
 		self.object:setvelocity{x = 0, y = 0, z = 0}
 		self:set_animation(working_villages.animation_frames.STAND)
 	end
@@ -313,22 +343,23 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		return false
 	end
 	local function to_sleep(self)
-		--print("a villager is laying down")
-		self:set_animation(working_villages.animation_frames.LAY)
+		print("a villager is laying down")
 		self.object:setvelocity{x = 0, y = 0, z = 0}
 		local bed_pos=working_villages.home.get_bed(working_villages.homes[self.inventory_name])
-		bed_pos=vector.add(bed_pos,{x=0,y=1,z=0})
-		self.object:setpos(bed_pos)
-		local bed_bottom = working_villages.func.find_adjacent_pos(bed_pos,function(p) return minetest.get_node(p).name=="beds:bed_bottom" end)
-		if bed_bottom then
-			self:set_yaw_by_direction(vector.subtract(bed_bottom, self.object:getpos()))
+		local bed_top = working_villages.func.find_adjacent_pos(bed_pos,function(p) return string.find(minetest.get_node(p).name,"_top") end)
+		local bed_bottom = working_villages.func.find_adjacent_pos(bed_pos,function(p) return string.find(minetest.get_node(p).name,"_bottom") end)
+		if bed_top and bed_bottom then
+			self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
+		else
+			print("no bed found")
 		end
+		self:set_animation(working_villages.animation_frames.LAY)
+		self.object:setpos(vector.add(bed_pos,{x=0,y=1,z=0}))
 	end
 	local function follow_path(self)		
-		self.time_counters[1] = self.time_counters[1] + 1
-		self.time_counters[2] = self.time_counters[2] + 1
-		if self.time_counters[1] >= 100 then
-			self.time_counters[1] = 0
+		self:count_timer(1)
+		self:count_timer(2)
+		if self:timer_exceeded(1,100) then
 			local val_pos = working_villages.func.validate_pos(self.object:getpos())
 			local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
 			if path ~= nil then
@@ -336,8 +367,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 			end
 		end
 
-		if self.time_counters[2] >= 30 then
-			self.time_counters[2] = 0
+		if self:timer_exceeded(2,30) then
 			self:change_direction(self.path[1])
 		end
 		
@@ -348,7 +378,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 			if #self.path == 0 then -- end of path
 				return true
 			else -- else next step, follow next path.
-				self.time_counters[1] = 0
+				self:set_timer(1,0)
 				self:change_direction(self.path[1])
 			end
 		else
@@ -370,8 +400,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		end
 		local val_pos = working_villages.func.validate_pos(self.object:getpos())
 		self.path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
-		self.time_counters[1] = 0 -- find path interval
-		self.time_counters[2] = 0
+		self:set_timer(1,0) -- find path interval
+		self:set_timer(2,0)
 		if self.path == nil then
 			self.path = {}
 			self.path[1]=self.destination
@@ -389,8 +419,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		self.destination=working_villages.home.get_door(working_villages.homes[self.inventory_name])
 		local val_pos = working_villages.func.validate_pos(self.object:getpos())
 		self.path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
-		self.time_counters[1] = 0 -- find path interval
-		self.time_counters[2] = 0
+		self:set_timer(1,0) -- find path interval
+		self:set_timer(2,0)
 		if self.path == nil then
 			self.path = {}
 			self.path[1]=self.destination
@@ -422,6 +452,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		newStates.WALK_HOME	= {number=3,
 					func=follow_path,
 					self_condition = function (self)
+						--if self==nil then return end
 						local myHome = working_villages.homes[self.inventory_name]
 						if myHome then
 							if not(working_villages.home.get_bed(myHome)) then
@@ -483,4 +514,14 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		on_step          = on_step,
 		states           = newStates
 	})
+end
+
+function working_villages.func.get_back_to_searching(self)
+	local myJob = self:get_job()
+	if myJob and myJob.states and myJob.states.SEARCH then
+		self.state = myJob.states.SEARCH
+		if myJob.states.SEARCH.to_state then
+			myJob.states.SEARCH.to_state(self)
+		end
+	end
 end

@@ -39,10 +39,10 @@ actions.PLACE={self_condition=function(self)
 				end
 				if self.torcher_accompany then
 					self.state=actions.ACCOMPANY
-					self:set_animation(maidroid.animation_frames.WALK)
+					self:set_animation(working_villages.animation_frames.WALK)
 				else
-					self.state = working_villages.registered_jobs["working_villages:job_torcher"].states.SEARCH
-					self:set_animation(maidroid.animation_frames.STAND)
+					working_villages.func.get_back_to_searching(self)
+					self:set_animation(working_villages.animation_frames.STAND)
 				end
 			else
 				self.time_counter = self.time_counter + 1
@@ -50,7 +50,7 @@ actions.PLACE={self_condition=function(self)
 		end,
 		to_state=function(self)
 				self.time_counter = 0
-				self:set_animation(maidroid.animation_frames.MINE)
+				self:set_animation(working_villages.animation_frames.MINE)
 				self.torcher_accompany=false
 			end}
 actions.ACCOMPANY={self_condition=function(self)
@@ -66,8 +66,7 @@ actions.ACCOMPANY={self_condition=function(self)
 			func = function(self)
 				local player = self:get_nearest_player(10)
 				if player == nil then
-					self.state = working_villages.registered_jobs[self.get_job_name(self)].states.SEARCH
-					working_villages.registered_jobs[self.get_job_name(self)].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 				local position = self.object:getpos()
@@ -79,7 +78,7 @@ actions.ACCOMPANY={self_condition=function(self)
 					or self:move_main_to_wield(function (itemname) return itemname == "default:torch" end)) then
 						self.time_counter = 0
 						self.state = actions.PLACE
-						self:set_animation(maidroid.animation_frames.WALK_MINE)
+						self:set_animation(working_villages.animation_frames.WALK_MINE)
 						self.torcher_accompany=true
 						return
 					end
@@ -87,8 +86,7 @@ actions.ACCOMPANY={self_condition=function(self)
 				local player_position = player:getpos()
 				local direction = vector.subtract(player_position, position)
 				if vector.length(direction) < 3 then
-					self.state = working_villages.registered_jobs["working_villages:job_torcher"].states.SEARCH
-					working_villages.registered_jobs["working_villages:job_torcher"].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 				local velocity = self.object:getvelocity()

@@ -12,16 +12,14 @@ actions.ACCOMPANY={self_condition=function(self)
 			func = function(self)
 				local player = self:get_nearest_player(10)
 				if player == nil then
-					self.state = working_villages.registered_jobs[self.get_job_name(self)].states.SEARCH
-					working_villages.registered_jobs[self.get_job_name(self)].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 				local position = self.object:getpos()
 				local player_position = player:getpos()
 				local direction = vector.subtract(player_position, position)
 				if vector.length(direction) < 3 then
-					self.state = working_villages.registered_jobs[self.get_job_name(self)].states.SEARCH
-					working_villages.registered_jobs[self.get_job_name(self)].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 				local velocity = self.object:getvelocity()

@@ -6,6 +6,13 @@ local function find_tree(p)
 	return false
 end
 
+local function is_sapling(node)
+	if minetest.get_item_group(node.name, "sapling") > 0 then
+		return true
+	end
+	return false
+end
+
 actions={}
 actions.COLLECT = {to_state=function(self, path, destination, target)
 				self.path = path
@@ -23,14 +30,12 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 			end,
 			func = function(self)
 				if working_villages.func.is_near(self, {x=self.destination.x,y=self.object:getpos().y,z=self.destination.z}, 0.5) then
-					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-				working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 				end
 				local MAX_WALK_TIME = 800
 				local FIND_PATH_TIME_INTERVAL = 200
 				if self.time_counters[2] >= MAX_WALK_TIME then -- time over.
-					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-					working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 
@@ -48,12 +53,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 					local val_pos = working_villages.func.validate_pos(self.object:getpos())
 					local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
 					if path == nil then
-						--print("looking for a new path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. val_pos.y .. "," .. destination.z)
-						path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z}), self)
-					end
-					if path == nil then
-						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-						working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+						working_villages.func.get_back_to_searching(self)
 						return
 					end
 					self.path = path
@@ -68,8 +68,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 					table.remove(self.path, 1)
 
 					if #self.path == 0 then -- end of path
-						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-				working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+						working_villages.func.get_back_to_searching(self)
 					else -- else next step, follow next path.
 						self:change_direction(self.path[1])
 						self.time_counters[1] = 0
@@ -79,23 +78,17 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 					working_villages.func.handle_obstacles(self,false,true)
 				end
 			end,
-			search_condition=function(pos)
-				local all_objects = minetest.get_objects_inside_radius(pos, 1)
-				local _,obj
-				for _,obj in ipairs(all_objects) do
-					if not obj:is_player() and obj:get_luaentity() and obj:get_luaentity().name == "__builtin:item" then
-						local name = ItemStack(obj:get_luaentity().itemstring):to_table()
-						if name then
-							name=name.name
-							return minetest.get_item_group(name, "sapling") > 0
-						end
+			target_getter=function(self, searching_range)
+				local sapling = self:get_nearest_item_by_condition(is_sapling, searching_range)
+				if sapling ~= nil then
+					local pos = sapling:getpos()
+					--print("found a sapling at:".. pos.x .. "," .. pos.y .. "," .. pos.z)
+					local inv=self:get_inventory()
+					if inv:room_for_item("main", ItemStack(sapling:get_luaentity().itemstring)) then
+						return pos
 					end
 				end
-				return false
-			end,
-			self_condition=function(self)
-				local inv=self:get_inventory()
-				return inv:room_for_item("main", ItemStack("default:sappling 99"))
+				return nil
 			end,}
 actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				--print("found place to plant at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
@@ -119,8 +112,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				local MAX_WALK_TIME = 800
 				local FIND_PATH_TIME_INTERVAL = 200
 				if self.time_counters[2] >= MAX_WALK_TIME then -- time over.
-					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-					working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 
@@ -142,8 +134,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 						path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z}), self)
 					end
 					if path == nil then
-						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-						working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+						working_villages.func.get_back_to_searching(self)
 						return
 					end
 					self.path = path
@@ -211,8 +202,7 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 				local FIND_PATH_TIME_INTERVAL = 200
 				if self.time_counters[2] >= MAX_WALK_TIME then 
 					--print("time over: back to searching")
-					self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-					working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 
@@ -235,8 +225,7 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 						end
 					if path == nil then
 						--print("no new path found: back to searching")
-						self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-						working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+						working_villages.func.get_back_to_searching(self)
 						return
 					end
 					self.path = path
@@ -282,8 +271,7 @@ actions.PLANT = {to_state=function(self)
 				self:set_yaw_by_direction(vector.subtract(self.target, self.object:getpos()))
 				return
 			else
-				self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-				working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+				working_villages.func.get_back_to_searching(self)
 				return
 			end
 		end,
@@ -300,8 +288,7 @@ actions.PLANT = {to_state=function(self)
 				minetest.set_node(pointed_thing.above,{name = itemname})
 				stack:take_item(1)
 				self:set_wield_item_stack(stack)
-				self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-				working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+				working_villages.func.get_back_to_searching(self)
 			else
 				self.time_counters[1] = self.time_counters[1] + 1
 			end
@@ -328,8 +315,7 @@ actions.CUT = {to_state=function(self)
 						minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
 					end
 				end
-				self.state = working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH
-				working_villages.registered_jobs["working_villages:job_woodcutter"].states.SEARCH.to_state(self)
+				working_villages.func.get_back_to_searching(self)
 				return
 			else
 				self.time_counters[1] = self.time_counters[1] + 1

@@ -59,3 +59,7 @@ property name   |          default            |   type  | description
 night_active    =  false                      -- boolean, whether the villager should not go to sleep
 search_idle     =  false                      -- boolean, whether the villager should stay where he is while searching for a state with self_condition(self) = true and search_condition(pos) = true
 searching_range =  {x = 10, y = 3, z = 10}    -- table  , searching range for search_contition(pos)
+
+
+function working_villages.func.get_back_to_searching(self)
+makes a villager switch to the SEARCH state witch is default for a state_machine_job

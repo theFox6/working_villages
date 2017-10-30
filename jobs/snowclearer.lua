@@ -23,8 +23,7 @@ actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
 				local FIND_PATH_TIME_INTERVAL = 50
 				if self.time_counters[2] >= MAX_WALK_TIME then 
 					--print("time over: back to searching")
-					self.state = working_villages.registered_jobs["working_villages:job_snowclearer"].states.SEARCH
-					working_villages.registered_jobs["working_villages:job_snowclearer"].states.SEARCH.to_state(self)
+					working_villages.func.get_back_to_searching(self)
 					return
 				end
 
@@ -38,8 +37,7 @@ actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
 					local path = minetest.find_path(val_pos, self.destination, 10, 1, 1, "A*")
 					if path == nil then
 						--print("no new path found: back to searching")
-						self.state = working_villages.registered_jobs["working_villages:job_snowclearer"].states.SEARCH
-						working_villages.registered_jobs["working_villages:job_snowclearer"].states.SEARCH.to_state(self)
+						working_villages.func.get_back_to_searching(self)
 						return
 					end
 					self.path = path
@@ -101,8 +99,7 @@ actions.CLEAR = {to_state=function(self)
 						minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
 					end
 				end
-				self.state = working_villages.registered_jobs["working_villages:job_snowclearer"].states.SEARCH
-				working_villages.registered_jobs["working_villages:job_snowclearer"].states.SEARCH.to_state(self)
+				working_villages.func.get_back_to_searching(self)
 				return true
 			else
 				self.time_counters[1] = self.time_counters[1] + 1
