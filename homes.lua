@@ -32,7 +32,7 @@ minetest.register_node("working_villages:home_marker", {
 			"size[5,5]"..
 			"field[0.5,1;4,1;name;house label;${name}]"..
 			"field[0.5,2;4,1;bed_pos;bed position;${bed_pos}]"..
-			"field[0.5,3;4,1;door_pos;position outside near door;${door_pos}]"..
+			"field[0.5,3;4,1;door_pos;position outside the house;${door_pos}]"..
 			"button_exit[1,4;2,1;ok;Write]")
 	end,
 	on_receive_fields = function(pos, formname, fields, sender)
@@ -80,7 +80,7 @@ minetest.register_node("working_villages:home_marker", {
 			"size[5,4]"..
 			"label[0.5,0.5;house label: ".. fields.name .."]"..
 			"label[0.5,1;bed position:".. fields.bed_pos .."]"..
-			"label[0.5,1.5;door position:".. fields.door_pos .."]"..
+			"label[0.5,1.5;position outside:".. fields.door_pos .."]"..
 			"label[0.5,2;position of this marker:" .. pos.x .. "," .. pos.y .. "," .. pos.z .. "]"..
 			"button_exit[1,2.5;2,1;ok;exit]")
 	end,
@@ -104,7 +104,7 @@ function working_villages.home.get_door(home_marker_pos)
 	local door_pos = meta:get_string("door")
 	if not door_pos then
 		if working_villages.debug_logging then
-			minetest.log("warning", "The door position was not entered for the home at:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
+			minetest.log("warning", "The position outside the house was not entered for the home at:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
 		end
 		return false
 	end
@@ -128,5 +128,9 @@ function working_villages.home.get_bed(home_marker_pos)
 	p.x=tonumber(p.x)
 	p.y=tonumber(p.y)
 	p.z=tonumber(p.z)
+	if not (p.x and p.y and p.z) then
+		print("invalid bed position")
+		return false
+	end
 	return p
 end

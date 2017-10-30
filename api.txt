@@ -53,3 +53,5 @@ working_villages.register_job("working_villages:example_job", {
 })
 
 ("state" must be a table containing ids for every state in this case)
+
+for further documentation look for the comments in the api.lua

@@ -45,10 +45,10 @@ local function get_distance_to_neighbor(start_pos, end_pos)
 	end
 end
 local function walkable(node)
-		if string.find(node.name,"doors:door") then
+		if string.find(node.name,"doors:") then
 			return false
 		else
-			return minetest.registered_nodes[node.name].walkable			
+			return minetest.registered_nodes[node.name].walkable
 		end
 end
 

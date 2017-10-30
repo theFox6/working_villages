@@ -84,6 +84,37 @@ function working_villages.villager.get_nearest_player(self, range_distance)
 	return player
 end
 
+-- woriking_villages.villager.get_nearest_item_by_condition returns the position of
+-- an item that returns true for the condition
+function working_villages.villager.get_nearest_item_by_condition(self, cond, range_distance)
+	local max_distance=range_distance
+	if type(range_distance) == "table" then
+		max_distance=math.max(math.max(range_distance.x,range_distance.y),range_distance.z)
+	end
+	local item = nil
+	local min_distance = max_distance
+	local position = self.object:getpos()
+
+	local all_objects = minetest.get_objects_inside_radius(position, max_distance)
+	for _, object in pairs(all_objects) do
+		if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
+			local found_item = ItemStack(object:get_luaentity().itemstring):to_table()
+			if found_item then
+				if cond(found_item) then
+					local item_position = object:getpos()
+					local distance = vector.distance(position, item_position)
+
+					if distance < min_distance then
+						min_distance = distance
+						item = object
+					end
+				end
+			end
+		end
+	end
+	return item;
+end
+
 -- working_villages.villager.get_front returns a position in front of the villager.
 function working_villages.villager.get_front(self)
 	local direction = self:get_look_direction()
@@ -149,6 +180,14 @@ end
 -- this method is wrapper for self.object:set_animation.
 function working_villages.villager.set_animation(self, frame)
 	self.object:set_animation(frame, 15, 0)
+	if frame == working_villages.animation_frames.LAY then
+		local dir = self:get_look_direction()
+		local dirx = dir.x*0.5
+		local dirz = dir.z*0.5
+		self.object:set_properties({collisionbox={-0.5-dirx, -1, -0.5-dirz, 0.5+dirx, -0.5, 0.5+dirz}})
+	else
+		self.object:set_properties({collisionbox={-0.25, -1, -0.25, 0.25, 0.75, 0.25}})
+	end
 end
 
 -- working_villages.villager.set_yaw_by_direction sets the villager's yaw
@@ -233,6 +272,45 @@ function working_villages.villager.change_direction_randomly(self)
 	local velocity = vector.multiply(vector.normalize(direction), 1.5)
 	self.object:setvelocity(velocity)
 	self:set_yaw_by_direction(direction)
+end
+
+-- working_villages.villager.get_timer get the value of a counter.
+function working_villages.villager.get_timer(self,timerId)
+	return self.time_counters[timerId]
+end
+
+-- working_villages.villager.set_timer set the value of a counter.
+function working_villages.villager.set_timer(self,timerId,value)
+	self.time_counters[timerId]=value
+end
+
+-- working_villages.villager.clear_timers set all counters to 0.
+function working_villages.villager.clear_timers(self)
+	for _, counter in pairs(self.time_counters) do
+		counter=0
+	end
+end
+
+-- working_villages.villager.count_timer count a counter up by 1.
+function working_villages.villager.count_timer(self,timerId)
+	self.time_counters[timerId] = self.time_counters[timerId] + 1
+end
+
+-- working_villages.villager.count_timers count all counters up by 1.
+function working_villages.villager.count_timers(self)
+	for _, counter in pairs(self.time_counters) do
+		counter = counter + 1
+	end
+end
+
+-- working_villages.villager.timer_exceeded if a timer exceeds the limit it will be reset and true is returned
+function working_villages.villager.timer_exceeded(self,timerId,limit)
+	if self:get_timer(timerId)>=limit then
+		self:set_timer(timerId,0)
+		return true
+	else
+		return false
+	end
 end
 
 -- working_villages.villager.update_infotext updates the infotext of the villager.
@@ -683,6 +761,7 @@ function working_villages.register_villager(product_name, def)
 		product_name                 = "",
 		manufacturing_number         = -1,
 		owner_name                   = "",
+		time_counters                = {},
 
 		-- callback methods.
 		on_activate                  = on_activate,
@@ -696,6 +775,7 @@ function working_villages.register_villager(product_name, def)
 		get_job                      = working_villages.villager.get_job,
 		get_job_name                 = working_villages.villager.get_job_name,
 		get_nearest_player           = working_villages.villager.get_nearest_player,
+		get_nearest_item_by_condition= working_villages.villager.get_nearest_item_by_condition,
 		get_front                    = working_villages.villager.get_front,
 		get_front_node               = working_villages.villager.get_front_node,
 		get_back                     = working_villages.villager.get_back,
@@ -711,6 +791,12 @@ function working_villages.register_villager(product_name, def)
 		has_item_in_main             = working_villages.villager.has_item_in_main,
 		change_direction             = working_villages.villager.change_direction,
 		change_direction_randomly    = working_villages.villager.change_direction_randomly,
+		get_timer                    = working_villages.villager.get_timer,
+		set_timer                    = working_villages.villager.set_timer,
+		clear_timers                 = working_villages.villager.clear_timers,
+		count_timer                  = working_villages.villager.count_timer,
+		count_timers                 = working_villages.villager.count_timers,
+		timer_exceeded               = working_villages.villager.timer_exceeded,
 		update_infotext              = working_villages.villager.update_infotext,
 	})
 
