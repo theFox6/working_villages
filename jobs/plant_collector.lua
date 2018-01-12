@@ -1,19 +1,15 @@
 working_villages.herbs={
-"default:apple",
-"default:cactus",
-"default:papyrus",
-"default:dry_shrub",
-"default:junglegrass",
-"default:grass_1",
-"default:grass_2",
-"default:grass_3",
-"default:grass_4",
-"default:grass_5",
-"default:dry_grass_1",
-"default:dry_grass_2",
-"default:dry_grass_3",
-"default:dry_grass_4",
-"default:dry_grass_5",
+	groups = {
+		"flora",
+	},
+	names = {
+		"default:apple",
+		"default:cactus",
+		"default:papyrus",
+		"default:dry_shrub",
+		"flowers:mushroom_brown",
+		"flowers:mushroom_red",
+	}
 }
 
 local function find_herb(p)
@@ -25,7 +21,12 @@ function working_villages.func.is_herb(node)
 	if type(nname)=="table" then
 		nname=nname.name
 	end
-	for _, i in ipairs(working_villages.herbs) do
+	for _, i in ipairs(working_villages.herbs.groups) do
+		if minetest.get_item_group(adj_node.name, i) > 0 then
+			return true
+		end
+	end
+	for _, i in ipairs(working_villages.herbs.names) do
 		if nname==i then
 			return true
 		end

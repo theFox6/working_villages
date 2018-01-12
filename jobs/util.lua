@@ -170,10 +170,6 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		sprop.searching_range = {x = 10, y = 3, z = 10}
 	end
 
-	--basic states
-	local night_active = sprop.night_active
-	local search_idle = sprop.search_idle
-	local searching_range = sprop.searching_range
 	local MAX_WALK_TIME = 120
 
 	--controlling state
@@ -197,7 +193,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 					self_cond=true
 				end
 				if search_state.search_condition ~= nil and self_cond then
-					local target = working_villages.func.search_surrounding(self.object:getpos(), search_state.search_condition, searching_range)
+					local target = working_villages.func.search_surrounding(self.object:getpos(), search_state.search_condition, sprop.searching_range)
 					if target ~= nil then
 						local destination = find_adjacent_clear(target)
 						if destination==false then
@@ -221,10 +217,10 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 						end
 					end
 				elseif search_state.target_getter ~= nil and self_cond then
-					local target = search_state.target_getter(self, searching_range)
+					local target = search_state.target_getter(self, sprop.searching_range)
 					if target ~= nil then
 						local distance = vector.subtract(target, self.object:getpos())
-						if distance.x<=searching_range.x and distance.y<=searching_range.y and distance.z<=searching_range.z then
+						if distance.x<=sprop.searching_range.x and distance.y<=sprop.searching_range.y and distance.z<=sprop.searching_range.z then
 							local destination = working_villages.func.validate_pos(target)
 							local val_pos = working_villages.func.validate_pos(self.object:getpos())
 							--print("looking for a path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. destination.y .. "," .. destination.z)
@@ -277,7 +273,6 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	end
 
 	local function s_search_idle(self)
-		local searching_range = {x = 10, y = 10, z = 10}
 		if self:timer_exceeded(1,20) then
 			self:set_timer(1,0)
 			local myJob = self:get_job()
@@ -291,7 +286,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 					self_cond=true
 				end
 				if search_state.search_condition ~= nil and self_cond then
-					local target = working_villages.func.search_surrounding(self.object:getpos(), search_state.search_condition, searching_range)
+					local target = working_villages.func.search_surrounding(self.object:getpos(), search_state.search_condition, sprop.searching_range)
 					if target ~= nil then
 						local destination = find_adjacent_clear(target)
 						if not(destniation) then
@@ -333,17 +328,17 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	
 	--sleeping states
 	local function s_sleep(self)
-		if not(minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.78) then
-			--pos=self.object:getpos()
-			--self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
-			print("time to get up")
+		if not(minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76) then
+			pos=self.object:getpos()
+			self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
+			minetest.log("action","a villager gets up")
 			self:set_animation(working_villages.animation_frames.STAND)
 			return true
 		end
 		return false
 	end
 	local function to_sleep(self)
-		print("a villager is laying down")
+		minetest.log("action","a villager is laying down")
 		self.object:setvelocity{x = 0, y = 0, z = 0}
 		local bed_pos=working_villages.home.get_bed(working_villages.homes[self.inventory_name])
 		local bed_top = working_villages.func.find_adjacent_pos(bed_pos,function(p) return string.find(minetest.get_node(p).name,"_top") end)
@@ -351,10 +346,10 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		if bed_top and bed_bottom then
 			self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
 		else
-			print("no bed found")
+			minetest.log("info","no bed found")
 		end
 		self:set_animation(working_villages.animation_frames.LAY)
-		self.object:setpos(vector.add(bed_pos,{x=0,y=1,z=0}))
+		self.object:setpos(vector.add(bed_pos,{x=0,y=1.5,z=0}))
 	end
 	local function follow_path(self)		
 		self:count_timer(1)
@@ -430,7 +425,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	end
 	--list all states
 	local newStates={}
-	if search_idle then
+	if sprop.search_idle then
 		newStates.SEARCH = {number=0,
 				func=s_search_idle,
 				to_state=to_search_idle}
@@ -440,7 +435,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 				to_state=to_walk_randomly}
 	end
 	local i = 0
-	if not(night_active) then
+	if not sprop.night_active then
 		newStates.GO_OUT	= {number=1,
 					func=follow_path,
 					to_state=to_go_out,
@@ -492,6 +487,18 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		self.path = nil
 		self:set_animation(working_villages.animation_frames.STAND)
 	end
+	local function on_resume(self)
+		local job = self:get_job()
+		if self.state ~= job.states.SLEEP then
+			job.on_start(self)
+		end
+	end
+	local function on_pause(self)
+		local job = self:get_job()
+		if self.state ~= job.states.SLEEP then
+			job.on_stop(self)
+		end
+	end
 	local function on_step(self, dtime)
 		if self.state.next_state ~= nil then
 			if self.state.func(self) then
@@ -509,8 +516,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		inventory_image  = "default_paper.png^memorandum_letters.png",
 		on_start         = on_start,
 		on_stop          = on_stop,
-		on_resume        = on_start,
-		on_pause         = on_stop,
+		on_resume        = on_resume,
+		on_pause         = on_pause,
 		on_step          = on_step,
 		states           = newStates
 	})

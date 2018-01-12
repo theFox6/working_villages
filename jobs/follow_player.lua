@@ -35,6 +35,7 @@ actions.ACCOMPANY={self_condition=function(self)
 			}
 local follower_prop = {
 	night_Active = true,
-	search_idle = true
+	search_idle = true,
+	searching_range = {x = 10, y = 10, z = 10}
 }
 working_villages.func.villager_state_machine_job("job_folow_player","follower",actions,follower_prop)
