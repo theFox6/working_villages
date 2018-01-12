@@ -182,8 +182,8 @@ function working_villages.villager.set_animation(self, frame)
 	self.object:set_animation(frame, 15, 0)
 	if frame == working_villages.animation_frames.LAY then
 		local dir = self:get_look_direction()
-		local dirx = dir.x*0.5
-		local dirz = dir.z*0.5
+		local dirx = math.abs(dir.x)*0.5
+		local dirz = math.abs(dir.z)*0.5
 		self.object:set_properties({collisionbox={-0.5-dirx, -1, -0.5-dirz, 0.5+dirx, -0.5, 0.5+dirz}})
 	else
 		self.object:set_properties({collisionbox={-0.25, -1, -0.25, 0.25, 0.75, 0.25}})
@@ -316,19 +316,18 @@ end
 -- working_villages.villager.update_infotext updates the infotext of the villager.
 function working_villages.villager.update_infotext(self)
 	local infotext = ""
-	local job_name = self:get_job_name()
+	local job_name = self:get_job()
 
-	if job_name ~= "" then
-		if self.pause then
-			infotext = infotext .. "this villager is resting\n"
-		else
-			infotext = infotext .. "this villager is active\n"
-		end
-		infotext = infotext .. "[job] : " .. job_name .. "\n"
+	if job_name ~= nil then
+		job_name = job_name.description
+		infotext = infotext .. job_name .. "\n"
 	else
-		infotext = infotext .. "this villager is inactive\n[job] : None\n"
+		infotext = infotext .. "this villager is inactive\nNo job\n"
 	end
 	infotext = infotext .. "[Owner] : " .. self.owner_name
+	if self.pause then
+		infotext = infotext .. "\nthis villager is stopped"
+	end
 	self.object:set_properties{infotext = infotext}
 end
 
@@ -622,6 +621,7 @@ function working_villages.register_villager(product_name, def)
 			self.manufacturing_number = data["manufacturing_number"]
 			self.nametag = data["nametag"]
 			self.owner_name = data["owner_name"]
+			self.pause = data["pause"]
 
 			local inventory = create_inventory(self)
 			working_villages.homes[self.inventory_name] = data["home_position"]
@@ -639,6 +639,9 @@ function working_villages.register_villager(product_name, def)
 		local job = self:get_job()
 		if job ~= nil then
 			job.on_start(self)
+			if self.pause then
+				job.on_pause(self)
+			end
 		else
 			self.object:setvelocity{x = 0, y = 0, z = 0}
 			self.object:setacceleration{x = 0, y = -10, z = 0}
@@ -655,6 +658,7 @@ function working_villages.register_villager(product_name, def)
 			["owner_name"] = self.owner_name,
 			["inventory"] = {},
 			["home_position"] = working_villages.homes[self.inventory_name],
+			["pause"] = self.pause,
 		}
 
 		-- set lists.
@@ -697,10 +701,10 @@ function working_villages.register_villager(product_name, def)
 
 	-- on_step is a callback function that is called every delta times.
 	local function on_step(self, dtime)
-		-- if owner didn't login, the villager does nothing.
+		--[[ if owner didn't login, the villager does nothing.
 		if not minetest.get_player_by_name(self.owner_name) then
 			return
-		end
+		end--]]
 
 		-- pickup surrounding item.
 		pickup_item(self)
@@ -714,29 +718,37 @@ function working_villages.register_villager(product_name, def)
 
 	-- on_rightclick is a callback function that is called when a player right-click them.
 	local function on_rightclick(self, clicker)
-		minetest.show_formspec(
-			clicker:get_player_name(),
-			"villager:gui_"..self.inventory_name,
-			create_formspec_string(self)
-		)
+		if clicker:get_player_name()~=self.owner_name then
+			-- don't trust anybody except the owner
+			return
+		end
+		local wielded_stack = clicker:get_wielded_item()
+		if wielded_stack:get_name() == "working_villages:capture_rod" then
+			local job = self:get_job()
+			if job ~= nil then
+				if self.pause == true then
+					self.pause = false
+					job.on_resume(self)
+				else
+					self.pause = true
+					job.on_pause(self)
+				end
+			end
+		else
+			minetest.show_formspec(
+				clicker:get_player_name(),
+				"villager:gui_"..self.inventory_name,
+				create_formspec_string(self)
+			)
+
+		end
+		
+		self:update_infotext()
 	end
 
 	-- on_punch is a callback function that is called when a player punch then.
 	local function on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		local job = self:get_job()
-		if self.pause == true then
-			self.pause = false
-			if job then
-				job.on_resume(self)
-			end
-		else
-			self.pause = true
-			if job then
-				job.on_pause(self)
-			end
-		end
-
-		self:update_infotext()
+		--TODO: aggression
 	end
 
 	-- register a definition of a new villager.

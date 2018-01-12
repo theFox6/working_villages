@@ -265,7 +265,7 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 			end
 		end
 		if count > 100 then
-			print("failed finding a path to:" .. endpos.x .. ",".. endpos.y .. ",".. endpos.z)
+			--print("failed finding a path to:" .. endpos.x .. ",".. endpos.y .. ",".. endpos.z)
 			return
 		end
 	until count < 1

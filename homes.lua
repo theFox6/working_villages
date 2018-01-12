@@ -117,6 +117,14 @@ function working_villages.home.get_door(home_marker_pos)
 end
 
 function working_villages.home.get_bed(home_marker_pos)
+	if minetest.get_node(home_marker_pos).name ~= "working_villages:home_marker" then
+		if working_villages.debug_logging and not(vector.equals(home_marker_pos,{x=0,y=0,z=0})) then
+			minetest.log("warning", "The bed position of an invalid home was requested.")
+			minetest.log("warning", "Given home position:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
+		end
+		return false
+	end
+
 	local meta = minetest.get_meta(home_marker_pos)
 	local bed_pos = meta:get_string("bed")
 	if not bed_pos then
@@ -129,7 +137,7 @@ function working_villages.home.get_bed(home_marker_pos)
 	p.y=tonumber(p.y)
 	p.z=tonumber(p.z)
 	if not (p.x and p.y and p.z) then
-		print("invalid bed position")
+		--print("invalid bed position")
 		return false
 	end
 	return p
