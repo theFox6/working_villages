@@ -1,5 +1,25 @@
 working_villages.home = {}
 
+-- working_villages.homes represents a table that contains the villagers homes.
+-- This table's keys are inventory names, and values are home objects.
+working_villages.homes = (function()
+	local file_name = minetest.get_worldpath() .. "/working_villages_homes"
+
+	minetest.register_on_shutdown(function()
+		local file = io.open(file_name, "w")
+		file:write(minetest.serialize(working_villages.homes))
+		file:close()
+	end)
+
+	local file = io.open(file_name, "r")
+	if file ~= nil then
+		local data = file:read("*a")
+		file:close()
+		return minetest.deserialize(data)
+	end
+	return {}
+end) ()
+
 minetest.register_node("working_villages:home_marker", {
 	description = "home marker for working_villages",
 	drawtype = "nodebox",
@@ -92,7 +112,48 @@ minetest.register_node("working_villages:home_marker", {
 	end,
 })
 
-function working_villages.home.get_door(home_marker_pos)
+-- get the home of a villager
+function working_villages.home.get_home(self)
+	return working_villages.homes[self.inventory_name]
+end
+
+-- check whether a villager has a home
+function working_villages.home.is_valid(self)
+	local home = working_villages.home.get_home(self)
+	if home ~= nil then
+		return true
+	end
+	return false
+end
+
+-- get the position of the home_marker
+function working_villages.home.get_marker(self)
+	local home = working_villages.home.get_home(self)
+	if home==nil then
+		return nil
+	end
+	--[[if home.marker==nil and home.x~=nil then
+		print("updated home pos")
+		local marker_pos = vector.new(home)
+		home = {}
+		home.marker = maker_pos
+	end--]]
+	return home.marker
+end
+
+-- get the position that marks "outside"
+function working_villages.home.get_door(self)
+	local home = working_villages.home.get_home(self)
+	if home==nil then
+		return nil
+	end
+	if home.door~=nil then
+		return home.door
+	end
+	local home_marker_pos = working_villages.home.get_marker(self)
+	if minetest.get_node(home_marker_pos).name == "ignore" then
+		minetest.get_voxel_manip():read_from_map(home_marker_pos, home_marker_pos)
+	end
 	if minetest.get_node(home_marker_pos).name ~= "working_villages:home_marker" then
 		if working_villages.debug_logging and not(vector.equals(home_marker_pos,{x=0,y=0,z=0})) then
 			minetest.log("warning", "The door position of an invalid home was requested.")
@@ -113,10 +174,23 @@ function working_villages.home.get_door(home_marker_pos)
 	p.x=tonumber(p.x)
 	p.y=tonumber(p.y)
 	p.z=tonumber(p.z)
+	home.door = p
 	return p
 end
 
-function working_villages.home.get_bed(home_marker_pos)
+-- get the bed of a villager
+function working_villages.home.get_bed(self)
+	local home = working_villages.home.get_home(self)
+	if home==nil then
+		return nil
+	end
+	if home.bed~=nil then
+		return home.bed
+	end
+	local home_marker_pos = working_villages.home.get_marker(self)
+	if minetest.get_node(home_marker_pos).name == "ignore" then
+		minetest.get_voxel_manip():read_from_map(home_marker_pos, home_marker_pos)
+	end
 	if minetest.get_node(home_marker_pos).name ~= "working_villages:home_marker" then
 		if working_villages.debug_logging and not(vector.equals(home_marker_pos,{x=0,y=0,z=0})) then
 			minetest.log("warning", "The bed position of an invalid home was requested.")
@@ -137,8 +211,9 @@ function working_villages.home.get_bed(home_marker_pos)
 	p.y=tonumber(p.y)
 	p.z=tonumber(p.z)
 	if not (p.x and p.y and p.z) then
-		--print("invalid bed position")
+		print("invalid bed position:"..bed_pos)
 		return false
 	end
+	home.bed = p
 	return p
 end

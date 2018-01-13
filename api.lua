@@ -13,8 +13,6 @@ working_villages.registered_jobs = {}
 
 working_villages.registered_eggs = {}
 
-working_villages.homes = {}
-
 -- working_villages.is_job reports whether a item is a job item by the name.
 function working_villages.is_job(item_name)
 	if working_villages.registered_jobs[item_name] then
@@ -487,7 +485,7 @@ minetest.register_on_player_receive_fields(
 				minetest.chat_send_player(sender_name, 'Home marker not configured, please right-click the home marker to configure it.')
 				return
 			end
-			working_villages.homes[inv_name]=coords
+			working_villages.homes[inv_name].marker=coords
 		end
 	end
 )
@@ -584,9 +582,12 @@ function working_villages.register_villager(product_name, def)
 	-- create_formspec_string returns a string that represents a formspec definition.
 	local function create_formspec_string(self)
 		if not working_villages.homes[self.inventory_name] then
-			working_villages.homes[self.inventory_name] = {x=0,y=0,z=0}
+			working_villages.homes[self.inventory_name] = {}
 		end
-		local home_pos = tostring(working_villages.homes[self.inventory_name].x) .. "," .. tostring(working_villages.homes[self.inventory_name].y) .. "," .. tostring(working_villages.homes[self.inventory_name].z)
+		if not working_villages.homes[self.inventory_name].marker then
+			working_villages.homes[self.inventory_name].marker = {x=0,y=0,z=0}
+		end
+		local home_pos = tostring(working_villages.homes[self.inventory_name].marker.x) .. "," .. tostring(working_villages.homes[self.inventory_name].marker.y) .. "," .. tostring(working_villages.homes[self.inventory_name].marker.z)
 		return "size[8,9]"
 			.. default.gui_bg
 			.. default.gui_bg_img
@@ -624,7 +625,6 @@ function working_villages.register_villager(product_name, def)
 			self.pause = data["pause"]
 
 			local inventory = create_inventory(self)
-			working_villages.homes[self.inventory_name] = data["home_position"]
 			for list_name, list in pairs(data["inventory"]) do
 				inventory:set_list(list_name, list)
 			end
@@ -657,7 +657,6 @@ function working_villages.register_villager(product_name, def)
 			["nametag"] = self.nametag,
 			["owner_name"] = self.owner_name,
 			["inventory"] = {},
-			["home_position"] = working_villages.homes[self.inventory_name],
 			["pause"] = self.pause,
 		}
 
@@ -781,6 +780,13 @@ function working_villages.register_villager(product_name, def)
 		on_rightclick                = on_rightclick,
 		on_punch                     = on_punch,
 		get_staticdata               = get_staticdata,
+
+		-- home methods.
+		get_home                     = working_villages.home.get_home,
+		has_home                     = working_villages.home.is_valid,
+		get_home_marker              = working_villages.home.get_marker,
+		get_home_door                = working_villages.home.get_door,
+		get_bed                      = working_villages.home.get_bed,
 
 		-- extra methods.
 		get_inventory                = working_villages.villager.get_inventory,
