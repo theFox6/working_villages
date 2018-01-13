@@ -13,7 +13,7 @@ local function is_sapling(node)
 	return false
 end
 
-actions={}
+local actions={}
 actions.COLLECT = {to_state=function(self, path, destination, target)
 				self.path = path
 				self.destination = destination

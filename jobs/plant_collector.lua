@@ -22,7 +22,7 @@ function working_villages.func.is_herb(node)
 		nname=nname.name
 	end
 	for _, i in ipairs(working_villages.herbs.groups) do
-		if minetest.get_item_group(adj_node.name, i) > 0 then
+		if minetest.get_item_group(nname, i) > 0 then
 			return true
 		end
 	end
@@ -34,7 +34,7 @@ function working_villages.func.is_herb(node)
 	return false
 end
 
-actions={}
+local actions={}
 actions.COLLECT = {to_state=function(self, path, destination, target)
 				self.path = path
 				self.destination = destination

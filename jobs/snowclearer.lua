@@ -1,6 +1,6 @@
 local function find_snow(p) return minetest.get_node(p).name == "default:snow" end
 
-actions={}
+local actions={}
 actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
 				--print("found place to clear at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
 				self.path = path

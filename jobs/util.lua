@@ -131,20 +131,20 @@ function working_villages.func.find_adjacent_pos(pos,pred)
 	if pred(pos) then
 		return pos
 	end
-	dest_pos = vector.add(pos,{x=1,y=0,z=0})
-	if pred(dest_pos) then
-		return dest_pos
-	end
-	dest_pos = vector.add(pos,{x=-1,y=0,z=0})
-	if pred(dest_pos) then
-		return dest_pos
-	end
 	dest_pos = vector.add(pos,{x=0,y=1,z=0})
 	if pred(dest_pos) then
 		return dest_pos
 	end
 	dest_pos = vector.add(pos,{x=0,y=-1,z=0})
 		if pred(dest_pos) then
+		return dest_pos
+	end
+	dest_pos = vector.add(pos,{x=1,y=0,z=0})
+	if pred(dest_pos) then
+		return dest_pos
+	end
+	dest_pos = vector.add(pos,{x=-1,y=0,z=0})
+	if pred(dest_pos) then
 		return dest_pos
 	end
 	dest_pos = vector.add(pos,{x=0,y=0,z=1})
@@ -329,7 +329,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	--sleeping states
 	local function s_sleep(self)
 		if not(minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76) then
-			pos=self.object:getpos()
+			local pos=self.object:getpos()
 			self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
 			minetest.log("action","a villager gets up")
 			self:set_animation(working_villages.animation_frames.STAND)
@@ -340,7 +340,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	local function to_sleep(self)
 		minetest.log("action","a villager is laying down")
 		self.object:setvelocity{x = 0, y = 0, z = 0}
-		local bed_pos=working_villages.home.get_bed(working_villages.homes[self.inventory_name])
+		local bed_pos=self:get_bed()
 		local bed_top = working_villages.func.find_adjacent_pos(bed_pos,function(p) return string.find(minetest.get_node(p).name,"_top") end)
 		local bed_bottom = working_villages.func.find_adjacent_pos(bed_pos,function(p) return string.find(minetest.get_node(p).name,"_bottom") end)
 		if bed_top and bed_bottom then
@@ -385,7 +385,11 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		if working_villages.debug_logging then		
 			minetest.log("action","a villager is going home")
 		end
-		self.destination=working_villages.home.get_bed(working_villages.homes[self.inventory_name])
+		self.destination=self:get_bed()
+		if not self.destination then
+			minetest.log("warning","villager couldn't find his bed")
+			return
+		end
 		if working_villages.debug_logging then
 			minetest.log("info","his bed is at:" .. self.destination.x .. ",".. self.destination.y .. ",".. self.destination.z)
 		end
@@ -411,7 +415,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		if working_villages.debug_logging then		
 			minetest.log("action","a villager stood up and is going outside")
 		end
-		self.destination=working_villages.home.get_door(working_villages.homes[self.inventory_name])
+		self.destination=self:get_home_door()
 		local val_pos = working_villages.func.validate_pos(self.object:getpos())
 		self.path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
 		self:set_timer(1,0) -- find path interval
@@ -447,10 +451,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		newStates.WALK_HOME	= {number=3,
 					func=follow_path,
 					self_condition = function (self)
-						--if self==nil then return end
-						local myHome = working_villages.homes[self.inventory_name]
-						if myHome then
-							if not(working_villages.home.get_bed(myHome)) then
+						if self:has_home() then
+							if not self:get_bed()  then
 								return false
 							end
 						else

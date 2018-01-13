@@ -3,7 +3,7 @@ local function is_dark(pos)
 	return light_level <= 5
 end
 
-actions={}
+local actions={}
 actions.PLACE={self_condition=function(self)
 				local front = self:get_front() -- if it is dark, set touch.
 				local wield_stack = self:get_wield_item_stack()
