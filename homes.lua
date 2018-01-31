@@ -58,51 +58,46 @@ minetest.register_node("working_villages:home_marker", {
 	on_receive_fields = function(pos, formname, fields, sender)
 		local meta = minetest.get_meta(pos)
 		local sender_name = sender:get_player_name()
+		local failed = false
 		if minetest.is_protected(pos, sender_name) then
 			minetest.record_protection_violation(pos, sender_name)
 			return
 		end
-		if (meta:get_string("bed")~="" and meta:get_string("door")~="") or fields.bed_pos == nil or fields.door_pos == nil then
+		if (meta:get_string("bed")~="" and meta:get_string("door")~="") or (fields.bed_pos == nil and fields.door_pos == nil) then
 			return
 		end
-		local coords = {}
-		coords.x, coords.y, coords.z = string.match(fields.bed_pos, "^([%d.-]+)[, ] *([%d.-]+)[, ] *([%d.-]+)$")
-		coords.x=tonumber(coords.x)
-		coords.y=tonumber(coords.y)
-		coords.z=tonumber(coords.z)
-		if not (coords.x and coords.y and coords.z) then
+		local coords = minetest.sring_to_pos(fields.bed_pos)
+		if coords == nil then
 			-- fail on illegal input of coordinates
 			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the bed position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
-			return
-		end
-		if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
+			failed = true
+		elseif(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
 			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
-			return
+			failed = true
+		else
+			meta:set_string("bed", fields.bed_pos)
 		end
-		coords = {}
-		coords.x, coords.y, coords.z = string.match(fields.door_pos, "^([%d.-]+)[, ] *([%d.-]+)[, ] *([%d.-]+)$")
-		coords.x=tonumber(coords.x)
-		coords.y=tonumber(coords.y)
-		coords.z=tonumber(coords.z)
-		if not (coords.x and coords.y and coords.z) then
+		coords = minetest.sring_to_pos(fields.door_pos)
+		if coords == nil then
 			-- fail on illegal input of coordinates
-			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the bed position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
-			return
-		end
-		if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
+			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the door position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+			failed = true
+		elseif(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
 			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
-			return
+			failed = true
+		else
+			meta:set_string("door", fields.door_pos)
 		end
-		meta:set_string("bed", fields.bed_pos)
-		meta:set_string("door", fields.door_pos)
-		meta:set_string("infotext", fields.name)
-		meta:set_string("formspec",
-			"size[5,4]"..
-			"label[0.5,0.5;house label: ".. fields.name .."]"..
-			"label[0.5,1;bed position:".. fields.bed_pos .."]"..
-			"label[0.5,1.5;position outside:".. fields.door_pos .."]"..
-			"label[0.5,2;position of this marker:" .. pos.x .. "," .. pos.y .. "," .. pos.z .. "]"..
-			"button_exit[1,2.5;2,1;ok;exit]")
+		if not failed then
+			meta:set_string("infotext", fields.name)
+			meta:set_string("formspec",
+				"size[5,4]"..
+				"label[0.5,0.5;house label: ".. fields.name .."]"..
+				"label[0.5,1;bed position:".. fields.bed_pos .."]"..
+				"label[0.5,1.5;position outside:".. fields.door_pos .."]"..
+				"label[0.5,2;position of this marker:" .. pos.x .. "," .. pos.y .. "," .. pos.z .. "]"..
+				"button_exit[1,2.5;2,1;ok;exit]")
+		end
 	end,
 	can_dig = function(pos, player)
 		local meta = minetest.get_meta(pos)
