@@ -1,4 +1,10 @@
-print("loading [working_villages]")
+local init = os.clock()
+if minetest.settings:get_bool("log_mods") then
+  minetest.log("action", "[MOD] "..minetest.get_current_modname()..": loading")
+else
+  print("[MOD] "..minetest.get_current_modname()..": loading")
+end
+
 working_villages={
 	modpath=minetest.get_modpath("working_villages"),
 	debug_logging=true,
@@ -25,7 +31,9 @@ dofile(working_villages.modpath.."/jobs/torcher.lua")
 dofile(working_villages.modpath.."/jobs/snowclearer.lua")
 
 --ready
-if minetest.setting_getbool("log_mods") then
-  minetest.log("action", "[working_villages] loaded")
+local time_to_load= os.clock() - init
+if minetest.settings:get_bool("log_mods") then
+  minetest.log("action", string.format("[MOD] "..minetest.get_current_modname()..": loaded in %.4f s", time_to_load))
+else
+  print(string.format("[MOD] "..minetest.get_current_modname()..": loaded in %.4f s", time_to_load))
 end
-print("[working_villages] loaded")
