@@ -16,7 +16,7 @@ actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
 				self:set_animation(working_villages.animation_frames.WALK)
 			end,
 			func = function(self)
-				if working_villages.func.is_near(self, self.destination, 1.5) then
+				if self:is_near(self.destination, 1.5) then
 					return true
 				end
 				local MAX_WALK_TIME = 800
@@ -52,7 +52,7 @@ actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
 				if self.path[1] == nil then
 					self.path[1]=self.destination
 				end
-				if working_villages.func.is_near(self, self.path[1], 0.5) then
+				if self:is_near(self.path[1], 0.5) then
 					table.remove(self.path, 1)
 
 					if #self.path == 0 then -- end of path

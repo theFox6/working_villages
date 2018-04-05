@@ -9,9 +9,6 @@ function working_villages.func.validate_pos(pos)
 returns the position rounded, if it is a slab/stair the position on top is given
 for getting the position of the villager for pathfinding
 
-function working_villages.func.is_near(self, pos, distance)
-returns whether a villager is inside distance to pos
-
 function working_villages.func.search_surrounding(pos, pred, searching_range)
 calls pred(pos) for every node within searching_range of pos
 if pred(pos) returns true it will return the position

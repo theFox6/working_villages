@@ -43,12 +43,6 @@ function working_villages.func.validate_pos(pos)
   end
 end
 
-function working_villages.func.is_near(self, pos, distance)
-	local p = self.object:getpos()
-	p.y = p.y - 0.5
-	return vector.distance(p, pos) < distance
-end
-
 function working_villages.func.clear_pos(pos)
 	local node=minetest.get_node(pos)
 	local above_node=minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z})
@@ -367,7 +361,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		end
 		
 		-- follow path
-		if working_villages.func.is_near(self, self.path[1], 1) then
+		if self:is_near(self.path[1], 1) then
 			table.remove(self.path, 1)
 
 			if #self.path == 0 then -- end of path
