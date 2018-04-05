@@ -48,7 +48,7 @@ local function walkable(node)
 		if string.find(node.name,"doors:") then
 			return false
 		else
-			if minetest.registered_nodes[node.name]~= null
+			if minetest.registered_nodes[node.name]~= nil then
 				return minetest.registered_nodes[node.name].walkable
 			else
 				return true
