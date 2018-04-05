@@ -39,7 +39,7 @@ end
 working_villages.villager = {}
 
 -- working_villages.villager.get_inventory returns a inventory of a villager.
-function working_villages.villager.get_inventory(self)
+function working_villages.villager:get_inventory()
 	return minetest.get_inventory {
 		type = "detached",
 		name = self.inventory_name,
@@ -47,13 +47,13 @@ function working_villages.villager.get_inventory(self)
 end
 
 -- working_villages.villager.get_job_name returns a name of a villager's current job.
-function working_villages.villager.get_job_name(self)
+function working_villages.villager:get_job_name()
 	local inv = self:get_inventory()
 	return inv:get_stack("job", 1):get_name()
 end
 
 -- working_villages.villager.get_job returns a villager's current job definition.
-function working_villages.villager.get_job(self)
+function working_villages.villager:get_job()
 	local name = self:get_job_name()
 	if name ~= "" then
 		return working_villages.registered_jobs[name]
@@ -63,7 +63,7 @@ end
 
 -- working_villages.villager.get_nearest_player returns a player object who
 -- is the nearest to the villager.
-function working_villages.villager.get_nearest_player(self, range_distance)
+function working_villages.villager:get_nearest_player(range_distance)
 	local player, min_distance = nil, range_distance
 	local position = self.object:getpos()
 
@@ -84,7 +84,7 @@ end
 
 -- woriking_villages.villager.get_nearest_item_by_condition returns the position of
 -- an item that returns true for the condition
-function working_villages.villager.get_nearest_item_by_condition(self, cond, range_distance)
+function working_villages.villager:get_nearest_item_by_condition(cond, range_distance)
 	local max_distance=range_distance
 	if type(range_distance) == "table" then
 		max_distance=math.max(math.max(range_distance.x,range_distance.y),range_distance.z)
@@ -114,7 +114,7 @@ function working_villages.villager.get_nearest_item_by_condition(self, cond, ran
 end
 
 -- working_villages.villager.get_front returns a position in front of the villager.
-function working_villages.villager.get_front(self)
+function working_villages.villager:get_front()
 	local direction = self:get_look_direction()
 	if math.abs(direction.x) >= 0.5 then
 		if direction.x > 0 then	direction.x = 1	else direction.x = -1 end
@@ -134,13 +134,13 @@ function working_villages.villager.get_front(self)
 end
 
 -- working_villages.villager.get_front_node returns a node that exists in front of the villager.
-function working_villages.villager.get_front_node(self)
+function working_villages.villager:get_front_node()
 	local front = self:get_front()
 	return minetest.get_node(front)
 end
 
 -- working_villages.villager.get_back returns a position behind the villager.
-function working_villages.villager.get_back(self)
+function working_villages.villager:get_back()
 	local direction = self:get_look_direction()
 	if math.abs(direction.x) >= 0.5 then
 		if direction.x > 0 then	direction.x = -1
@@ -162,21 +162,21 @@ function working_villages.villager.get_back(self)
 end
 
 -- working_villages.villager.get_back_node returns a node that exists behind the villager.
-function working_villages.villager.get_back_node(self)
+function working_villages.villager:get_back_node()
 	local back = self:get_back()
 	return minetest.get_node(back)
 end
 
 -- working_villages.villager.get_look_direction returns a normalized vector that is
 -- the villagers's looking direction.
-function working_villages.villager.get_look_direction(self)
+function working_villages.villager:get_look_direction()
 	local yaw = self.object:getyaw()
 	return vector.normalize{x = -math.sin(yaw), y = 0.0, z = math.cos(yaw)}
 end
 
 -- working_villages.villager.set_animation sets the villager's animation.
 -- this method is wrapper for self.object:set_animation.
-function working_villages.villager.set_animation(self, frame)
+function working_villages.villager:set_animation(frame)
 	self.object:set_animation(frame, 15, 0)
 	if frame == working_villages.animation_frames.LAY then
 		local dir = self:get_look_direction()
@@ -190,32 +190,32 @@ end
 
 -- working_villages.villager.set_yaw_by_direction sets the villager's yaw
 -- by a direction vector.
-function working_villages.villager.set_yaw_by_direction(self, direction)
+function working_villages.villager:set_yaw_by_direction(direction)
 	self.object:setyaw(math.atan2(direction.z, direction.x) - math.pi / 2)
 end
 
 -- working_villages.villager.get_wield_item_stack returns the villager's wield item's stack.
-function working_villages.villager.get_wield_item_stack(self)
+function working_villages.villager:get_wield_item_stack()
 	local inv = self:get_inventory()
 	return inv:get_stack("wield_item", 1)
 end
 
 -- working_villages.villager.set_wield_item_stack sets villager's wield item stack.
-function working_villages.villager.set_wield_item_stack(self, stack)
+function working_villages.villager:set_wield_item_stack(stack)
 	local inv = self:get_inventory()
 	inv:set_stack("wield_item", 1, stack)
 end
 
 -- working_villages.villager.add_item_to_main add item to main slot.
 -- and returns leftover.
-function working_villages.villager.add_item_to_main(self, stack)
+function working_villages.villager:add_item_to_main(stack)
 	local inv = self:get_inventory()
 	return inv:add_item("main", stack)
 end
 
 -- working_villages.villager.move_main_to_wield moves itemstack from main to wield.
 -- if this function fails then returns false, else returns true.
-function working_villages.villager.move_main_to_wield(self, pred)
+function working_villages.villager:move_main_to_wield(pred)
 	local inv = self:get_inventory()
 	local main_size = inv:get_size("main")
 
@@ -232,12 +232,12 @@ function working_villages.villager.move_main_to_wield(self, pred)
 end
 
 -- working_villages.villager.is_named reports the villager is still named.
-function working_villages.villager.is_named(self)
+function working_villages.villager:is_named()
 	return self.nametag ~= ""
 end
 
 -- working_villages.villager.has_item_in_main reports whether the villager has item.
-function working_villages.villager.has_item_in_main(self, pred)
+function working_villages.villager:has_item_in_main(pred)
 	local inv = self:get_inventory()
 	local stacks = inv:get_list("main")
 
@@ -250,7 +250,7 @@ function working_villages.villager.has_item_in_main(self, pred)
 end
 
 -- working_villages.villager.change_direction change direction to destination and velocity vector.
-function working_villages.villager.change_direction(self, destination)
+function working_villages.villager:change_direction(destination)
   local position = self.object:getpos()
   local direction = vector.subtract(destination, position)
 	direction.y = 0
@@ -261,7 +261,7 @@ function working_villages.villager.change_direction(self, destination)
 end
 
 -- working_villages.villager.change_direction_randomly change direction randonly.
-function working_villages.villager.change_direction_randomly(self)
+function working_villages.villager:change_direction_randomly()
 	local direction = {
 		x = math.random(0, 5) * 2 - 5,
 		y = 0,
@@ -273,36 +273,36 @@ function working_villages.villager.change_direction_randomly(self)
 end
 
 -- working_villages.villager.get_timer get the value of a counter.
-function working_villages.villager.get_timer(self,timerId)
+function working_villages.villager:get_timer(timerId)
 	return self.time_counters[timerId]
 end
 
 -- working_villages.villager.set_timer set the value of a counter.
-function working_villages.villager.set_timer(self,timerId,value)
+function working_villages.villager:set_timer(timerId,value)
 	self.time_counters[timerId]=value
 end
 
 -- working_villages.villager.clear_timers set all counters to 0.
-function working_villages.villager.clear_timers(self)
+function working_villages.villager:clear_timers()
 	for _, counter in pairs(self.time_counters) do
 		counter=0
 	end
 end
 
 -- working_villages.villager.count_timer count a counter up by 1.
-function working_villages.villager.count_timer(self,timerId)
+function working_villages.villager:count_timer(timerId)
 	self.time_counters[timerId] = self.time_counters[timerId] + 1
 end
 
 -- working_villages.villager.count_timers count all counters up by 1.
-function working_villages.villager.count_timers(self)
+function working_villages.villager:count_timers()
 	for _, counter in pairs(self.time_counters) do
 		counter = counter + 1
 	end
 end
 
 -- working_villages.villager.timer_exceeded if a timer exceeds the limit it will be reset and true is returned
-function working_villages.villager.timer_exceeded(self,timerId,limit)
+function working_villages.villager:timer_exceeded(timerId,limit)
 	if self:get_timer(timerId)>=limit then
 		self:set_timer(timerId,0)
 		return true
@@ -312,7 +312,7 @@ function working_villages.villager.timer_exceeded(self,timerId,limit)
 end
 
 -- working_villages.villager.update_infotext updates the infotext of the villager.
-function working_villages.villager.update_infotext(self)
+function working_villages.villager:update_infotext()
 	local infotext = ""
 	local job_name = self:get_job()
 
@@ -327,6 +327,13 @@ function working_villages.villager.update_infotext(self)
 		infotext = infotext .. "\nthis villager is stopped"
 	end
 	self.object:set_properties{infotext = infotext}
+end
+
+-- working_villages.villager.is_near checks if the villager is withing the radius of a position
+function working_villages.villager:is_near(pos, distance)
+	local p = self.object:getpos()
+	p.y = p.y - 0.5
+	return vector.distance(p, pos) < distance
 end
 
 ---------------------------------------------------------------------
