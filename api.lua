@@ -590,7 +590,7 @@ function working_villages.register_villager(product_name, def)
 		if self:has_home() then
 			home_pos = self:get_home():get_marker()
 		end
-		home_pos = pos_to_string(home_pos)
+		home_pos = minetest.pos_to_string(home_pos)
 		return "size[8,9]"
 			.. default.gui_bg
 			.. default.gui_bg_img
@@ -806,6 +806,7 @@ function working_villages.register_villager(product_name, def)
 		add_item_to_main             = working_villages.villager.add_item_to_main,
 		move_main_to_wield           = working_villages.villager.move_main_to_wield,
 		is_named                     = working_villages.villager.is_named,
+		is_near                      = working_villages.villager.is_near,
 		has_item_in_main             = working_villages.villager.has_item_in_main,
 		change_direction             = working_villages.villager.change_direction,
 		change_direction_randomly    = working_villages.villager.change_direction_randomly,
