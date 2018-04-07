@@ -195,14 +195,14 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 							destination = target
 						end
 						local val_pos = working_villages.func.validate_pos(self.object:getpos())
-						--print("looking for a path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+						--print("looking for a path from " .. minetest.pos_to_string(val_pos) .. " to " .. minetest.pos_to_string(destination))
 						local path = working_villages.pathfinder.find_path(val_pos, destination, self)
 						if path == nil then
-							--print("looking for a new path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. val_pos.y .. "," .. destination.z)
+							--print("looking for a new path from " .. minetest.pos_to_string(val_pos) .. " to " .. destination.x .. "," .. val_pos.y .. "," .. destination.z)
 							path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=destination.x,y=destination.y-1,z=destination.z}), self)
 						end
 						if path ~= nil then
-							--print("path found to: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+							--print("path found to: " .. minetest.pos_to_string(destination))
 							if search_state.to_state then
 								search_state.to_state(self, path, destination, target)
 							end
@@ -217,7 +217,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 						if distance.x<=sprop.searching_range.x and distance.y<=sprop.searching_range.y and distance.z<=sprop.searching_range.z then
 							local destination = working_villages.func.validate_pos(target)
 							local val_pos = working_villages.func.validate_pos(self.object:getpos())
-							--print("looking for a path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+							--print("looking for a path from " .. minetest.pos_to_string(val_pos) .. " to " .. minetest.pos_to_string(destination))
 							local path = working_villages.pathfinder.find_path(val_pos, destination, self)
 							if path == nil then
 								local node = minetest.get_node(destination)
@@ -226,11 +226,11 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 								else
 									destination.y = destination.y - 1
 								end
-								--print("looking for a new path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+								--print("looking for a new path from " .. minetest.pos_to_string(val_pos) .. " to " .. minetest.pos_to_string(destination))
 								path = working_villages.pathfinder.find_path(val_pos, destination, self)
 							end
 							if path ~= nil then
-								--print("path found to: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+								--print("path found to: " .. minetest.pos_to_string(destination))
 								if search_state.to_state then
 									search_state.to_state(self, path, destination, target)
 								end

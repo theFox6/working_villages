@@ -95,7 +95,7 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 end
 
 function working_villages.pathfinder.find_path(pos, endpos, entity)
-	--print("searching for a path to:" .. endpos.x .. ",".. endpos.y .. ",".. endpos.z)
+	--print("searching for a path to:" .. minetest.pos_to_string(endpos))
 	local start_index = minetest.hash_node_position(pos)
 	local target_index = minetest.hash_node_position(endpos)
 	local count = 1
@@ -269,7 +269,7 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 			end
 		end
 		if count > 100 then
-			--print("failed finding a path to:" .. endpos.x .. ",".. endpos.y .. ",".. endpos.z)
+			--print("failed finding a path to:" minetest.pos_to_string(endpos.z))
 			return
 		end
 	until count < 1

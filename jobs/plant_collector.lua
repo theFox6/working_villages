@@ -105,7 +105,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 				local sapling = self:get_nearest_item_by_condition(working_villages.func.is_herb, searching_range)
 				if sapling ~= nil then
 					local pos = sapling:getpos()
-					--print("found a sapling at:".. pos.x .. "," .. pos.y .. "," .. pos.z)
+					--print("found a sapling at:".. minetest.pos_to_string(pos))
 					local inv=self:get_inventory()
 					if inv:room_for_item("main", ItemStack(sapling:get_luaentity().itemstring)) then
 						return pos
@@ -114,7 +114,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 				return nil
 			end,}
 actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
-				--print("going to herb at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+				--print("going to herb at: " .. minetest.pos_to_string(destination))
 				self.path = path
 				self.destination = destination
 				self.target = target

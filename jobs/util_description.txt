@@ -34,8 +34,8 @@ description="working_villages job : "..job_description
 actions has to be a table containing states like this:
 actions.some_state = {to_state=function(self, path, destination, target)
 				--(opional) what to do while entering this state
-				print("found place to do something at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
-				print("my actual target is: " .. target.x .. "," .. target.y .. "," .. target.z)
+				print("found place to do something at: " .. minetest.pos_to_string(destination))
+				print("my actual target is: " .. minetest.pos_to_string(target))
 				--path is a table containing the positions of waypoints to the destination
 			end,
 			func = function(self)

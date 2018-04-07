@@ -82,7 +82,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 				local sapling = self:get_nearest_item_by_condition(is_sapling, searching_range)
 				if sapling ~= nil then
 					local pos = sapling:getpos()
-					--print("found a sapling at:".. pos.x .. "," .. pos.y .. "," .. pos.z)
+					--print("found a sapling at:".. minetest.pos_to_string(pos))
 					local inv=self:get_inventory()
 					if inv:room_for_item("main", ItemStack(sapling:get_luaentity().itemstring)) then
 						return pos
@@ -91,7 +91,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 				return nil
 			end,}
 actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
-				--print("found place to plant at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+				--print("found place to plant at: " .. minetest.pos_to_string(destination))
 				self.path = path
 				self.destination = destination
 				self.target = target
@@ -130,7 +130,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 					local val_pos = working_villages.func.validate_pos(self.object:getpos())
 					local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
 					if path == nil then
-						--print("looking for a new path from " .. val_pos.x .. "," .. val_pos.y .. "," .. val_pos.z .. " to " .. destination.x .. "," .. val_pos.y .. "," .. destination.z)
+						--print("looking for a new path from " .. minetest.pos_to_string(val_pos) .. " to " .. destination.x .. "," .. val_pos.y .. "," .. destination.z)
 						path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z}), self)
 					end
 					if path == nil then
@@ -180,7 +180,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				return false
 			end,}
 actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
-				--print("found place to cut at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+				--print("found place to cut at: " .. minetest.pos_to_string(destination))
 				self.path = path
 				self.destination = destination
 				self.target = target
