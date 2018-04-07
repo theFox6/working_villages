@@ -324,7 +324,7 @@ actions.CUT = {to_state=function(self)
 actions.WALK_TO_PLANT.next_state = actions.PLANT
 actions.WALK_TO_CUT.next_state = actions.CUT
 local woodcutter_prop = {
-	searching_range = {x = 10, y = 10, z = 10}
+	searching_range = {x = 10, y = 10, z = 10, h = 5}
 }
 
 working_villages.func.villager_state_machine_job("job_woodcutter","woodcutter",actions,woodcutter_prop)

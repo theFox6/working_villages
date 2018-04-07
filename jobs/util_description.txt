@@ -11,6 +11,7 @@ for getting the position of the villager for pathfinding
 
 function working_villages.func.search_surrounding(pos, pred, searching_range)
 calls pred(pos) for every node within searching_range of pos
+if searching_range.h is given the searching range will start h above pos
 if pred(pos) returns true it will return the position
 if pred(pos) doesn't return true at all nil will be returned
 
@@ -19,7 +20,7 @@ local function find_tree(p)
 	local nod = minetest.get_node(p)
 	return minetest.get_item_group(nod.name, "tree") > 0
 end
-local searching_range = {x = 10, y = 3, z = 10}
+local searching_range = {x = 10, y = 7, z = 10, h = 3}
 local target = working_villages.func.search_surrounding(self.object:getpos(), find_tree, searching_range)
 
 function working_villages.func.find_adjacent_pos(pos,pred)
