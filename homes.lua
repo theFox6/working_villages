@@ -1,5 +1,3 @@
-working_villages.home = {}
-
 -- working_villages.homes represents a table that contains the villagers homes.
 -- This table's keys are inventory names, and values are home objects.
 working_villages.homes = (function()
@@ -107,14 +105,17 @@ minetest.register_node("working_villages:home_marker", {
 	end,
 })
 
+-- home is a prototype home object
+working_villages.home = {}
+
 -- get the home of a villager
-function working_villages.home.get_home(self)
+function working_villages.get_home(self)
 	return working_villages.homes[self.inventory_name]
 end
 
 -- check whether a villager has a home
-function working_villages.home.is_valid(self)
-	local home = working_villages.home.get_home(self)
+function working_villages.is_valid_home(self)
+	local home = working_villages.get_home(self)
 	if home ~= nil then
 		return true
 	end
@@ -122,30 +123,12 @@ function working_villages.home.is_valid(self)
 end
 
 -- get the position of the home_marker
-function working_villages.home.get_marker(self)
-	local home = working_villages.home.get_home(self)
-	if home==nil then
-		return nil
-	end
-	--[[if home.marker==nil and home.x~=nil then
-		print("updated home pos")
-		local marker_pos = vector.new(home)
-		home = {}
-		home.marker = maker_pos
-	end--]]
-	return home.marker
+function working_villages.home:get_marker()
+	return self.marker
 end
 
--- get the position that marks "outside"
-function working_villages.home.get_door(self)
-	local home = working_villages.home.get_home(self)
-	if home==nil then
-		return nil
-	end
-	if home.door~=nil then
-		return home.door
-	end
-	local home_marker_pos = working_villages.home.get_marker(self)
+function working_villages.home:get_marker_meta()
+	local home_marker_pos = self:get_marker
 	if minetest.get_node(home_marker_pos).name == "ignore" then
 		minetest.get_voxel_manip():read_from_map(home_marker_pos, home_marker_pos)
 	end
@@ -156,7 +139,15 @@ function working_villages.home.get_door(self)
 		end
 		return false
 	end
-	local meta = minetest.get_meta(home_marker_pos)
+	return minetest.get_meta(home_marker_pos)
+end
+
+-- get the position that marks "outside"
+function working_villages.home:get_door()
+	if self.door~=nil then
+		return self.door
+	end
+	local meta = self:get_marker_meta()
 	local door_pos = meta:get_string("door")
 	if not door_pos then
 		if working_villages.debug_logging then
@@ -164,51 +155,30 @@ function working_villages.home.get_door(self)
 		end
 		return false
 	end
-	local p = {}
-	p.x, p.y, p.z = string.match(door_pos, "^([%d.-]+)[, ] *([%d.-]+)[, ] *([%d.-]+)$")
-	p.x=tonumber(p.x)
-	p.y=tonumber(p.y)
-	p.z=tonumber(p.z)
-	home.door = p
-	return p
+	home.door = minetest.string_to_pos(door_pos)
+	return home.door
 end
 
 -- get the bed of a villager
-function working_villages.home.get_bed(self)
-	local home = working_villages.home.get_home(self)
-	if home==nil then
-		return nil
+function working_villages.home:get_bed()
+	if self.bed~=nil then
+		return self.bed
 	end
-	if home.bed~=nil then
-		return home.bed
-	end
-	local home_marker_pos = working_villages.home.get_marker(self)
-	if minetest.get_node(home_marker_pos).name == "ignore" then
-		minetest.get_voxel_manip():read_from_map(home_marker_pos, home_marker_pos)
-	end
-	if minetest.get_node(home_marker_pos).name ~= "working_villages:home_marker" then
-		if working_villages.debug_logging and not(vector.equals(home_marker_pos,{x=0,y=0,z=0})) then
-			minetest.log("warning", "The bed position of an invalid home was requested.")
-			minetest.log("warning", "Given home position:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
+
+	local meta = self:get_marker_meta()
+	local bed_pos = meta:get_string("bed")
+	if not bed_pos then
+		if working_villages.debug_logging then
+			minetest.log("warning", "The position of the bed was not entered for the home at:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
 		end
 		return false
 	end
+	home.bed = minetest.string_to_pos(bed_pos)
+	return home.bed
+end
 
-	local meta = minetest.get_meta(home_marker_pos)
-	local bed_pos = meta:get_string("bed")
-	if not bed_pos then
-		print("no bed position")
-		return false
-	end
-	local p = {}
-	p.x, p.y, p.z = string.match(bed_pos, "^([%d.-]+)[, ] *([%d.-]+)[, ] *([%d.-]+)$")
-	p.x=tonumber(p.x)
-	p.y=tonumber(p.y)
-	p.z=tonumber(p.z)
-	if not (p.x and p.y and p.z) then
-		print("invalid bed position:"..bed_pos)
-		return false
-	end
-	home.bed = p
-	return p
+-- set the home of a villager
+function working_villages.set_home(inv_name,marker_pos)
+	working_villages.homes[inv_name] = table.copy(working_villages.home)
+	working_villages.homes[inv_name].marker = marker_pos
 end

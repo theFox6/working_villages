@@ -470,29 +470,27 @@ minetest.register_on_player_receive_fields(
 			if fields.home_pos == nil then
 				return
 			end
-			local coords = {}
-			coords.x, coords.y, coords.z = string.match(fields.home_pos, "^([%d.-]+)[, ] *([%d.-]+)[, ] *([%d.-]+)$")
-			coords.x=tonumber(coords.x)
-			coords.y=tonumber(coords.y)
-			coords.z=tonumber(coords.z)
+			local coords = minetest.sring_to_pos(fields.home_pos)
 			if not (coords.x and coords.y and coords.z) then
 				-- fail on illegal input of coordinates
-				minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the bed position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+				minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the home position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 				return
 			end
 			if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-				minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
+				minetest.chat_send_player(sender_name, 'The coordinates of your home position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
 				return
 			end
 			if minetest.get_node(coords).name ~= "working_villages:home_marker" then
 				minetest.chat_send_player(sender_name, 'No home marker could be found at the entered position.')
 				return
 			end
+
+			working_villages.set_home(inv_name,coords)
+			minetest.chat_send_player(sender_name, 'Home set!')
+
 			if not minetest.get_meta(coords):get_string("bed") then
 				minetest.chat_send_player(sender_name, 'Home marker not configured, please right-click the home marker to configure it.')
-				return
 			end
-			working_villages.homes[inv_name].marker=coords
 		end
 	end
 )
@@ -588,13 +586,11 @@ function working_villages.register_villager(product_name, def)
 
 	-- create_formspec_string returns a string that represents a formspec definition.
 	local function create_formspec_string(self)
-		if not working_villages.homes[self.inventory_name] then
-			working_villages.homes[self.inventory_name] = {}
+		local home_pos = {x = 0, y = 0, z = 0}
+		if self:has_home() then
+			home_pos = self:get_home():get_marker()
 		end
-		if not working_villages.homes[self.inventory_name].marker then
-			working_villages.homes[self.inventory_name].marker = {x=0,y=0,z=0}
-		end
-		local home_pos = tostring(working_villages.homes[self.inventory_name].marker.x) .. "," .. tostring(working_villages.homes[self.inventory_name].marker.y) .. "," .. tostring(working_villages.homes[self.inventory_name].marker.z)
+		home_pos = pos_to_string(home_pos)
 		return "size[8,9]"
 			.. default.gui_bg
 			.. default.gui_bg_img
@@ -789,11 +785,8 @@ function working_villages.register_villager(product_name, def)
 		get_staticdata               = get_staticdata,
 
 		-- home methods.
-		get_home                     = working_villages.home.get_home,
-		has_home                     = working_villages.home.is_valid,
-		get_home_marker              = working_villages.home.get_marker,
-		get_home_door                = working_villages.home.get_door,
-		get_bed                      = working_villages.home.get_bed,
+		get_home                     = working_villages.get_home,
+		has_home                     = working_villages.is_valid_home,
 
 		-- extra methods.
 		get_inventory                = working_villages.villager.get_inventory,
