@@ -116,10 +116,15 @@ end
 -- check whether a villager has a home
 function working_villages.is_valid_home(self)
 	local home = working_villages.get_home(self)
-	if home ~= nil then
-		return true
+	if home == nil then
+		return false
 	end
-	return false
+	if not home.get_bed then --update home
+		for k, v in pairs(working_villages.home) do
+			home[k] = v
+		end
+	end
+	return true
 end
 
 -- get the position of the home_marker
@@ -128,7 +133,7 @@ function working_villages.home:get_marker()
 end
 
 function working_villages.home:get_marker_meta()
-	local home_marker_pos = self:get_marker
+	local home_marker_pos = self:get_marker()
 	if minetest.get_node(home_marker_pos).name == "ignore" then
 		minetest.get_voxel_manip():read_from_map(home_marker_pos, home_marker_pos)
 	end
