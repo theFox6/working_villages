@@ -23,11 +23,13 @@ function working_villages.func.is_herb(node)
 	end
 	for _, i in ipairs(working_villages.herbs.groups) do
 		if minetest.get_item_group(nname, i) > 0 then
+			--print("found some "..i)
 			return true
 		end
 	end
 	for _, i in ipairs(working_villages.herbs.names) do
 		if nname==i then
+			--print("found a "..nname)
 			return true
 		end
 	end
@@ -112,7 +114,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 				return nil
 			end,}
 actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
-				--print("found herb at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
+				--print("going to herb at: " .. destination.x .. "," .. destination.y .. "," .. destination.z)
 				self.path = path
 				self.destination = destination
 				self.target = target
