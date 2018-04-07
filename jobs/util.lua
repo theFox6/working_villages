@@ -74,7 +74,7 @@ function working_villages.func.search_surrounding(pos, pred, searching_range)
 	local max_xz = math.max(searching_range.x, searching_range.z)
 	local mod_y = 0
 	if searching_range.y > 2 then
-		mod_y = 3
+		mod_y = 2
 	end
 
 	for j = mod_y - searching_range.y, searching_range.y do
