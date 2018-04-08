@@ -619,9 +619,9 @@ function working_villages.register_villager(product_name, def)
 			.. default.gui_bg
 			.. default.gui_bg_img
  			.. default.gui_slots
-			.. "label[1,1;job:".. self:get_job().description.."]"
-			.. "label[1,2;hello]"
-			.. "button_exit[4,8;1,1;exit;bye]"
+			.. "label[0,0;".. self:get_job().description.."]"
+			.. "label[3.5,2;hello]"
+			.. "button_exit[3.5,8;1,1;exit;bye]"
 	end
 
 	-- on_activate is a callback function that is called when the object is created or recreated.
