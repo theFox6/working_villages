@@ -11,22 +11,23 @@ working_villages={
 	func = {}
 }
 
---base
+--helpers
 dofile(working_villages.modpath.."/pathfinder.lua")
 dofile(working_villages.modpath.."/homes.lua")
+
+--base
 dofile(working_villages.modpath.."/api.lua")
 dofile(working_villages.modpath.."/register.lua")
-
 dofile(working_villages.modpath.."/commanding_sceptre.lua")
 
 --jobs
 dofile(working_villages.modpath.."/jobs/util.lua")
 dofile(working_villages.modpath.."/jobs/empty.lua")
 
+dofile(working_villages.modpath.."/jobs/follow_player.lua")
 dofile(working_villages.modpath.."/jobs/plant_collector.lua")
 dofile(working_villages.modpath.."/jobs/woodcutter.lua")
 --testing jobs
-dofile(working_villages.modpath.."/jobs/follow_player.lua")
 dofile(working_villages.modpath.."/jobs/torcher.lua")
 dofile(working_villages.modpath.."/jobs/snowclearer.lua")
 
