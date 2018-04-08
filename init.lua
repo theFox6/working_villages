@@ -17,7 +17,7 @@ dofile(working_villages.modpath.."/homes.lua")
 dofile(working_villages.modpath.."/api.lua")
 dofile(working_villages.modpath.."/register.lua")
 
-dofile(working_villages.modpath.."/capture_rod.lua")
+dofile(working_villages.modpath.."/commanding_sceptre.lua")
 
 --jobs
 dofile(working_villages.modpath.."/jobs/util.lua")
