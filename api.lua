@@ -323,8 +323,12 @@ function working_villages.villager:update_infotext()
 		infotext = infotext .. "this villager is inactive\nNo job\n"
 	end
 	infotext = infotext .. "[Owner] : " .. self.owner_name
-	if self.pause then
-		infotext = infotext .. "\nthis villager is stopped"
+	if self.pause=="resting" then
+		infotext = infotext .. "\nthis villager is resting"
+	elseif self.pause=="sleeping" then
+		infotext = infotext .. "\nthis villager is sleeping"
+	elseif self.pause=="active" then
+		infotext = infotext .. "\nthis villager is active"
 	end
 	self.object:set_properties{infotext = infotext}
 end
@@ -464,9 +468,9 @@ end
 --receive fields when villager was rightclicked
 minetest.register_on_player_receive_fields(
 	function(player, formname, fields)
-		if string.find(formname,"villager:gui_") then
-			local inv_name = string.sub(formname, string.len("villager:gui_")+1)
-			local sender_name = player:get_player_name();
+		if string.find(formname,"villager:gui_inv_") then
+			local inv_name = string.sub(formname, string.len("villager:gui_inv_")+1)
+			local sender_name = player:get_player_name()
 			if fields.home_pos == nil then
 				return
 			end
@@ -491,6 +495,9 @@ minetest.register_on_player_receive_fields(
 			if not minetest.get_meta(coords):get_string("bed") then
 				minetest.chat_send_player(sender_name, 'Home marker not configured, please right-click the home marker to configure it.')
 			end
+		elseif string.find(formname,"villager:gui_talk_") then
+			local inv_name = string.sub(formname, string.len("villager:gui_inv_")+1)
+			local sender_name = player:get_player_name()
 		end
 	end
 )
@@ -584,8 +591,8 @@ function working_villages.register_villager(product_name, def)
 		return inventory
 	end
 
-	-- create_formspec_string returns a string that represents a formspec definition.
-	local function create_formspec_string(self)
+	-- create_inv_formspec_string returns a string that represents a formspec definition.
+	local function create_inv_formspec_string(self)
 		local home_pos = {x = 0, y = 0, z = 0}
 		if self:has_home() then
 			home_pos = self:get_home():get_marker()
@@ -604,6 +611,17 @@ function working_villages.register_villager(product_name, def)
 			.. "list[detached:"..self.inventory_name..";wield_item;5.5,1.5;1,1;]"
 			.. "field[4.5,3;2.5,1;home_pos;home position;" .. home_pos .. "]"
 			.. "button_exit[7,3;1,1;ok;set]"
+	end
+
+	-- create_talking_formspec_string returns a string that represents a formspec definition.
+	local function create_talking_formspec_string(self)
+		return "size[8,9]"
+			.. default.gui_bg
+			.. default.gui_bg_img
+ 			.. default.gui_slots
+			.. "label[1,1;job:".. self:get_job().description.."]"
+			.. "label[1,2;hello]"
+			.. "button_exit[4,8;1,1;exit;bye]"
 	end
 
 	-- on_activate is a callback function that is called when the object is created or recreated.
@@ -642,7 +660,7 @@ function working_villages.register_villager(product_name, def)
 		local job = self:get_job()
 		if job ~= nil then
 			job.on_start(self)
-			if self.pause then
+			if self.pause == "resting" then
 				job.on_pause(self)
 			end
 		else
@@ -711,38 +729,36 @@ function working_villages.register_villager(product_name, def)
 		-- pickup surrounding item.
 		pickup_item(self)
 
+		--upate old pause state
+		if self.pause==true then
+			self.pause="resting"
+		elseif self.pause == false then
+			self.pause="active"
+		end
+
 		-- do job method.
 		local job = self:get_job()
-		if (not self.pause) and job then
+		if (self.pause == "active" or self.pause == "sleeping") and job then
 			job.on_step(self, dtime)
+			--TODO: single handling for sleeping
 		end
 	end
 
 	-- on_rightclick is a callback function that is called when a player right-click them.
 	local function on_rightclick(self, clicker)
-		if clicker:get_player_name()~=self.owner_name then
-			-- don't trust anybody except the owner
-			return
-		end
 		local wielded_stack = clicker:get_wielded_item()
-		if wielded_stack:get_name() == "working_villages:capture_rod" then
-			local job = self:get_job()
-			if job ~= nil then
-				if self.pause == true then
-					self.pause = false
-					job.on_resume(self)
-				else
-					self.pause = true
-					job.on_pause(self)
-				end
-			end
+		if wielded_stack:get_name() == "working_villages:commanding_sceptre" and clicker:get_player_name() == self.owner_name then
+			minetest.show_formspec(
+				clicker:get_player_name(),
+				"villager:gui_inv_"..self.inventory_name,
+				create_inv_formspec_string(self)
+			)
 		else
 			minetest.show_formspec(
 				clicker:get_player_name(),
-				"villager:gui_"..self.inventory_name,
-				create_formspec_string(self)
-			)
-
+				"villager:gui_talk_"..self.inventory_name,
+				create_talking_formspec_string(self)
+			)			
 		end
 		
 		self:update_infotext()
@@ -771,7 +787,7 @@ function working_villages.register_villager(product_name, def)
 		nametag                      = "",
 
 		-- extra initial properties
-		pause                        = false,
+		pause                        = "active",
 		product_name                 = "",
 		manufacturing_number         = -1,
 		owner_name                   = "",

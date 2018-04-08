@@ -333,6 +333,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 			self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
 			minetest.log("action","a villager gets up")
 			self:set_animation(working_villages.animation_frames.STAND)
+			self.pause="active"
+			self:update_infotext()
 			return true
 		end
 		return false
@@ -350,6 +352,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		end
 		self:set_animation(working_villages.animation_frames.LAY)
 		self.object:setpos(vector.add(bed_pos,{x=0,y=1.5,z=0}))
+		self.pause="sleeping"
+		self:update_infotext()
 	end
 	local function follow_path(self)		
 		self:count_timer(1)

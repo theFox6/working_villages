@@ -16,10 +16,12 @@ minetest.register_tool("working_villages:commanding_sceptre", {
 			if job ~= nil then
 				if luaentity.pause == "active" or luaentity.pause == "sleeping" then
 					luaentity.pause = "resting"
-					job.on_pause(self)
+					job.on_pause(luaentity)
+					luaentity:update_infotext()
 				elseif luaentity.pause == "resting" then
-					luaentity.pause == "active"
-					job.on_resume(self)
+					luaentity.pause = "active"
+					job.on_resume(luaentity)
+					luaentity:update_infotext()
 				else
 					minetest.log("warning","unknown pause state: "..self.pause)
 				end
