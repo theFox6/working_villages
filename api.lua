@@ -465,43 +465,6 @@ function working_villages.register_egg(egg_name, def)
 	})
 end
 
---receive fields when villager was rightclicked
-minetest.register_on_player_receive_fields(
-	function(player, formname, fields)
-		if string.find(formname,"villager:gui_inv_") then
-			local inv_name = string.sub(formname, string.len("villager:gui_inv_")+1)
-			local sender_name = player:get_player_name()
-			if fields.home_pos == nil then
-				return
-			end
-			local coords = minetest.string_to_pos(fields.home_pos)
-			if not (coords.x and coords.y and coords.z) then
-				-- fail on illegal input of coordinates
-				minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the home position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
-				return
-			end
-			if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-				minetest.chat_send_player(sender_name, 'The coordinates of your home position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
-				return
-			end
-			if minetest.get_node(coords).name ~= "working_villages:home_marker" then
-				minetest.chat_send_player(sender_name, 'No home marker could be found at the entered position.')
-				return
-			end
-
-			working_villages.set_home(inv_name,coords)
-			minetest.chat_send_player(sender_name, 'Home set!')
-
-			if not minetest.get_meta(coords):get_string("bed") then
-				minetest.chat_send_player(sender_name, 'Home marker not configured, please right-click the home marker to configure it.')
-			end
-		elseif string.find(formname,"villager:gui_talk_") then
-			local inv_name = string.sub(formname, string.len("villager:gui_inv_")+1)
-			local sender_name = player:get_player_name()
-		end
-	end
-)
-
 -- working_villages.register_villager registers a definition of a new villager.
 function working_villages.register_villager(product_name, def)
 	working_villages.registered_villagers[product_name] = def
@@ -715,17 +678,9 @@ function working_villages.register_villager(product_name, def)
 	local function on_rightclick(self, clicker)
 		local wielded_stack = clicker:get_wielded_item()
 		if wielded_stack:get_name() == "working_villages:commanding_sceptre" and clicker:get_player_name() == self.owner_name then
-			minetest.show_formspec(
-				clicker:get_player_name(),
-				"villager:gui_inv_"..self.inventory_name,
-				working_villages.forms.create_inv_formspec_string(self)
-			)
+			working_villages.forms.show_inv_formspec(self, clicker:get_player_name())
 		else
-			minetest.show_formspec(
-				clicker:get_player_name(),
-				"villager:gui_talk_"..self.inventory_name,
-				working_villages.forms.create_talking_formspec_string(self)
-			)			
+			working_villages.forms.show_talking_formspec(self, clicker:get_player_name())			
 		end
 		
 		self:update_infotext()
