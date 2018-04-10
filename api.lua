@@ -591,39 +591,6 @@ function working_villages.register_villager(product_name, def)
 		return inventory
 	end
 
-	-- create_inv_formspec_string returns a string that represents a formspec definition.
-	local function create_inv_formspec_string(self)
-		local home_pos = {x = 0, y = 0, z = 0}
-		if self:has_home() then
-			home_pos = self:get_home():get_marker()
-		end
-		home_pos = minetest.pos_to_string(home_pos)
-		return "size[8,9]"
-			.. default.gui_bg
-			.. default.gui_bg_img
- 			.. default.gui_slots
-			.. "list[detached:"..self.inventory_name..";main;0,0;4,4;]"
-			.. "label[4.5,1;job]"
-			.. "list[detached:"..self.inventory_name..";job;4.5,1.5;1,1;]"
-			.. "list[current_player;main;0,5;8,1;]"
-			.. "list[current_player;main;0,6.2;8,3;8]"
-			.. "label[5.5,1;wield]"
-			.. "list[detached:"..self.inventory_name..";wield_item;5.5,1.5;1,1;]"
-			.. "field[4.5,3;2.5,1;home_pos;home position;" .. home_pos .. "]"
-			.. "button_exit[7,3;1,1;ok;set]"
-	end
-
-	-- create_talking_formspec_string returns a string that represents a formspec definition.
-	local function create_talking_formspec_string(self)
-		return "size[8,9]"
-			.. default.gui_bg
-			.. default.gui_bg_img
- 			.. default.gui_slots
-			.. "label[0,0;".. self:get_job().description.."]"
-			.. "label[3.5,2;hello]"
-			.. "button_exit[3.5,8;1,1;exit;bye]"
-	end
-
 	-- on_activate is a callback function that is called when the object is created or recreated.
 	local function on_activate(self, staticdata)
 		-- parse the staticdata, and compose a inventory.
@@ -751,13 +718,13 @@ function working_villages.register_villager(product_name, def)
 			minetest.show_formspec(
 				clicker:get_player_name(),
 				"villager:gui_inv_"..self.inventory_name,
-				create_inv_formspec_string(self)
+				working_villages.forms.create_inv_formspec_string(self)
 			)
 		else
 			minetest.show_formspec(
 				clicker:get_player_name(),
 				"villager:gui_talk_"..self.inventory_name,
-				create_talking_formspec_string(self)
+				working_villages.forms.create_talking_formspec_string(self)
 			)			
 		end
 		
