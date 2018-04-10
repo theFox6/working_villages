@@ -474,7 +474,7 @@ minetest.register_on_player_receive_fields(
 			if fields.home_pos == nil then
 				return
 			end
-			local coords = minetest.sring_to_pos(fields.home_pos)
+			local coords = minetest.string_to_pos(fields.home_pos)
 			if not (coords.x and coords.y and coords.z) then
 				-- fail on illegal input of coordinates
 				minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the home position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')

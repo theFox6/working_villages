@@ -64,7 +64,7 @@ minetest.register_node("working_villages:home_marker", {
 		if (meta:get_string("bed")~="" and meta:get_string("door")~="") or (fields.bed_pos == nil and fields.door_pos == nil) then
 			return
 		end
-		local coords = minetest.sring_to_pos(fields.bed_pos)
+		local coords = minetest.string_to_pos(fields.bed_pos)
 		if coords == nil then
 			-- fail on illegal input of coordinates
 			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the bed position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
@@ -75,7 +75,7 @@ minetest.register_node("working_villages:home_marker", {
 		else
 			meta:set_string("bed", fields.bed_pos)
 		end
-		coords = minetest.sring_to_pos(fields.door_pos)
+		coords = minetest.string_to_pos(fields.door_pos)
 		if coords == nil then
 			-- fail on illegal input of coordinates
 			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the door position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
