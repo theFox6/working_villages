@@ -13,6 +13,7 @@ working_villages={
 
 --helpers
 dofile(working_villages.modpath.."/pathfinder.lua")
+dofile(working_villages.modpath.."/forms.lua")
 dofile(working_villages.modpath.."/homes.lua")
 
 --base
