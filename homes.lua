@@ -4,8 +4,12 @@ working_villages.homes = (function()
 	local file_name = minetest.get_worldpath() .. "/working_villages_homes"
 
 	minetest.register_on_shutdown(function()
+		local save_data = {}
+		for k,v in pairs(working_villages.homes) do
+			save_data[k]={marker=v.marker}
+		end
 		local file = io.open(file_name, "w")
-		file:write(minetest.serialize(working_villages.homes))
+		file:write(minetest.serialize(save_data))
 		file:close()
 	end)
 
