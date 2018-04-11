@@ -106,7 +106,7 @@ minetest.register_node("working_villages:home_marker", {
 })
 
 -- home is a prototype home object
-working_villages.home = {}
+working_villages.home = {version = 1}
 
 -- get the home of a villager
 function working_villages.get_home(self)
@@ -119,7 +119,7 @@ function working_villages.is_valid_home(self)
 	if home == nil then
 		return false
 	end
-	if not home.get_bed then --update home
+	if not home.version~=1 then --update home
 		for k, v in pairs(working_villages.home) do
 			home[k] = v
 		end
@@ -156,12 +156,13 @@ function working_villages.home:get_door()
 	local door_pos = meta:get_string("door")
 	if not door_pos then
 		if working_villages.debug_logging then
+			local home_marker_pos = self:get_marker()
 			minetest.log("warning", "The position outside the house was not entered for the home at:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
 		end
 		return false
 	end
-	home.door = minetest.string_to_pos(door_pos)
-	return home.door
+	self.door = minetest.string_to_pos(door_pos)
+	return self.door
 end
 
 -- get the bed of a villager
@@ -174,12 +175,13 @@ function working_villages.home:get_bed()
 	local bed_pos = meta:get_string("bed")
 	if not bed_pos then
 		if working_villages.debug_logging then
+			local home_marker_pos = self:get_marker()
 			minetest.log("warning", "The position of the bed was not entered for the home at:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
 		end
 		return false
 	end
-	home.bed = minetest.string_to_pos(bed_pos)
-	return home.bed
+	self.bed = minetest.string_to_pos(bed_pos)
+	return self.bed
 end
 
 -- set the home of a villager
