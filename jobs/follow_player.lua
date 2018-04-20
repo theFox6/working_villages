@@ -27,7 +27,7 @@ actions.ACCOMPANY={self_condition=function(self)
 				self:set_yaw_by_direction(direction)
 
 				--if villager is stoped by obstacle, the villager must jump.
-				working_villages.func.handle_obstacles(self,true,false)
+				self:handle_obstacles(true)
 			end,
 			to_state = function(self)
 				self:set_animation(working_villages.animation_frames.WALK)

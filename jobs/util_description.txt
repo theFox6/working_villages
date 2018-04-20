@@ -1,10 +1,5 @@
 working_villages.func is a table with several functions:
 
-function working_villages.func.handle_obstacles(self,ignore_fence)
-if the villager hits a walkable he wil jump
-if the villager hits a door he opens it
-if ignore_fence is false the villager will not jump over fences
-
 function working_villages.func.validate_pos(pos)
 returns the position rounded, if it is a slab/stair the position on top is given
 for getting the position of the villager for pathfinding

@@ -98,7 +98,7 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 					end
 				else
 					-- if villager is stopped by obstacles, the villager must jump.
-					working_villages.func.handle_obstacles(self,false,true)
+					self:handle_obstacles(false,true)
 				end
 			end,
 			target_getter=function(self, searching_range)
@@ -133,7 +133,7 @@ actions.WALK_TO_CLEAR = {to_state=function(self, path, destination,target)
 				end
 				local MAX_WALK_TIME = 800
 				local FIND_PATH_TIME_INTERVAL = 50
-				if self.time_counters[2] >= MAX_WALK_TIME then 
+				if self.time_counters[2] >= MAX_WALK_TIME then
 					--print("time over: back to searching")
 					working_villages.func.get_back_to_searching(self)
 					return
@@ -195,7 +195,7 @@ actions.CLEAR = {to_state=function(self)
 			self:set_animation(working_villages.animation_frames.MINE)
 			self:set_yaw_by_direction(vector.subtract(self.target, self.object:getpos()))
 		end,
-		func = function(self, dtime)
+		func = function(self)
 			if self.time_counters[1] >= 30 then
 				local destnode = minetest.get_node(self.target)
 				minetest.remove_node(self.target)

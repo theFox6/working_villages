@@ -19,17 +19,17 @@ actions.PLACE={self_condition=function(self)
 		func=function(self)
 			if self.time_counter >= 5 then
 				self.time_counter = -1
-	
+
 				local owner = minetest.get_player_by_name(self.owner_name)
 				local wield_stack = self:get_wield_item_stack()
 				local front = self:get_front()
-	
+
 				local pointed_thing = {
 					type = "node",
 					under = vector.add(front, {x = 0, y = -1, z = 0}),
 					above = front,
 				}
-	
+
 				if wield_stack:get_name() == "default:torch" then
 					local res_stack, success = minetest.item_place_node(wield_stack, owner, pointed_thing)
 					if success then
@@ -94,7 +94,7 @@ actions.ACCOMPANY={self_condition=function(self)
 				self:set_yaw_by_direction(direction)
 
 				--if villager is stoped by obstacle, the villager must jump.
-				working_villages.func.handle_obstacles(self,true,false)
+				self:handle_obstacles(true,false)
 			end,
 			to_state = function(self)
 				self:set_animation(working_villages.animation_frames.WALK)

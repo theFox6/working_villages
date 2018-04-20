@@ -13,6 +13,8 @@ working_villages.registered_jobs = {}
 
 working_villages.registered_eggs = {}
 
+working_villages.registered_states = {}
+
 -- working_villages.is_job reports whether a item is a job item by the name.
 function working_villages.is_job(item_name)
 	if working_villages.registered_jobs[item_name] then
@@ -127,7 +129,7 @@ function working_villages.villager:get_front()
 	else
 		direction.z = 0
 	end
-	
+
 	direction.y = direction.y - 1
 
 	return vector.add(vector.round(self.object:getpos()), direction)
@@ -155,7 +157,7 @@ function working_villages.villager:get_back()
 	else
 		direction.z = 0
 	end
-	
+
 	direction.y = direction.y - 1
 
 	return vector.add(vector.round(self.object:getpos()), direction)
@@ -279,18 +281,20 @@ end
 
 -- working_villages.villager.set_timer set the value of a counter.
 function working_villages.villager:set_timer(timerId,value)
+	assert(type(value)=="number","timers need to be countable")
 	self.time_counters[timerId]=value
 end
 
 -- working_villages.villager.clear_timers set all counters to 0.
 function working_villages.villager:clear_timers()
-	for _, counter in pairs(self.time_counters) do
-		counter=0
+	for timerId,_ in pairs(self.time_counters) do
+		self.time_counters[timerId] = 0
 	end
 end
 
 -- working_villages.villager.count_timer count a counter up by 1.
 function working_villages.villager:count_timer(timerId)
+	assert(self.time_counters[timerId],"timer \""..timerId.."\" was not initialized")
 	self.time_counters[timerId] = self.time_counters[timerId] + 1
 end
 
@@ -339,6 +343,93 @@ function working_villages.villager:is_near(pos, distance)
 	p.y = p.y - 0.5
 	return vector.distance(p, pos) < distance
 end
+
+--working_villages.villager.handle_obstacles(ignore_fence,ignore_doors)
+--if the villager hits a walkable he wil jump
+--if ignore_fence is false and the villager hits a door he opens it
+--if ignore_fence is false the villager will not jump over fences
+function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
+	local velocity = self.object:getvelocity()
+	local inside_node = minetest.get_node(self.object:getpos())
+	if string.find(inside_node.name,"doors:door") and not ignore_doors then
+		self:change_direction(vector.round(self.object:getpos()))
+	end
+	if velocity.y == 0 then
+		local front_node = self:get_front_node()
+		local above_node = self:get_front()
+		above_node = vector.add(above_node,{x=0,y=1,z=0})
+		above_node = minetest.get_node(above_node)
+		if minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence) then
+			self:change_direction_randomly()
+		elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
+			local door = doors.get(self:get_front())
+			door:open()
+		elseif minetest.registered_nodes[front_node.name].walkable and not(minetest.registered_nodes[above_node.name].walkable) then
+			self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
+		end
+		if not ignore_doors then
+			local back_pos = self:get_back()
+			if string.find(minetest.get_node(back_pos).name,"doors:door") then
+				local door = doors.get(back_pos)
+				door:close()
+			end
+		end
+	end
+end
+
+-- working_villages.villager.pickup_item pickup items placed and put it to main slot.
+function working_villages.villager:pickup_item()
+	local pos = self.object:getpos()
+	local radius = 1.0
+	local all_objects = minetest.get_objects_inside_radius(pos, radius)
+
+	for _, obj in ipairs(all_objects) do
+		if not obj:is_player() and obj:get_luaentity() and obj:get_luaentity().itemstring then
+			local itemstring = obj:get_luaentity().itemstring
+			local stack = ItemStack(itemstring)
+			if stack and stack:to_table() then
+				local name = stack:to_table().name
+
+				if minetest.registered_items[name] ~= nil then
+					local inv = self:get_inventory()
+					local leftover = inv:add_item("main", stack)
+
+					minetest.add_item(obj:getpos(), leftover)
+					obj:get_luaentity().itemstring = ""
+					obj:remove()
+				end
+			end
+		end
+	end
+end
+
+---------------------------------------------------------------------
+
+function working_villages.villager:get_state(id)
+	return working_villages.registered_states[id]
+end
+
+function working_villages.villager:set_state(id)
+	if not self:get_state(id) then
+		error("state \""..id.."\" is not registered")
+	end
+	self:get_state(self.state).on_finish(self)
+	self.state = id
+	self:get_state(id).on_start(self)
+end
+
+function working_villages.register_state(id,def)
+	if working_villages.registered_states[id]~=nil then
+		error("state \"".. id .. "\" already registered")
+	end
+	if not def.on_start then def.on_start = function() end end
+	if not def.on_finish then def.on_finish = function() end end
+	if not def.on_step then def.on_step = function() end end
+	working_villages.registered_states[id] = def
+	--minetest.log("debug","registered state: "..id)
+end
+
+dofile(working_villages.modpath.."/actions.lua") --load states
 
 ---------------------------------------------------------------------
 
@@ -623,42 +714,8 @@ function working_villages.register_villager(product_name, def)
 		return minetest.serialize(data)
 	end
 
-	-- working_villages.villager.pickup_item pickup items placed and put it to main slot.
-	local function pickup_item(self)
-		local pos = self.object:getpos()
-		local radius = 1.0
-		local all_objects = minetest.get_objects_inside_radius(pos, radius)
-
-		for _, obj in ipairs(all_objects) do
-			if not obj:is_player() and obj:get_luaentity() and obj:get_luaentity().itemstring then
-				local itemstring = obj:get_luaentity().itemstring
-				local stack = ItemStack(itemstring)
-				if stack and stack:to_table() then
-					local name = stack:to_table().name
-
-					if minetest.registered_items[name] ~= nil then
-						local inv = self:get_inventory()
-						local leftover = inv:add_item("main", stack)
-
-						minetest.add_item(obj:getpos(), leftover)
-						obj:get_luaentity().itemstring = ""
-						obj:remove()
-					end
-				end
-			end
-		end
-	end
-
 	-- on_step is a callback function that is called every delta times.
 	local function on_step(self, dtime)
-		--[[ if owner didn't login, the villager does nothing.
-		if not minetest.get_player_by_name(self.owner_name) then
-			return
-		end--]]
-
-		-- pickup surrounding item.
-		pickup_item(self)
-
 		--upate old pause state
 		if self.pause==true then
 			self.pause="resting"
@@ -666,12 +723,7 @@ function working_villages.register_villager(product_name, def)
 			self.pause="active"
 		end
 
-		-- do job method.
-		local job = self:get_job()
-		if (self.pause == "active" or self.pause == "sleeping") and job then
-			job.on_step(self, dtime)
-			--TODO: single handling for sleeping
-		end
+		self:get_state(self.state).on_step(self, dtime)
 	end
 
 	-- on_rightclick is a callback function that is called when a player right-click them.
@@ -710,10 +762,12 @@ function working_villages.register_villager(product_name, def)
 
 		-- extra initial properties
 		pause                        = "active",
+		state                        = "job",
 		product_name                 = "",
 		manufacturing_number         = -1,
 		owner_name                   = "",
 		time_counters                = {},
+		destination                  = vector.new(0,0,0),
 
 		-- callback methods.
 		on_activate                  = on_activate,
@@ -725,6 +779,10 @@ function working_villages.register_villager(product_name, def)
 		-- home methods.
 		get_home                     = working_villages.get_home,
 		has_home                     = working_villages.is_valid_home,
+
+		-- state methods.
+		get_state                    = working_villages.villager.get_state,
+		set_state                    = working_villages.villager.set_state,
 
 		-- extra methods.
 		get_inventory                = working_villages.villager.get_inventory,
@@ -755,6 +813,8 @@ function working_villages.register_villager(product_name, def)
 		count_timers                 = working_villages.villager.count_timers,
 		timer_exceeded               = working_villages.villager.timer_exceeded,
 		update_infotext              = working_villages.villager.update_infotext,
+		handle_obstacles             = working_villages.villager.handle_obstacles,
+		pickup_item                  = working_villages.villager.pickup_item,
 	})
 
 	-- register villager egg.
