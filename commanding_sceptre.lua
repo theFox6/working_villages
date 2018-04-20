@@ -23,7 +23,7 @@ minetest.register_tool("working_villages:commanding_sceptre", {
 					job.on_resume(luaentity)
 					luaentity:update_infotext()
 				else
-					minetest.log("warning","unknown pause state: "..self.pause)
+					minetest.log("warning","unknown pause state: "..luaentity.pause)
 				end
 			end
 

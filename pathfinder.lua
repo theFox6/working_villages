@@ -56,7 +56,7 @@ local function walkable(node)
 		end
 end
 
-local function check_clearance(cpos, x, z, height)
+local function check_clearance(cpos, x, z, height) --TODO: this is unused
 	for i = 1, height do
 		local n_name = minetest.get_node({x = cpos.x + x, y = cpos.y + i, z = cpos.z + z}).name
 		local c_name = minetest.get_node({x = cpos.x, y = cpos.y + i, z = cpos.z}).name
@@ -116,11 +116,7 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 		local current_values
 
 		-- Get one index as reference from openSet
-		for i, v in pairs(openSet) do
-			current_index = i
-			current_values = v
-			break
-		end
+		current_index, current_values = pairs(openSet)(openSet)
 
 		-- Search for lowest fCost
 		for i, v in pairs(openSet) do
