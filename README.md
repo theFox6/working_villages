@@ -2,6 +2,8 @@
 This mod adds Villagers performing work.
 The plan is to make villagers build up their own villages.
 
+Forum page: https://forum.minetest.net/viewtopic.php?f=9&t=17429
+
 Planned Features:
 * Villagers
   * trading and building up an economy
