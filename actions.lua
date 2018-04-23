@@ -5,14 +5,10 @@ working_villages.register_state("job",{
 			return
 		end--]]
 
-		-- pickup surrounding item.
-		self:pickup_item()
-
-		-- do job method.
 		local job = self:get_job()
-		if (self.pause == "active" or self.pause == "sleeping") and job then
+
+		if job then
 			job.on_step(self, dtime)
-			--TODO: get rid of self.pause
 		end
 	end
 })
@@ -30,9 +26,7 @@ working_villages.register_state("goto_dest",{
 		if self.path == nil then
 			self.path = {self.destination}
 		end
-		--[[if working_villages.debug_logging then
-			minetest.log("info","the first waypiont on his path:" .. minetest.pos_to_string(self.path[1]))
-		end--]]
+		--print("the first waypiont on his path:" .. minetest.pos_to_string(self.path[1]))
 		self:change_direction(self.path[1])
 		self:set_animation(working_villages.animation_frames.WALK)
 	end,
@@ -52,8 +46,9 @@ working_villages.register_state("goto_dest",{
 		end
 
 		-- follow path
-		if self:is_near(self.path[1], 1) then
+		if self:is_near({x=self.path[1].x,y=self.object:getpos().y,z=self.path[1].z}, 1) then
 			table.remove(self.path, 1)
+			--print("removed path element")
 
 			if #self.path == 0 then -- end of path
 				self:set_state("job")

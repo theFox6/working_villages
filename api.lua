@@ -597,6 +597,8 @@ function working_villages.register_villager(product_name, def)
 				if listname == "job" then
 					local job_name = stack:get_name()
 					local job = working_villages.registered_jobs[job_name]
+					self.state = ""
+					self.time_counters = {}
 					job.on_stop(self)
 
 					self:update_infotext()
@@ -727,9 +729,18 @@ function working_villages.register_villager(product_name, def)
 			self.pause="active"
 		end
 
+		-- pickup surrounding item.
+		self:pickup_item()
+		
+		if self.pause ~= "active" and self.pause ~= "sleeping" then
+			--TODO: get rid of self.pause
+			return
+		end
+
 		if self.get_state(self.state)==nil then
 			minetest.log("error", "state \""..self.state.."\" does not exist")
 		end
+
 		self.get_state(self.state).on_step(self, dtime)
 	end
 

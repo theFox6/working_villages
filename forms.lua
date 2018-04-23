@@ -23,11 +23,17 @@ function working_villages.forms.show_inv_formspec(self, playername)
 end
 
 function working_villages.forms.show_talking_formspec(self, playername)
+	local jobname = self:get_job()
+	if jobname then
+		jobname = jobname.description
+	else
+		jobname = "no job"
+	end
 	local formstring = "size[8,9]"
 		.. default.gui_bg
 		.. default.gui_bg_img
 		.. default.gui_slots
-		.. "label[0,0;".. self:get_job().description.."]"
+		.. "label[0,0;"..jobname.."]"
 		.. "label[3.5,2;hello]"
 		.. "button_exit[3.5,8;1,1;exit;bye]"
 	minetest.show_formspec(playername,"villager:gui_talk_"..self.inventory_name, formstring)

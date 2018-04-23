@@ -59,7 +59,10 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				end
 				return false
 			end,}
-actions.CUT = {to_state=function(self) self:set_state("dig_target") end}
+actions.CUT = {to_state=function(self)
+			--print("cutting tree")
+			self:set_state("dig_target")
+		end}
 actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 				--print("found place to cut at: " .. minetest.pos_to_string(destination))
 				self.path = path
