@@ -233,34 +233,8 @@ actions.PLANT = {to_state=function(self)
 				self.time_counters[1] = self.time_counters[1] + 1
 			end
 		end,}
-actions.CUT = {to_state=function(self)
-			self.time_counters[1] = 0
-			self.object:setvelocity{x = 0, y = 0, z = 0}
-			self:set_animation(working_villages.animation_frames.MINE)
-			self:set_yaw_by_direction(vector.subtract(self.target, self.object:getpos()))
-		end,
-		func = function(self)
-			if self.time_counters[1] >= 30 then
-				local destnode = minetest.get_node(self.target)
-				minetest.remove_node(self.target)
-				local stacks = minetest.get_node_drops(destnode.name)
-				for _, stack in ipairs(stacks) do
-					local leftover = self:add_item_to_main(stack)
-					minetest.add_item(self.target, leftover)
-				end
-				local sounds = minetest.registered_nodes[destnode.name].sounds
-				if sounds then
-					local sound = sounds.dug
-					if sound then
-						minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
-					end
-				end
-				working_villages.func.get_back_to_searching(self)
-				return
-			else
-				self.time_counters[1] = self.time_counters[1] + 1
-			end
-		end,}
+actions.CUT = {to_state=function(self) self:set_state("dig_target") end,
+		func = function(self) return true end,}
 actions.WALK_TO_PLANT.next_state = actions.PLANT
 actions.WALK_TO_CUT.next_state = actions.CUT
 local woodcutter_prop = {

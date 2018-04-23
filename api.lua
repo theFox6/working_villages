@@ -412,12 +412,12 @@ function working_villages.villager.get_state(id)
 end
 
 function working_villages.villager:set_state(id)
-	if not self:get_state(id) then
+	if not self.get_state(id) then
 		error("state \""..id.."\" is not registered")
 	end
-	self:get_state(self.state).on_finish(self)
+	self.get_state(self.state).on_finish(self)
 	self.state = id
-	self:get_state(id).on_start(self)
+	self.get_state(id).on_start(self)
 end
 
 function working_villages.register_state(id,def)
@@ -727,7 +727,10 @@ function working_villages.register_villager(product_name, def)
 			self.pause="active"
 		end
 
-		self:get_state(self.state).on_step(self, dtime)
+		if self.get_state(self.state)==nil then
+			minetest.log("error", "state \""..self.state.."\" does not exist")
+		end
+		self.get_state(self.state).on_step(self, dtime)
 	end
 
 	-- on_rightclick is a callback function that is called when a player right-click them.

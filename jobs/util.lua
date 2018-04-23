@@ -425,7 +425,9 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 				end
 			end
 		else
-			self.job_state.func(self)
+			if self.job_state.func(self) then
+				working_villages.func.get_back_to_searching(self)
+			end
 		end
 	end
 	working_villages.register_job("working_villages:"..job_name, {
