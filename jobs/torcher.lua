@@ -5,7 +5,7 @@ end
 
 local actions={}
 actions.PLACE={self_condition=function(self)
-				local front = self:get_front() -- if it is dark, set touch.
+				local front = self:get_front() -- if it is dark, set torch.
 				local wield_stack = self:get_wield_item_stack()
 
 				if is_dark(front)
