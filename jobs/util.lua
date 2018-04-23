@@ -413,19 +413,21 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 	local function on_pause(self)
 		local job = self:get_job()
 		if self.job_state ~= job.states.SLEEP then
-			job.on_stop(self)
+			self.object:setvelocity{x = 0, y = 0, z = 0}
+			self.job_state = nil
+			self:set_animation(working_villages.animation_frames.STAND)
 		end
 	end
 	local function on_step(self)
 		if self.job_state.next_state ~= nil then
-			if self.job_state.func(self) then
+			if (not self.job_state.func) or self.job_state.func(self) then
 				self.job_state=self.job_state.next_state
 				if self.job_state.to_state ~= nil then
 					self.job_state.to_state(self)
 				end
 			end
 		else
-			if self.job_state.func(self) then
+			if (not self.job_state.func) or self.job_state.func(self) then
 				working_villages.func.get_back_to_searching(self)
 			end
 		end
