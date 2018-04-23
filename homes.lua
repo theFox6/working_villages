@@ -57,7 +57,7 @@ minetest.register_node("working_villages:home_marker", {
 			"field[0.5,3;4,1;door_pos;position outside the house;${door_pos}]"..
 			"button_exit[1,4;2,1;ok;Write]")
 	end,
-	on_receive_fields = function(pos, formname, fields, sender)
+	on_receive_fields = function(pos, _, fields, sender)
 		local meta = minetest.get_meta(pos)
 		local sender_name = sender:get_player_name()
 		local failed = false
@@ -65,16 +65,20 @@ minetest.register_node("working_villages:home_marker", {
 			minetest.record_protection_violation(pos, sender_name)
 			return
 		end
-		if (meta:get_string("bed")~="" and meta:get_string("door")~="") or (fields.bed_pos == nil and fields.door_pos == nil) then
+		if (meta:get_string("bed")~="" and meta:get_string("door")~="")
+			or (fields.bed_pos == nil and fields.door_pos == nil) then
 			return
 		end
 		local coords = minetest.string_to_pos(fields.bed_pos)
 		if coords == nil then
 			-- fail on illegal input of coordinates
-			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the bed position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the bed position. '..
+				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
+				'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 			failed = true
 		elseif(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
+			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. '..
+				'Correct coordinates range from -30912 to 30927 in all axes.')
 			failed = true
 		else
 			meta:set_string("bed", fields.bed_pos)
@@ -82,10 +86,12 @@ minetest.register_node("working_villages:home_marker", {
 		coords = minetest.string_to_pos(fields.door_pos)
 		if coords == nil then
 			-- fail on illegal input of coordinates
-			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the door position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the door position. '..
+				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 			failed = true
 		elseif(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
+			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. '..
+				'Correct coordinates range from -30912 to 30927 in all axes.')
 			failed = true
 		else
 			meta:set_string("door", fields.door_pos)

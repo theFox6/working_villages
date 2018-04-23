@@ -35,6 +35,7 @@ end
 
 
 --receive fields when villager was rightclicked
+
 minetest.register_on_player_receive_fields(
 	function(player, formname, fields)
 		if string.find(formname,"villager:gui_inv_") then
@@ -46,11 +47,14 @@ minetest.register_on_player_receive_fields(
 			local coords = minetest.string_to_pos(fields.home_pos)
 			if not (coords.x and coords.y and coords.z) then
 				-- fail on illegal input of coordinates
-				minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the home position. Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+				minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the home position. '..
+					'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
+					'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 				return
 			end
 			if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-				minetest.chat_send_player(sender_name, 'The coordinates of your home position do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
+				minetest.chat_send_player(sender_name, 'The coordinates of your home position do not exist in our coordinate system. '..
+					'Correct coordinates range from -30912 to 30927 in all axes.')
 				return
 			end
 			if minetest.get_node(coords).name ~= "working_villages:home_marker" then
@@ -62,11 +66,15 @@ minetest.register_on_player_receive_fields(
 			minetest.chat_send_player(sender_name, 'Home set!')
 
 			if not minetest.get_meta(coords):get_string("bed") then
-				minetest.chat_send_player(sender_name, 'Home marker not configured, please right-click the home marker to configure it.')
+				minetest.chat_send_player(sender_name, 'Home marker not configured, '..
+					'please right-click the home marker to configure it.')
 			end
 		elseif string.find(formname,"villager:gui_talk_") then
 			local inv_name = string.sub(formname, string.len("villager:gui_inv_")+1)
 			local sender_name = player:get_player_name()
+			minetest.log("info",inv_name)
+			minetest.log("info",sender_name)
+			--TODO: event handling for talking
 		end
 	end
 )

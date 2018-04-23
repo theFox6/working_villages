@@ -68,6 +68,8 @@ local function check_clearance(cpos, x, z, height) --TODO: this is unused
 	return true
 end
 
+assert(check_clearance)
+
 local function get_neighbor_ground_level(pos, jump_height, fall_height)
 	local node = minetest.get_node(pos)
 	local height = 0

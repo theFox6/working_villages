@@ -2,7 +2,7 @@ function working_villages.func.validate_pos(pos)
   local resultp = vector.round(pos)
   resultp = vector.subtract(resultp,{x=0,y=1,z=0})
   local node = minetest.get_node(resultp)
-  if minetest.registered_nodes[node.name].walkable then    
+  if minetest.registered_nodes[node.name].walkable then
     resultp = vector.subtract(pos, resultp)
     resultp = vector.round(resultp)
     resultp = vector.add(pos, resultp)
@@ -139,8 +139,6 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		sprop.searching_range = {x = 10, y = 3, z = 10}
 	end
 
-	local MAX_WALK_TIME = 120
-
 	--controlling state
 	local function walk_randomly(self)
 		local CHANGE_DIRECTION_TIME_INTERVAL = 50
@@ -258,7 +256,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 					local target = working_villages.func.search_surrounding(self.object:getpos(), search_state.search_condition, sprop.searching_range)
 					if target ~= nil then
 						local destination = find_adjacent_clear(target)
-						if not(destniation) then
+						if not(destnation) then
 							destination = target
 						end
 						local val_pos = working_villages.func.validate_pos(self.object:getpos())
@@ -294,7 +292,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		self.object:setvelocity{x = 0, y = 0, z = 0}
 		self:set_animation(working_villages.animation_frames.STAND)
 	end
-	
+
 	--sleeping states
 	local function s_sleep(self)
 		if not(minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76) then
@@ -325,7 +323,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		self:update_infotext()
 	end
 	local function to_walk_home(self)
-		if working_villages.debug_logging then		
+		if working_villages.debug_logging then
 			minetest.log("action","a villager is going home")
 		end
 		self.destination=self:get_home():get_bed()
@@ -346,7 +344,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 				to_state=to_search_idle}
 	else
 		newStates.SEARCH = {number=0,
-				func=walk_randomly,	
+				func=walk_randomly,
 				to_state=to_walk_randomly}
 	end
 	local i = 0
@@ -354,7 +352,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		newStates.GO_OUT	= {number=1,
 					func=function() return true end,
 					to_state=function(self)
-						if working_villages.debug_logging then		
+						if working_villages.debug_logging then
 							minetest.log("action","a villager stood up and is going outside")
 						end
 						self.destination=self:get_home():get_door()
@@ -418,7 +416,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 			job.on_stop(self)
 		end
 	end
-	local function on_step(self, dtime)
+	local function on_step(self)
 		if self.job_state.next_state ~= nil then
 			if self.job_state.func(self) then
 				self.job_state=self.job_state.next_state

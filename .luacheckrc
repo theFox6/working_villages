@@ -5,5 +5,5 @@ read_globals = {
 	"dump", "vector",
 	"VoxelManip", "VoxelArea",
 	"ItemStack", "default", "doors",
-	table = {"copy"}
+	table = { fields = { "copy" } }
 }

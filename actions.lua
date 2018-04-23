@@ -28,16 +28,15 @@ working_villages.register_state("goto_dest",{
 		self:set_timer("goto_dest:find_path",0) -- find path interval
 		self:set_timer("goto_dest:change_dir",0)
 		if self.path == nil then
-			self.path = {}
-			self.path[1]=self.destination
+			self.path = {self.destination}
 		end
 		--[[if working_villages.debug_logging then
-			minetest.log("info","the first waypiont on his path:" .. self.path[1].x .. ",".. self.path[1].y .. ",".. self.path[1].z)
+			minetest.log("info","the first waypiont on his path:" .. minetest.pos_to_string(self.path[1]))
 		end--]]
 		self:change_direction(self.path[1])
 		self:set_animation(working_villages.animation_frames.WALK)
 	end,
-	on_step = function(self,dtime)
+	on_step = function(self)
 		self:count_timer("goto_dest:find_path")
 		self:count_timer("goto_dest:change_dir")
 		if self:timer_exceeded("goto_dest:find_path",100) then
@@ -51,7 +50,7 @@ working_villages.register_state("goto_dest",{
 		if self:timer_exceeded("goto_dest:change_dir",30) then
 			self:change_direction(self.path[1])
 		end
-		
+
 		-- follow path
 		if self:is_near(self.path[1], 1) then
 			table.remove(self.path, 1)

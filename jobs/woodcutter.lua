@@ -111,7 +111,7 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				local lpos = vector.add(pos, {x = 0, y = -1, z = 0})
 				local lnode = minetest.get_node(lpos)
 				local light_level = minetest.get_node_light(pos)
-				if node.name == "air" 
+				if node.name == "air"
 				and minetest.get_item_group(lnode.name, "soil") > 0
 				and light_level > 12 then
 					return true
@@ -139,7 +139,7 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 				end
 				local MAX_WALK_TIME = 800
 				local FIND_PATH_TIME_INTERVAL = 200
-				if self.time_counters[2] >= MAX_WALK_TIME then 
+				if self.time_counters[2] >= MAX_WALK_TIME then
 					--print("time over: back to searching")
 					working_villages.func.get_back_to_searching(self)
 					return
@@ -160,7 +160,8 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 					local val_pos = working_villages.func.validate_pos(self.object:getpos())
 					local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
 						if path == nil then
-							path = working_villages.pathfinder.find_path(val_pos, working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z}), self)
+							local ground_pos = working_villages.pathfinder.get_ground_level({x=self.destination.x,y=self.destination.y-1,z=self.destination.z})
+							path = working_villages.pathfinder.find_path(val_pos, ground_pos, self)
 						end
 					if path == nil then
 						--print("no new path found: back to searching")
@@ -214,7 +215,7 @@ actions.PLANT = {to_state=function(self)
 				return
 			end
 		end,
-		func = function(self, dtime)
+		func = function(self)
 			if self.time_counters[1] >= 15 then
 				local stack = self:get_wield_item_stack()
 				local itemname = stack:get_name()
@@ -238,7 +239,7 @@ actions.CUT = {to_state=function(self)
 			self:set_animation(working_villages.animation_frames.MINE)
 			self:set_yaw_by_direction(vector.subtract(self.target, self.object:getpos()))
 		end,
-		func = function(self, dtime)
+		func = function(self)
 			if self.time_counters[1] >= 30 then
 				local destnode = minetest.get_node(self.target)
 				minetest.remove_node(self.target)

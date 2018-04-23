@@ -300,8 +300,8 @@ end
 
 -- working_villages.villager.count_timers count all counters up by 1.
 function working_villages.villager:count_timers()
-	for _, counter in pairs(self.time_counters) do
-		counter = counter + 1
+	for id, counter in pairs(self.time_counters) do
+		self.time_counters[id] = counter + 1
 	end
 end
 
@@ -364,7 +364,9 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 		elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
 			local door = doors.get(self:get_front())
 			door:open()
-		elseif minetest.registered_nodes[front_node.name].walkable and not(minetest.registered_nodes[above_node.name].walkable) then
+		elseif minetest.registered_nodes[front_node.name].walkable
+			and not(minetest.registered_nodes[above_node.name].walkable) then
+
 			self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
 		end
 		if not ignore_doors then
@@ -405,7 +407,7 @@ end
 
 ---------------------------------------------------------------------
 
-function working_villages.villager:get_state(id)
+function working_villages.villager.get_state(id)
 	return working_villages.registered_states[id]
 end
 
@@ -463,7 +465,7 @@ do
 		wield_image = "working_villages_dummy_empty_craftitem.png",
 	})
 
-	local function on_activate(self, staticdata)
+	local function on_activate(self)
 		-- attach to the nearest villager.
 		local all_objects = minetest.get_objects_inside_radius(self.object:getpos(), 0.1)
 		for _, obj in ipairs(all_objects) do
@@ -477,7 +479,7 @@ do
 		end
 	end
 
-	local function on_step(self, dtime)
+	local function on_step(self)
 		local all_objects = minetest.get_objects_inside_radius(self.object:getpos(), 0.1)
 		for _, obj in ipairs(all_objects) do
 			local luaentity = obj:get_luaentity()
@@ -569,7 +571,7 @@ function working_villages.register_villager(product_name, def)
 	local function create_inventory(self)
 		self.inventory_name = self.product_name .. "_" .. tostring(self.manufacturing_number)
 		local inventory = minetest.create_detached_inventory(self.inventory_name, {
-			on_put = function(inv, listname, index, stack, player)
+			on_put = function(_, listname, _, stack) --inv, listname, index, stack, player
 				if listname == "job" then
 					local job_name = stack:get_name()
 					local job = working_villages.registered_jobs[job_name]
@@ -579,7 +581,7 @@ function working_villages.register_villager(product_name, def)
 				end
 			end,
 
-			allow_put = function(inv, listname, index, stack, player)
+			allow_put = function(_, listname, _, stack) --inv, listname, index, stack, player
 				-- only jobs can put to a job inventory.
 				if listname == "main" then
 					return stack:get_count()
@@ -591,7 +593,7 @@ function working_villages.register_villager(product_name, def)
 				return 0
 			end,
 
-			on_take = function(inv, listname, index, stack, player)
+			on_take = function(_, listname, _, stack) --inv, listname, index, stack, player
 				if listname == "job" then
 					local job_name = stack:get_name()
 					local job = working_villages.registered_jobs[job_name]
@@ -601,14 +603,15 @@ function working_villages.register_villager(product_name, def)
 				end
 			end,
 
-			allow_take = function(inv, listname, index, stack, player)
+			allow_take = function(_, listname, _, stack) --inv, listname, index, stack, player
 				if listname == "wield_item" then
 					return 0
 				end
 				return stack:get_count()
 			end,
 
-			on_move = function(inv, from_list, from_index, to_list, to_index, count, player)
+			on_move = function(inv, from_list, _, to_list, to_index)
+				--inv, from_list, from_index, to_list, to_index, count, player
 				if to_list == "job" or from_list == "job" then
 					local job_name = inv:get_stack(to_list, to_index):get_name()
 					local job = working_villages.registered_jobs[job_name]
@@ -623,7 +626,8 @@ function working_villages.register_villager(product_name, def)
 				end
 			end,
 
-			allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
+			allow_move = function(inv, from_list, from_index, to_list, _, count)
+				--inv, from_list, from_index, to_list, to_index, count, player
 				if to_list == "wield_item" then
 					return 0
 				end
@@ -729,17 +733,18 @@ function working_villages.register_villager(product_name, def)
 	-- on_rightclick is a callback function that is called when a player right-click them.
 	local function on_rightclick(self, clicker)
 		local wielded_stack = clicker:get_wielded_item()
-		if wielded_stack:get_name() == "working_villages:commanding_sceptre" and clicker:get_player_name() == self.owner_name then
+		if wielded_stack:get_name() == "working_villages:commanding_sceptre"
+			and clicker:get_player_name() == self.owner_name then
+
 			working_villages.forms.show_inv_formspec(self, clicker:get_player_name())
 		else
-			working_villages.forms.show_talking_formspec(self, clicker:get_player_name())			
+			working_villages.forms.show_talking_formspec(self, clicker:get_player_name())
 		end
-		
 		self:update_infotext()
 	end
 
 	-- on_punch is a callback function that is called when a player punch then.
-	local function on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir)
+	local function on_punch()--self, puncher, time_from_last_punch, tool_capabilities, dir
 		--TODO: aggression
 	end
 
