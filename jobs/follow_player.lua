@@ -34,7 +34,7 @@ actions.ACCOMPANY={self_condition=function(self)
 			end,
 			}
 local follower_prop = {
-	night_Active = true,
+	night_active = true,
 	search_idle = true,
 	searching_range = {x = 10, y = 10, z = 10}
 }
