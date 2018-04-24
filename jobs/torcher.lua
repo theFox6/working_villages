@@ -4,55 +4,6 @@ local function is_dark(pos)
 end
 
 local actions={}
-actions.PLACE={self_condition=function(self)
-				local front = self:get_front() -- if it is dark, set torch.
-				local wield_stack = self:get_wield_item_stack()
-
-				if is_dark(front)
-				and (wield_stack:get_name() == "default:torch"
-				or self:move_main_to_wield(function (itemname) return itemname == "default:torch" end)) then
-					return true
-				end
-				return false
-
-			end,
-		func=function(self)
-			if self.time_counter >= 5 then
-				self.time_counter = -1
-
-				local owner = minetest.get_player_by_name(self.owner_name)
-				local wield_stack = self:get_wield_item_stack()
-				local front = self:get_front()
-
-				local pointed_thing = {
-					type = "node",
-					under = vector.add(front, {x = 0, y = -1, z = 0}),
-					above = front,
-				}
-
-				if wield_stack:get_name() == "default:torch" then
-					local res_stack, success = minetest.item_place_node(wield_stack, owner, pointed_thing)
-					if success then
-						res_stack:take_item(1)
-						self:set_wield_item_stack(res_stack)
-					end
-				end
-				if self.torcher_accompany then
-					self.state=actions.ACCOMPANY
-					self:set_animation(working_villages.animation_frames.WALK)
-				else
-					working_villages.func.get_back_to_searching(self)
-					self:set_animation(working_villages.animation_frames.STAND)
-				end
-			else
-				self.time_counter = self.time_counter + 1
-			end
-		end,
-		to_state=function(self)
-				self.time_counter = 0
-				self:set_animation(working_villages.animation_frames.MINE)
-				self.torcher_accompany=false
-			end}
 actions.ACCOMPANY={self_condition=function(self)
 				local player = self:get_nearest_player(10)
 				if player == nil then
@@ -71,14 +22,14 @@ actions.ACCOMPANY={self_condition=function(self)
 				end
 				local position = self.object:getpos()
 				if is_dark(position) then
-					local front = self:get_front() -- if it is dark, set touch.
+					local front = self:get_front() -- if it is dark, set torch.
 					local wield_stack = self:get_wield_item_stack()
 					if is_dark(front)
 					and (wield_stack:get_name() == "default:torch"
 					or self:move_main_to_wield(function (itemname) return itemname == "default:torch" end)) then
-						self.time_counter = 0
-						self.state = actions.PLACE
-						self:set_animation(working_villages.animation_frames.WALK_MINE)
+						self.target = front
+						--FIXME: somehow the placement is wrong
+						self:set_state("place_wield")
 						self.torcher_accompany=true
 						return
 					end
@@ -101,7 +52,7 @@ actions.ACCOMPANY={self_condition=function(self)
 			end,
 			}
 local torcher_prop = {
-	night_Active = true,
+	night_active = true,
 	search_idle = true
 }
 working_villages.func.villager_state_machine_job("job_torcher","torcher",actions,torcher_prop)

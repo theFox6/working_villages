@@ -32,6 +32,17 @@ actions.COLLECT = {to_state=function(self, path, destination, target)
 				end
 				return nil
 			end,}
+actions.PLANT = {to_state=function(self)
+			local wield_stack = self:get_wield_item_stack()
+			if minetest.get_item_group(wield_stack:get_name(), "sapling") > 0
+			or self:move_main_to_wield(function(itemname)	return (minetest.get_item_group(itemname, "sapling") > 0) end) then
+				self:set_state("place_wield")
+				return
+			else
+				working_villages.func.get_back_to_searching(self)
+				return
+			end
+		end}
 actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 				--print("found place to plant at: " .. minetest.pos_to_string(destination))
 				self.path = path
@@ -58,11 +69,14 @@ actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
 					return true
 				end
 				return false
-			end,}
+			end,
+	next_state = actions.PLANT
+}
 actions.CUT = {to_state=function(self)
 			--print("cutting tree")
 			self:set_state("dig_target")
-		end}
+		end
+}
 actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 				--print("found place to cut at: " .. minetest.pos_to_string(destination))
 				self.path = path
@@ -71,40 +85,8 @@ actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
 				self:set_state("goto_dest")
 			end,
 			search_condition = find_tree,
-			next_state = actions.CUT}
-actions.PLANT = {to_state=function(self)
-			local wield_stack = self:get_wield_item_stack()
-			if minetest.get_item_group(wield_stack:get_name(), "sapling") > 0
-			or self:move_main_to_wield(function(itemname)	return (minetest.get_item_group(itemname, "sapling") > 0) end) then
-				self.time_counters[1] = 0
-				self.object:setvelocity{x = 0, y = 0, z = 0}
-				self:set_animation(working_villages.animation_frames.MINE)
-				self:set_yaw_by_direction(vector.subtract(self.target, self.object:getpos()))
-				return
-			else
-				working_villages.func.get_back_to_searching(self)
-				return
-			end
-		end,
-		func = function(self)
-			if self.time_counters[1] >= 15 then
-				local stack = self:get_wield_item_stack()
-				local itemname = stack:get_name()
-				local pointed_thing = {
-					type = "node",
-					under = vector.add(self.target, {x = 0, y = -1, z = 0}),
-					above = self.target,
-				}
-				--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
-				minetest.set_node(pointed_thing.above,{name = itemname})
-				stack:take_item(1)
-				self:set_wield_item_stack(stack)
-				working_villages.func.get_back_to_searching(self)
-			else
-				self.time_counters[1] = self.time_counters[1] + 1
-			end
-		end,}
-actions.WALK_TO_PLANT.next_state = actions.PLANT
+			next_state = actions.CUT
+}
 local woodcutter_prop = {
 	searching_range = {x = 10, y = 10, z = 10, h = 5}
 }
