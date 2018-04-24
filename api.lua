@@ -597,7 +597,7 @@ function working_villages.register_villager(product_name, def)
 				if listname == "job" then
 					local job_name = stack:get_name()
 					local job = working_villages.registered_jobs[job_name]
-					self.state = ""
+					self.state = "job"
 					self.time_counters = {}
 					job.on_stop(self)
 
