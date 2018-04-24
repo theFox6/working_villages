@@ -2,8 +2,9 @@ read jobs/util_description.txt for simpler job registration and more functions
 
 I am using the maidroid api, but I have already modified many things.
 
--- registering villagers
--- functions for moving etc.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+this document is deprecated
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 To register a new job you use:
 
