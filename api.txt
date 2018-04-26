@@ -1,10 +1,7 @@
-read jobs/util_description.txt for simpler job registration and more functions
+for specific documentation look for the comments in the api.lua
+read jobs/util_description.txt for more functions
 
 I am using the maidroid api, but I have already modified many things.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
-this document is deprecated
-!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 To register a new job you use:
 
@@ -20,39 +17,43 @@ working_villages.register_job("[itemstring for the job item]", {
 
 for example:
 
+local function is_dark(pos)
+	local light_level = minetest.get_node_light(pos)
+	local below_node = monetest.get_node(vector.add(pos,{x=0,y=-1,z=0}))
+	if minetest.get_node(pos).name == "air" and below_node.name~="air" then
+		return light_level <= 5
+	else
+		return false
+	end
+end
+
 working_villages.register_job("working_villages:example_job", {
 	description      = "working_villages job : example",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
 	on_start         = function(self)
-		self.object:setacceleration{x = 0, y = -10, z = 0}
-		self.object:setvelocity{x = 0, y = 0, z = 0}
-		self.state = state.WALK_RANDOMLY
-		self.time_counters = {}
-		self.path = nil
-		to_walk_randomly(self)
+		self:change_direction_randomly()
+		self:set_animation(working_villages.animation_frames.WALK)
 	end,
 	on_stop          = function(self)
 		self.object:setvelocity{x = 0, y = 0, z = 0}
-		self.state = nil
-		self.time_counters = nil
-		self.path = nil
 		self:set_animation(working_villages.animation_frames.STAND)
 	end,
 	on_resume        = [same as on_start],
 	on_pause         = [same as on_stop],
 	on_step          = function (self, dtime)
-		if self.state == state.WALK_RANDOMLY then
-			walk_randomly(self, dtime)
-		elseif self.state == state.WALK_TO_PLANT or self.state == state.WALK_TO_MOW then
-			walk_to_plant_and_mow_common(self, dtime)
-		elseif self.state == state.PLANT then
-			plant(self, dtime)
-		elseif self.state == state.MOW then
-			mow(self, dtime)
+		if self.target and self:is_near({x=self.target.x,y=self.object:getpos().y,z=self.target.z}, 2) then
+			if wield_stack:get_name() ~= "default:torch" then
+				self:move_main_to_wield(function (itemname) return itemname == "default:torch" end)
+			end
+			self:set_state("place_wield")
+			self.target = nil
+		end
+		self.target = working_villages.func.search_surrounding(self.object:getpos(), is_dark, {x=10,y=3,z=3})
+		if self.target then
+			self.destination = working_villages.func.find_adjacent_clear(self.target)
+			if self.destination then
+				self:set_state("goto_destination")
+			end
 		end
 	end,
 })
-
-("state" must be a table containing ids for every state in this case)
-
-for further documentation look for the comments in the api.lua
