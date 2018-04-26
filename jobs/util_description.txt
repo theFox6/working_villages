@@ -28,14 +28,16 @@ registers a job with:
 itemstring="working_villages:"..job_name
 description="working_villages job : "..job_description
 actions has to be a table containing states like this:
-actions.some_state = {to_state=function(self, path, destination, target)
+actions.some_state = {to_state=function(self, destination, target)
 				--(opional) what to do while entering this state
 				print("found place to do something at: " .. minetest.pos_to_string(destination))
+				self.destination = destination
 				print("my actual target is: " .. minetest.pos_to_string(target))
-				--path is a table containing the positions of waypoints to the destination
+				self.target = target
+				self:set_state("goto_dest")
 			end,
 			func = function(self)
-				--do something every step we have this state
+				--(optional) do something every step we have this state
 			end,
 			self_condition=function(self)
 				--(optional) return true if the villager is ready to go to this state
@@ -45,7 +47,7 @@ actions.some_state = {to_state=function(self, path, destination, target)
 				--this is used as "pred(pos) for search_surrounding(pos, pred, searching_range)"
 			end,
 			next_state=actions.different_state
-			--(optional) go to this state if func(self) returns true
+				--(optional) go to this state if func(self) returns true or is not defined
 			}
 sprop has to be a table containing special properties:
 property name   |          default            |   type  | description
@@ -55,4 +57,4 @@ searching_range =  {x = 10, y = 3, z = 10}    -- table  , searching range for se
 
 
 function working_villages.func.get_back_to_searching(self)
-makes a villager switch to the SEARCH state witch is default for a state_machine_job
+makes a villager switch to the SEARCH state which is default for a state_machine_job
