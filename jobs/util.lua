@@ -177,7 +177,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 						if path ~= nil then
 							--print("path found to: " .. minetest.pos_to_string(destination))
 							if search_state.to_state then
-								search_state.to_state(self, path, destination, target)
+								search_state.to_state(self, destination, target)
 							end
 							self.job_state=search_state
 							return
@@ -205,7 +205,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 							if path ~= nil then
 								--print("path found to: " .. minetest.pos_to_string(destination))
 								if search_state.to_state then
-									search_state.to_state(self, path, destination, target)
+									search_state.to_state(self, destination, target)
 								end
 								self.job_state=search_state
 								return
@@ -266,7 +266,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 						end
 						if path ~= nil then
 							if search_state.to_state then
-								search_state.to_state(self, path, destination, target)
+								search_state.to_state(self, destination, target)
 							end
 							self.job_state=search_state
 							return

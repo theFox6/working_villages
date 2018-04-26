@@ -14,8 +14,7 @@ local function is_sapling(node)
 end
 
 local actions={}
-actions.COLLECT = {to_state=function(self, path, destination, target)
-				self.path = path
+actions.COLLECT = {to_state=function(self, destination, target)
 				self.destination = destination
 				self.target = target
 				self:set_state("goto_dest")
@@ -43,9 +42,8 @@ actions.PLANT = {to_state=function(self)
 				return
 			end
 		end}
-actions.WALK_TO_PLANT = {to_state=function(self, path, destination, target)
+actions.WALK_TO_PLANT = {to_state=function(self, destination, target)
 				--print("found place to plant at: " .. minetest.pos_to_string(destination))
-				self.path = path
 				self.destination = destination
 				self.target = target
 				self:set_state("goto_dest")
@@ -77,9 +75,8 @@ actions.CUT = {to_state=function(self)
 			self:set_state("dig_target")
 		end
 }
-actions.WALK_TO_CUT = {to_state=function(self, path, destination,target)
+actions.WALK_TO_CUT = {to_state=function(self, destination,target)
 				--print("found place to cut at: " .. minetest.pos_to_string(destination))
-				self.path = path
 				self.destination = destination
 				self.target = target
 				self:set_state("goto_dest")
