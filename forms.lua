@@ -59,8 +59,8 @@ minetest.register_on_player_receive_fields(
 				return
 			end
 			if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-				minetest.chat_send_player(sender_name, 'The coordinates of your home position "..
-					"do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
+				minetest.chat_send_player(sender_name, "The coordinates of your home position "..
+					"do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.")
 				return
 			end
 			if minetest.get_node(coords).name ~= "working_villages:home_marker" then
