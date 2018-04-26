@@ -1,3 +1,5 @@
+working_villages.register_state("idle",{})
+
 working_villages.register_state("job",{
 	on_step = function(self,dtime)
 		--[[ if owner didn't login, the villager does nothing.
