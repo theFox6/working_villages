@@ -22,6 +22,16 @@ working_villages.homes = (function()
 	return {}
 end) ()
 
+local function out_of_limit(pos)
+	if (coords.x>30927 or coords.x<-30912
+		or coords.y>30927 or coords.y<-30912
+		or coords.z>30927 or coords.z<-30912) then
+
+		return false
+	end
+	return true
+end
+
 minetest.register_node("working_villages:home_marker", {
 	description = "home marker for working_villages",
 	drawtype = "nodebox",
@@ -76,9 +86,9 @@ minetest.register_node("working_villages:home_marker", {
 				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
 				'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 			failed = true
-		elseif(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. '..
-				'Correct coordinates range from -30912 to 30927 in all axes.')
+		elseif out_of_limit(coords) then
+			minetest.chat_send_player(sender_name, 'The coordinates of your bed position '..
+				'do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
 			failed = true
 		else
 			meta:set_string("bed", fields.bed_pos)
@@ -89,9 +99,9 @@ minetest.register_node("working_villages:home_marker", {
 			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the door position. '..
 				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 			failed = true
-		elseif(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-			minetest.chat_send_player(sender_name, 'The coordinates of your bed position do not exist in our coordinate system. '..
-				'Correct coordinates range from -30912 to 30927 in all axes.')
+		elseif out_of_limit(coords) then
+			minetest.chat_send_player(sender_name, 'The coordinates of your bed position '..
+				'do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
 			failed = true
 		else
 			meta:set_string("door", fields.door_pos)
