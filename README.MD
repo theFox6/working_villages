@@ -22,6 +22,7 @@ features:
   * just for a nicer look
 * jobs:
   * woodcutter/lumberjack (cutting trees and planting saplings, not night active)
+  * plant collector (collecting all sort of fauna to produce dyes etc.)
 * testing jobs:
   * snowclearer (clearing snow away, not night active)
   * player follower (following any player, night active)
