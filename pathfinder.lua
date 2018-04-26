@@ -109,6 +109,7 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 	openSet[start_index] = {hCost = h_start, gCost = 0, fCost = h_start, parent = nil, pos = pos}
 
 	-- Entity values
+	-- TODO: support nil entity
 	local entity_height = math.ceil(entity.collisionbox[5] - entity.collisionbox[2])
 	local entity_fear_height = entity.fear_height or 2
 	local entity_jump_height = entity.jump_height or 1
@@ -276,6 +277,17 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 end
 
 working_villages.pathfinder.walkable = walkable
-function working_villages.pathfinder.get_ground_level(pos)
+local function get_ground_level(pos)
 	return get_neighbor_ground_level(pos, 30927, 30927)
+end
+
+working_villages.pathfinder.get_ground_level = get_ground_level
+
+function working_villages.pathfinder.get_reachable(pos, endpos, entity)
+	local path = working_villages.pathfinder.find_path(pos, endpos, entity)
+	if path == nil then
+		local corr_dest = get_ground_level({x=endpos.x,y=endpos.y-1,z=endpos.z})
+		path = working_villages.pathfinder.find_path(pos, corr_dest, entity)
+	end
+	return path
 end

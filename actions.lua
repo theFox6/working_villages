@@ -22,7 +22,7 @@ working_villages.register_state("goto_dest",{
 			self.destination=working_villages.pathfinder.get_ground_level(vector.round(self.destination))
 		end
 		local val_pos = working_villages.func.validate_pos(self.object:getpos())
-		self.path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
+		self.path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
 		self:set_timer("goto_dest:find_path",0) -- find path interval
 		self:set_timer("goto_dest:change_dir",0)
 		if self.path == nil then
@@ -37,7 +37,7 @@ working_villages.register_state("goto_dest",{
 		self:count_timer("goto_dest:change_dir")
 		if self:timer_exceeded("goto_dest:find_path",100) then
 			local val_pos = working_villages.func.validate_pos(self.object:getpos())
-			local path = working_villages.pathfinder.find_path(val_pos, self.destination, self)
+			local path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
 			if path ~= nil then
 				self.path = path
 			end

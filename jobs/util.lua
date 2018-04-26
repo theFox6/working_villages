@@ -127,24 +127,6 @@ function working_villages.func.find_adjacent_pos(pos,pred)
 	return false
 end
 
-function working_villages.func.is_reachable(destination,self)
-	local val_pos = working_villages.func.validate_pos(self.object:getpos())
-	if working_villages.debug_logging then
-		minetest.log("info","looking for a path from " .. minetest.pos_to_string(val_pos) ..
-			" to " .. minetest.pos_to_string(destination))
-	end
-	local path = working_villages.pathfinder.find_path(val_pos, destination, self)
-	if path == nil then
-		local corr_dest = working_villages.pathfinder.get_ground_level({x=destination.x,y=destination.y-1,z=destination.z})
-		if working_villages.debug_logging then
-			minetest.log("info","looking for a new path from " .. minetest.pos_to_string(val_pos) ..
-				" to " .. minetest.pos_to_string(corr_dest))
-		end
-		path = working_villages.pathfinder.find_path(val_pos, corr_dest, self)
-	end
-	return path ~= nil
-end
-
 function working_villages.func.villager_state_machine_job(job_name,job_description,actions, sprop)
 	--special properties
 	if sprop.night_active ~= true then
@@ -191,7 +173,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 							minetest.log("info","looking for a path from " .. minetest.pos_to_string(val_pos) ..
 								" to " .. minetest.pos_to_string(destination))
 						end
-						if working_villages.func.is_reachable(destination,self) then
+						local val_pos = working_villages.func.validate_pos(self.object:getpos())
+						if working_villages.pathfinder.get_reachable(val_pos,destination,self) then
 							--print("path found to: " .. minetest.pos_to_string(destination))
 							if search_state.to_state then
 								search_state.to_state(self, destination, target)
@@ -214,7 +197,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 								minetest.log("info","looking for a path from " .. minetest.pos_to_string(val_pos) ..
 									" to " .. minetest.pos_to_string(destination))
 							end
-							if working_villages.func.is_reachable(destination,self) then
+							local val_pos = working_villages.func.validate_pos(self.object:getpos())
+							if working_villages.pathfinder.get_reachable(val_pos,destination,self) then
 								--print("path found to: " .. minetest.pos_to_string(destination))
 								if search_state.to_state then
 									search_state.to_state(self, destination, target)
@@ -272,7 +256,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 							destination = target
 						end
 						local val_pos = working_villages.func.validate_pos(self.object:getpos())
-						if working_villages.func.is_reachable(destination,self) then
+						if working_villages.pathfinder.get_reachable(val_pos,destination,self) then
 							if search_state.to_state then
 								search_state.to_state(self, destination, target)
 							end
