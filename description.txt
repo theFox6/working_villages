@@ -1,1 +1,1 @@
-A mod adding villager NPCs that are working. Right now it's mostly adapted from the Maidroid mod, but big features are planned.
+A mod adding villager NPCs that are doing predefined work. Big features are planned.
