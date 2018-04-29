@@ -1,9 +1,10 @@
-for specific documentation look for the comments in the api.lua
-read jobs/util_description.txt for more functions
+for specific documentation look for the comments in the (api.lua)
+read (jobs/util_description.MD) for more functions
 
 I am using the maidroid api, but I have already modified many things.
 
 To register a new job you use:
+```
 
 working_villages.register_job("[itemstring for the job item]", {
 	description      = "[description for the job item]",
@@ -14,8 +15,10 @@ working_villages.register_job("[itemstring for the job item]", {
 	on_pause         = [the same as on_stop can be used](self),
 	on_step          = [function for the actions we are doing every step](self, deltaTime),
 })
+```
 
 for example:
+```
 
 local function is_dark(pos)
 	local light_level = minetest.get_node_light(pos)
@@ -57,3 +60,4 @@ working_villages.register_job("working_villages:example_job", {
 		end
 	end,
 })
+```

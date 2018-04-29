@@ -27,3 +27,5 @@ features:
   * snowclearer (clearing snow away, not night active)
   * player follower (following any player, night active)
   * torcher (following player and placing torches in the dark, night active)
+
+for developining jobs read (api.MD)
