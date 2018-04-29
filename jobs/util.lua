@@ -173,7 +173,6 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 							minetest.log("info","looking for a path from " .. minetest.pos_to_string(val_pos) ..
 								" to " .. minetest.pos_to_string(destination))
 						end
-						local val_pos = working_villages.func.validate_pos(self.object:getpos())
 						if working_villages.pathfinder.get_reachable(val_pos,destination,self) then
 							--print("path found to: " .. minetest.pos_to_string(destination))
 							if search_state.to_state then
@@ -197,7 +196,6 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 								minetest.log("info","looking for a path from " .. minetest.pos_to_string(val_pos) ..
 									" to " .. minetest.pos_to_string(destination))
 							end
-							local val_pos = working_villages.func.validate_pos(self.object:getpos())
 							if working_villages.pathfinder.get_reachable(val_pos,destination,self) then
 								--print("path found to: " .. minetest.pos_to_string(destination))
 								if search_state.to_state then
@@ -249,10 +247,11 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 					self_cond=true
 				end
 				if search_state.search_condition ~= nil and self_cond then
-					local target = working_villages.func.search_surrounding(self.object:getpos(), search_state.search_condition, sprop.searching_range)
+					local target = working_villages.func.search_surrounding(self.object:getpos(),
+						search_state.search_condition, sprop.searching_range)
 					if target ~= nil then
 						local destination = find_adjacent_clear(target)
-						if not(destnation) then
+						if not(destination) then
 							destination = target
 						end
 						local val_pos = working_villages.func.validate_pos(self.object:getpos())
@@ -302,8 +301,10 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		minetest.log("action","a villager is laying down")
 		self.object:setvelocity{x = 0, y = 0, z = 0}
 		local bed_pos=self:get_home():get_bed()
-		local bed_top = working_villages.func.find_adjacent_pos(bed_pos,function(p) return string.find(minetest.get_node(p).name,"_top") end)
-		local bed_bottom = working_villages.func.find_adjacent_pos(bed_pos,function(p) return string.find(minetest.get_node(p).name,"_bottom") end)
+		local bed_top = working_villages.func.find_adjacent_pos(bed_pos,
+			function(p) return string.find(minetest.get_node(p).name,"_top") end)
+		local bed_bottom = working_villages.func.find_adjacent_pos(bed_pos,
+			function(p) return string.find(minetest.get_node(p).name,"_bottom") end)
 		if bed_top and bed_bottom then
 			self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
 		else

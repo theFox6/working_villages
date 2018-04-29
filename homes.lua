@@ -23,9 +23,9 @@ working_villages.homes = (function()
 end) ()
 
 local function out_of_limit(pos)
-	if (coords.x>30927 or coords.x<-30912
-		or coords.y>30927 or coords.y<-30912
-		or coords.z>30927 or coords.z<-30912) then
+	if (pos.x>30927 or pos.x<-30912
+		or pos.y>30927 or pos.y<-30912
+		or pos.z>30927 or pos.z<-30912) then
 
 		return false
 	end
@@ -97,7 +97,8 @@ minetest.register_node("working_villages:home_marker", {
 		if coords == nil then
 			-- fail on illegal input of coordinates
 			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the door position. '..
-				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
+				'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 			failed = true
 		elseif out_of_limit(coords) then
 			minetest.chat_send_player(sender_name, 'The coordinates of your bed position '..
@@ -160,7 +161,7 @@ function working_villages.home:get_marker_meta()
 	if minetest.get_node(home_marker_pos).name ~= "working_villages:home_marker" then
 		if working_villages.debug_logging and not(vector.equals(home_marker_pos,{x=0,y=0,z=0})) then
 			minetest.log("warning", "The door position of an invalid home was requested.")
-			minetest.log("warning", "Given home position:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
+			minetest.log("warning", "Given home position:" .. minetest.pos_to_string(home_marker_pos))
 		end
 		return false
 	end
@@ -177,7 +178,7 @@ function working_villages.home:get_door()
 	if not door_pos then
 		if working_villages.debug_logging then
 			local home_marker_pos = self:get_marker()
-			minetest.log("warning", "The position outside the house was not entered for the home at:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
+			minetest.log("warning", "The position outside the house was not entered for the home at:" .. minetest.pos_to_string(home_marker_pos))
 		end
 		return false
 	end
@@ -196,7 +197,7 @@ function working_villages.home:get_bed()
 	if not bed_pos then
 		if working_villages.debug_logging then
 			local home_marker_pos = self:get_marker()
-			minetest.log("warning", "The position of the bed was not entered for the home at:" .. home_marker_pos.x .. "," .. home_marker_pos.y .. "," .. home_marker_pos.z)
+			minetest.log("warning", "The position of the bed was not entered for the home at:" .. minetest.pos_to_string(home_marker_pos))
 		end
 		return false
 	end
