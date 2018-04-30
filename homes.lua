@@ -178,7 +178,8 @@ function working_villages.home:get_door()
 	if not door_pos then
 		if working_villages.debug_logging then
 			local home_marker_pos = self:get_marker()
-			minetest.log("warning", "The position outside the house was not entered for the home at:" .. minetest.pos_to_string(home_marker_pos))
+			minetest.log("warning", "The position outside the house was not entered for the home at:" ..
+				minetest.pos_to_string(home_marker_pos))
 		end
 		return false
 	end
@@ -197,7 +198,8 @@ function working_villages.home:get_bed()
 	if not bed_pos then
 		if working_villages.debug_logging then
 			local home_marker_pos = self:get_marker()
-			minetest.log("warning", "The position of the bed was not entered for the home at:" .. minetest.pos_to_string(home_marker_pos))
+			minetest.log("warning", "The position of the bed was not entered for the home at:" ..
+				minetest.pos_to_string(home_marker_pos))
 		end
 		return false
 	end
