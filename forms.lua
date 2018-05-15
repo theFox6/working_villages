@@ -37,6 +37,7 @@ function working_villages.forms.show_talking_formspec(self, playername)
 		.. "label[3.5,2;hello]"
 		.. "button_exit[3.5,8;1,1;exit;bye]"
 	minetest.show_formspec(playername,"villager:gui_talk_"..self.inventory_name, formstring)
+	--TODO: make something out of this placeholder
 end
 
 
