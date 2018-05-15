@@ -109,10 +109,14 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 	openSet[start_index] = {hCost = h_start, gCost = 0, fCost = h_start, parent = nil, pos = pos}
 
 	-- Entity values
-	-- TODO: support nil entity
-	local entity_height = math.ceil(entity.collisionbox[5] - entity.collisionbox[2])
-	local entity_fear_height = entity.fear_height or 2
-	local entity_jump_height = entity.jump_height or 1
+	local entity_height = 2
+	local entity_fear_height = 2
+	local entity_jump_height = 1
+	if entity then
+		entity_height = math.ceil(entity.collisionbox[5] - entity.collisionbox[2])
+		entity_fear_height = entity.fear_height or 2
+		entity_jump_height = entity.jump_height or 1
+	end
 
 	repeat
 		local current_index
