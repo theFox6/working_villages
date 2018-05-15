@@ -350,7 +350,7 @@ end
 --if ignore_fence is false the villager will not jump over fences
 function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 	local velocity = self.object:getvelocity()
-	local inside_node = minetest.get_node(self.object:getpos())
+	--local inside_node = minetest.get_node(self.object:getpos())
 	--if string.find(inside_node.name,"doors:door") and not ignore_doors then
 	--	self:change_direction(vector.round(self.object:getpos()))
 	--end
