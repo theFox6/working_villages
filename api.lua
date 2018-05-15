@@ -130,7 +130,7 @@ function working_villages.villager:get_front()
 		direction.z = 0
 	end
 
-	direction.y = direction.y - 1
+	--direction.y = direction.y - 1
 
 	return vector.add(vector.round(self.object:getpos()), direction)
 end
@@ -158,7 +158,7 @@ function working_villages.villager:get_back()
 		direction.z = 0
 	end
 
-	direction.y = direction.y - 1
+	--direction.y = direction.y - 1
 
 	return vector.add(vector.round(self.object:getpos()), direction)
 end
@@ -186,7 +186,7 @@ function working_villages.villager:set_animation(frame)
 		local dirz = math.abs(dir.z)*0.5
 		self.object:set_properties({collisionbox={-0.5-dirx, -1, -0.5-dirz, 0.5+dirx, -0.5, 0.5+dirz}})
 	else
-		self.object:set_properties({collisionbox={-0.25, -1, -0.25, 0.25, 0.75, 0.25}})
+		self.object:set_properties({collisionbox={-0.25, 0, -0.25, 0.25, 1.75, 0.25}})
 	end
 end
 
@@ -340,7 +340,7 @@ end
 -- working_villages.villager.is_near checks if the villager is withing the radius of a position
 function working_villages.villager:is_near(pos, distance)
 	local p = self.object:getpos()
-	p.y = p.y - 0.5
+	p.y = p.y + 0.5
 	return vector.distance(p, pos) < distance
 end
 
