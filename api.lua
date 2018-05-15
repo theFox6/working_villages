@@ -184,7 +184,7 @@ function working_villages.villager:set_animation(frame)
 		local dir = self:get_look_direction()
 		local dirx = math.abs(dir.x)*0.5
 		local dirz = math.abs(dir.z)*0.5
-		self.object:set_properties({collisionbox={-0.5-dirx, -1, -0.5-dirz, 0.5+dirx, -0.5, 0.5+dirz}})
+		self.object:set_properties({collisionbox={-0.5-dirx, 0, -0.5-dirz, 0.5+dirx, 0.5, 0.5+dirz}})
 	else
 		self.object:set_properties({collisionbox={-0.25, 0, -0.25, 0.25, 1.75, 0.25}})
 	end
@@ -351,9 +351,9 @@ end
 function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 	local velocity = self.object:getvelocity()
 	local inside_node = minetest.get_node(self.object:getpos())
-	if string.find(inside_node.name,"doors:door") and not ignore_doors then
-		self:change_direction(vector.round(self.object:getpos()))
-	end
+	--if string.find(inside_node.name,"doors:door") and not ignore_doors then
+	--	self:change_direction(vector.round(self.object:getpos()))
+	--end
 	if velocity.y == 0 then
 		local front_node = self:get_front_node()
 		local above_node = self:get_front()
