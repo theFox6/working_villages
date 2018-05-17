@@ -5,7 +5,6 @@ else
   print("[MOD] "..minetest.get_current_modname()..": loading")
 end
 
-rawset(_G,"working_villages",false)
 working_villages={
 	modpath=minetest.get_modpath("working_villages"),
 	debug_logging=true,
