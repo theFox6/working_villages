@@ -123,7 +123,7 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 		local current_values
 
 		-- Get one index as reference from openSet
-		current_index, current_values = pairs(openSet)(openSet)
+		current_index, current_values = next(openSet)
 
 		-- Search for lowest fCost
 		for i, v in pairs(openSet) do
