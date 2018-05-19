@@ -7,10 +7,15 @@ working_villages.register_state("job",{
 			return
 		end--]]
 
-		local job = self:get_job()
 
-		if job then
+		local job = self:get_job()
+		if not job then return end
+		if type(job.on_step)=="function" then
 			job.on_step(self, dtime)
+		elseif self.job_thread then
+			if coroutine.status(self.job_thread) == "suspended" then
+				coroutine.resume(self.job_thread, self)
+			end
 		end
 	end
 })
@@ -22,9 +27,11 @@ working_villages.register_state("goto_dest",{
 			self.destination=working_villages.pathfinder.get_ground_level(vector.round(self.destination))
 		end
 		local val_pos = working_villages.func.validate_pos(self.object:getpos())
+		--FIXME: doesn't seem to be right if villager is right below a roof
 		self.path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
 		self:set_timer("goto_dest:find_path",0) -- find path interval
 		self:set_timer("goto_dest:change_dir",0)
+		self:set_timer("goto_dest:give_up",0)
 		if self.path == nil then
 			self.path = {self.destination}
 		end
@@ -38,7 +45,17 @@ working_villages.register_state("goto_dest",{
 		if self:timer_exceeded("goto_dest:find_path",100) then
 			local val_pos = working_villages.func.validate_pos(self.object:getpos())
 			local path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
-			if path ~= nil then
+			if path == nil then
+				self:count_timer("goto_dest:give_up")
+				if self:timer_exceeded("goto_dest:give_up",3) then
+					self.destination=vector.round(self.destination)
+					if working_villages.func.walkable_pos(self.destination) then
+						self.destination=working_villages.pathfinder.get_ground_level(vector.round(self.destination))
+					end
+					print("villager can't find path")
+					--FIXME: we ought to give up at this point
+				end
+			else
 				self.path = path
 			end
 		end

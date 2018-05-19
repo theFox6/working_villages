@@ -405,6 +405,13 @@ function working_villages.villager:pickup_item()
 	end
 end
 
+-- working_villages.villager.is_active check if the villager is paused.
+function working_villages.villager:is_active()
+	return self.pause == "active"
+end
+
+dofile(working_villages.modpath.."/async_actions.lua") --load states
+
 ---------------------------------------------------------------------
 
 function working_villages.villager.get_state(id)
@@ -431,7 +438,8 @@ function working_villages.register_state(id,def)
 	--minetest.log("debug","registered state: "..id)
 end
 
-dofile(working_villages.modpath.."/actions.lua") --load states
+dofile(working_villages.modpath.."/states.lua") --load states
+--TODO: move states to async_actions
 
 ---------------------------------------------------------------------
 
@@ -548,7 +556,6 @@ function working_villages.register_egg(egg_name, def)
 				)
 				new_villager:get_luaentity().owner_name = user:get_player_name()
 				new_villager:get_luaentity():update_infotext()
-				new_villager:setvelocity{x =0, y = 5, z = 0}
 
 				itemstack:take_item()
 				return itemstack
@@ -575,7 +582,11 @@ function working_villages.register_villager(product_name, def)
 				if listname == "job" then
 					local job_name = stack:get_name()
 					local job = working_villages.registered_jobs[job_name]
-					job.on_start(self)
+					if type(job.on_start)=="function" then
+						job.on_start(self)
+					elseif type(job.jobfunc)=="function" then
+						self.job_thread = coroutine.create(job.jobfunc)
+					end
 					self:set_state("job")
 					self:update_infotext()
 				end
@@ -599,8 +610,13 @@ function working_villages.register_villager(product_name, def)
 					local job = working_villages.registered_jobs[job_name]
 					self:set_state("idle")
 					self.time_counters = {}
-					job.on_stop(self)
-
+					if job then
+						if type(job.on_stop)=="function" then
+							job.on_stop(self)
+						elseif type(job.jobfunc)=="function" then
+							self.job_thread = false
+						end
+					end
 					self:update_infotext()
 				end
 			end,
@@ -619,11 +635,19 @@ function working_villages.register_villager(product_name, def)
 					local job = working_villages.registered_jobs[job_name]
 
 					if to_list == "job" then
-						job.on_start(self)
+						if type(job.on_start)=="function" then
+							job.on_start(self)
+						elseif type(job.jobfunc)=="function" then
+							self.job_thread = coroutine.create(job.jobfunc)
+						end
 						self:set_state("job")
 					elseif from_list == "job" then
 						self:set_state("idle")
-						job.on_stop(self)
+						if type(job.on_stop)=="function" then
+							job.on_stop(self)
+						elseif type(job.jobfunc)=="function" then
+							self.job_thread = false
+						end
 					end
 
 					self:update_infotext()
@@ -686,17 +710,23 @@ function working_villages.register_villager(product_name, def)
 			text = self.nametag
 		}
 
+		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.object:setacceleration{x = 0, y = -10, z = 0}
+
 		local job = self:get_job()
 		if job ~= nil then
-			job.on_start(self)
+			if type(job.on_start)=="function" then
+				job.on_start(self)
+			elseif type(job.jobfunc)=="function" then
+				self.job_thread = coroutine.create(job.jobfunc)
+			end
 			self:set_state("job")
 			if self.pause == "resting" then
 				self:set_state("idle")
-				job.on_pause(self)
+				if type(job.on_pause)=="function" then
+					job.on_pause(self)
+				end
 			end
-		else
-			self.object:setvelocity{x = 0, y = 0, z = 0}
-			self.object:setacceleration{x = 0, y = -10, z = 0}
 		end
 	end
 
@@ -777,7 +807,7 @@ function working_villages.register_villager(product_name, def)
 		physical                     = true,
 		visual                       = "mesh",
 		visual_size                  = {x = 1, y = 1},
-		collisionbox                 = {-0.25, -1, -0.25, 0.25, 0.75, 0.25},
+		collisionbox                 = {-0.25, 0, -0.25, 0.25, 1.75, 0.25},
 		is_visible                   = true,
 		makes_footstep_sound         = true,
 		infotext                     = "",
@@ -786,6 +816,7 @@ function working_villages.register_villager(product_name, def)
 		-- extra initial properties
 		pause                        = "active",
 		state                        = "job",
+		job_thread                   = false,
 		product_name                 = "",
 		manufacturing_number         = -1,
 		owner_name                   = "",
@@ -807,6 +838,9 @@ function working_villages.register_villager(product_name, def)
 		get_state                    = working_villages.villager.get_state,
 		set_state                    = working_villages.villager.set_state,
 
+		-- async methods.
+		goto                    = working_villages.villager.goto,
+
 		-- extra methods.
 		get_inventory                = working_villages.villager.get_inventory,
 		get_job                      = working_villages.villager.get_job,
@@ -826,6 +860,7 @@ function working_villages.register_villager(product_name, def)
 		move_main_to_wield           = working_villages.villager.move_main_to_wield,
 		is_named                     = working_villages.villager.is_named,
 		is_near                      = working_villages.villager.is_near,
+		is_active                    = working_villages.villager.is_active,
 		has_item_in_main             = working_villages.villager.has_item_in_main,
 		change_direction             = working_villages.villager.change_direction,
 		change_direction_randomly    = working_villages.villager.change_direction_randomly,
