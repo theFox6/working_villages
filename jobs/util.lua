@@ -1,6 +1,5 @@
 function working_villages.func.validate_pos(pos)
   local resultp = vector.round(pos)
-  resultp = vector.subtract(resultp,{x=0,y=1,z=0})
   local node = minetest.get_node(resultp)
   if minetest.registered_nodes[node.name].walkable then
     resultp = vector.subtract(pos, resultp)
