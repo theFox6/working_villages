@@ -17,7 +17,7 @@ working_villages.register_state("job",{
 				self.job_thread = coroutine.create(job.jobfunc)
 			end
 			if coroutine.status(self.job_thread) == "suspended" then
-				state, err = coroutine.resume(self.job_thread, self)
+				local state, err = coroutine.resume(self.job_thread, self)
 				if state == false then
 					error("error in job_thread " .. err)
 				end

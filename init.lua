@@ -21,6 +21,8 @@ dofile(working_villages.modpath.."/api.lua")
 dofile(working_villages.modpath.."/register.lua")
 dofile(working_villages.modpath.."/commanding_sceptre.lua")
 
+dofile(working_villages.modpath.."/deprecated.lua")
+
 --jobs
 dofile(working_villages.modpath.."/jobs/util.lua")
 dofile(working_villages.modpath.."/jobs/empty.lua")
