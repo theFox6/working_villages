@@ -295,7 +295,7 @@ end
 -- working_villages.villager.count_timer count a counter up by 1.
 function working_villages.villager:count_timer(timerId)
 	if not self.time_counters[timerId] then
-		minetest.log("warning","timer \""..timerId.."\" was not initialized")
+		minetest.log("info","timer \""..timerId.."\" was not initialized")
 		self.time_counters[timerId] = 0
 	end
 	self.time_counters[timerId] = self.time_counters[timerId] + 1
@@ -842,7 +842,8 @@ function working_villages.register_villager(product_name, def)
 		set_state                    = working_villages.villager.set_state,
 
 		-- async methods.
-		goto                    = working_villages.villager.goto,
+		goto                         = working_villages.villager.goto,
+		dig                          = working_villages.villager.dig,
 
 		-- extra methods.
 		get_inventory                = working_villages.villager.get_inventory,
