@@ -294,7 +294,10 @@ end
 
 -- working_villages.villager.count_timer count a counter up by 1.
 function working_villages.villager:count_timer(timerId)
-	assert(self.time_counters[timerId],"timer \""..timerId.."\" was not initialized")
+	if not self.time_counters[timerId] then
+		minetest.log("warning","timer \""..timerId.."\" was not initialized")
+		self.time_counters[timerId] = 0
+	end
 	self.time_counters[timerId] = self.time_counters[timerId] + 1
 end
 
