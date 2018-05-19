@@ -1,7 +1,6 @@
+I started using the maidroid api, but by now it's a lot different.
 for specific documentation look for the comments in the (api.lua)
 read (jobs/util_description.MD) for more functions
-
-I am using the maidroid api, but I have already modified many things.
 
 To register a new job you use:
 ```
