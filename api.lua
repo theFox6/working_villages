@@ -842,7 +842,7 @@ function working_villages.register_villager(product_name, def)
 		set_state                    = working_villages.villager.set_state,
 
 		-- async methods.
-		goto                         = working_villages.villager.goto,
+		go_to                         = working_villages.villager.go_to,
 		dig                          = working_villages.villager.dig,
 		place                        = working_villages.villager.place,
 

@@ -1,4 +1,4 @@
-function working_villages.villager:goto(pos)
+function working_villages.villager:go_to(pos)
 	self.destination = pos
 	self:set_state("goto_dest")
 	coroutine.yield()

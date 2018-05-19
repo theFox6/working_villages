@@ -20,7 +20,7 @@ working_villages.register_job("working_villages:job_snowclearer", {
 						print("failure: no adjacent walkable found")
 						destination = target
 					end
-					self:goto(destination)
+					self:go_to(destination)
 					self:dig(target)
 				end
 			elseif self:timer_exceeded("snowclearer:change_dir",50) then
