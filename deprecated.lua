@@ -1,3 +1,5 @@
+local find_adjacent_clear = working_villages.func.find_adjacent_clear
+
 function working_villages.func.villager_state_machine_job(job_name,job_description,actions, sprop)
 	minetest.log("warning","old util jobdef should be replaced by jobfunc registration")
 	minetest.log("warning","old util jobdef: "..job_name)
