@@ -844,6 +844,7 @@ function working_villages.register_villager(product_name, def)
 		-- async methods.
 		goto                         = working_villages.villager.goto,
 		dig                          = working_villages.villager.dig,
+		place                        = working_villages.villager.place,
 
 		-- extra methods.
 		get_inventory                = working_villages.villager.get_inventory,
