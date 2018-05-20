@@ -130,7 +130,7 @@ function working_villages.villager:goto_bed()
 			if working_villages.debug_logging then
 				minetest.log("info","his bed is at:" .. self.destination.x .. ",".. self.destination.y .. ",".. self.destination.z)
 			end
-			self:goto(bed_pos)
+			self:go_to(bed_pos)
 			self:sleep()
 		end
 	end
