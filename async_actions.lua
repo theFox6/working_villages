@@ -14,7 +14,7 @@ function working_villages.villager:go_to(pos)
 	--print("the first waypiont on his path:" .. minetest.pos_to_string(self.path[1]))
 	self:change_direction(self.path[1])
 	self:set_animation(working_villages.animation_frames.WALK)
-	
+
 	while #self.path ~= 0 do
 		self:count_timer("goto_dest:find_path")
 		self:count_timer("goto_dest:change_dir")
@@ -78,7 +78,7 @@ function working_villages.villager:place(itemname,pos)
 	end
 end
 
-function working_villages.villager:wait_until_dawn()
+function working_villages.villager.wait_until_dawn()
 	while (minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76) do
 		coroutine.yield()
 	end
@@ -102,7 +102,7 @@ function working_villages.villager:sleep()
 	self.pause="sleeping"
 	self:update_infotext()
 
-	self:wait_until_dawn()
+	self.wait_until_dawn()
 
 	local pos=self.object:getpos()
 	self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
@@ -118,14 +118,14 @@ function working_villages.villager:goto_bed()
 	end
 	if not self:has_home() then
 		self:set_animation(working_villages.animation_frames.SIT)
-		self:wait_until_dawn()
+		self.wait_until_dawn()
 	else
 		local bed_pos = self:get_home():get_bed()
 		if not bed_pos then
 			minetest.log("warning","villager couldn't find his bed")
 			--perhaps go home
 			self:set_animation(working_villages.animation_frames.SIT)
-			self:wait_until_dawn()
+			self.wait_until_dawn()
 		else
 			if working_villages.debug_logging then
 				minetest.log("info","his bed is at:" .. self.destination.x .. ",".. self.destination.y .. ",".. self.destination.z)

@@ -800,7 +800,7 @@ function working_villages.register_villager(product_name, def)
 	end
 
 	-- register a definition of a new villager.
-	
+
 	local villager_def = table.copy(working_villages.villager)
 	-- basic initial properties
 	villager_def.hp_max               = def.hp_max
