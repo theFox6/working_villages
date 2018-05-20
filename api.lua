@@ -800,85 +800,46 @@ function working_villages.register_villager(product_name, def)
 	end
 
 	-- register a definition of a new villager.
-	minetest.register_entity(product_name, {
-		-- basic initial properties
-		hp_max                       = def.hp_max,
-		weight                       = def.weight,
-		mesh                         = def.mesh,
-		textures                     = def.textures,
+	
+	local villager_def = table.copy(working_villages.villager)
+	-- basic initial properties
+	villager_def.hp_max               = def.hp_max
+	villager_def.weight               = def.weight
+	villager_def.mesh                 = def.mesh
+	villager_def.textures             = def.textures
 
-		physical                     = true,
-		visual                       = "mesh",
-		visual_size                  = {x = 1, y = 1},
-		collisionbox                 = {-0.25, 0, -0.25, 0.25, 1.75, 0.25},
-		is_visible                   = true,
-		makes_footstep_sound         = true,
-		infotext                     = "",
-		nametag                      = "",
+	villager_def.physical             = true
+	villager_def.visual               = "mesh"
+	villager_def.visual_size          = {x = 1, y = 1}
+	villager_def.collisionbox         = {-0.25, 0, -0.25, 0.25, 1.75, 0.25}
+	villager_def.is_visible           = true
+	villager_def.makes_footstep_sound = true
+	villager_def.infotext             = ""
+	villager_def.nametag              = ""
 
-		-- extra initial properties
-		pause                        = "active",
-		state                        = "job",
-		job_thread                   = false,
-		product_name                 = "",
-		manufacturing_number         = -1,
-		owner_name                   = "",
-		time_counters                = {},
-		destination                  = vector.new(0,0,0),
+	-- extra initial properties
+	villager_def.pause                = "active"
+	villager_def.state                = "job"
+	villager_def.job_thread           = false
+	villager_def.product_name         = ""
+	villager_def.manufacturing_number = -1
+	villager_def.owner_name           = ""
+	villager_def.time_counters        = {}
+	villager_def.destination          = vector.new(0,0,0)
 
-		-- callback methods.
-		on_activate                  = on_activate,
-		on_step                      = on_step,
-		on_rightclick                = on_rightclick,
-		on_punch                     = on_punch,
-		get_staticdata               = get_staticdata,
+	-- callback methods
+	villager_def.on_activate          = on_activate
+	villager_def.on_step              = on_step
+	villager_def.on_rightclick        = on_rightclick
+	villager_def.on_punch             = on_punch
+	villager_def.get_staticdata       = get_staticdata
 
-		-- home methods.
-		get_home                     = working_villages.get_home,
-		has_home                     = working_villages.is_valid_home,
+	-- home methods
+	villager_def.get_home             = working_villages.get_home
+	villager_def.has_home             = working_villages.is_valid_home
 
-		-- state methods.
-		get_state                    = working_villages.villager.get_state,
-		set_state                    = working_villages.villager.set_state,
 
-		-- async methods.
-		go_to                         = working_villages.villager.go_to,
-		dig                          = working_villages.villager.dig,
-		place                        = working_villages.villager.place,
-
-		-- extra methods.
-		get_inventory                = working_villages.villager.get_inventory,
-		get_job                      = working_villages.villager.get_job,
-		get_job_name                 = working_villages.villager.get_job_name,
-		get_nearest_player           = working_villages.villager.get_nearest_player,
-		get_nearest_item_by_condition= working_villages.villager.get_nearest_item_by_condition,
-		get_front                    = working_villages.villager.get_front,
-		get_front_node               = working_villages.villager.get_front_node,
-		get_back                     = working_villages.villager.get_back,
-		get_back_node                = working_villages.villager.get_back_node,
-		get_look_direction           = working_villages.villager.get_look_direction,
-		set_animation                = working_villages.villager.set_animation,
-		set_yaw_by_direction         = working_villages.villager.set_yaw_by_direction,
-		get_wield_item_stack         = working_villages.villager.get_wield_item_stack,
-		set_wield_item_stack         = working_villages.villager.set_wield_item_stack,
-		add_item_to_main             = working_villages.villager.add_item_to_main,
-		move_main_to_wield           = working_villages.villager.move_main_to_wield,
-		is_named                     = working_villages.villager.is_named,
-		is_near                      = working_villages.villager.is_near,
-		is_active                    = working_villages.villager.is_active,
-		has_item_in_main             = working_villages.villager.has_item_in_main,
-		change_direction             = working_villages.villager.change_direction,
-		change_direction_randomly    = working_villages.villager.change_direction_randomly,
-		get_timer                    = working_villages.villager.get_timer,
-		set_timer                    = working_villages.villager.set_timer,
-		clear_timers                 = working_villages.villager.clear_timers,
-		count_timer                  = working_villages.villager.count_timer,
-		count_timers                 = working_villages.villager.count_timers,
-		timer_exceeded               = working_villages.villager.timer_exceeded,
-		update_infotext              = working_villages.villager.update_infotext,
-		handle_obstacles             = working_villages.villager.handle_obstacles,
-		pickup_item                  = working_villages.villager.pickup_item,
-	})
+	minetest.register_entity(product_name, villager_def)
 
 	-- register villager egg.
 	working_villages.register_egg(product_name .. "_egg", {
