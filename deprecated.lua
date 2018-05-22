@@ -64,7 +64,7 @@ working_villages.register_state("goto_dest",{
 	end
 })
 
-local find_adjacent_clear = working_villages.func.find_adjacent_clear
+local func = working_villages.func
 
 function working_villages.func.villager_state_machine_job(job_name,job_description,actions, sprop)
 	minetest.log("warning","old util jobdef should be replaced by jobfunc registration")
@@ -105,7 +105,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 					local target = working_villages.func.search_surrounding(
 						self.object:getpos(), search_state.search_condition, sprop.searching_range)
 					if target ~= nil then
-						local destination = find_adjacent_clear(target)
+						local destination = func.find_adjacent_clear(target)
 						if destination==false then
 							print("failure: no adjacent walkable found")
 							destination = target
@@ -192,7 +192,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 					local target = working_villages.func.search_surrounding(self.object:getpos(),
 						search_state.search_condition, sprop.searching_range)
 					if target ~= nil then
-						local destination = find_adjacent_clear(target)
+						local destination = func.find_adjacent_clear(target)
 						if not(destination) then
 							destination = target
 						end
