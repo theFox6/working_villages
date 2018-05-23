@@ -1,3 +1,29 @@
+working_villages.registered_states = {}
+
+function working_villages.villager.get_state(id)
+	return working_villages.registered_states[id]
+end
+
+function working_villages.villager:set_state(id)
+	if not self.get_state(id) then
+		error("state \""..id.."\" is not registered")
+	end
+	self.get_state(self.state).on_finish(self)
+	self.state = id
+	self.get_state(id).on_start(self)
+end
+
+function working_villages.register_state(id,def)
+	if working_villages.registered_states[id]~=nil then
+		error("state \"".. id .. "\" already registered")
+	end
+	if not def.on_start then def.on_start = function() end end
+	if not def.on_finish then def.on_finish = function() end end
+	if not def.on_step then def.on_step = function() end end
+	working_villages.registered_states[id] = def
+	--minetest.log("debug","registered state: "..id)
+end
+
 working_villages.register_state("idle",{})
 
 working_villages.register_state("job",{

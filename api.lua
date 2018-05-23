@@ -13,8 +13,6 @@ working_villages.registered_jobs = {}
 
 working_villages.registered_eggs = {}
 
-working_villages.registered_states = {}
-
 -- working_villages.is_job reports whether a item is a job item by the name.
 function working_villages.is_job(item_name)
 	if working_villages.registered_jobs[item_name] then
@@ -414,35 +412,6 @@ function working_villages.villager:is_active()
 end
 
 dofile(working_villages.modpath.."/async_actions.lua") --load states
-
----------------------------------------------------------------------
-
-function working_villages.villager.get_state(id)
-	return working_villages.registered_states[id]
-end
-
-function working_villages.villager:set_state(id)
-	if not self.get_state(id) then
-		error("state \""..id.."\" is not registered")
-	end
-	self.get_state(self.state).on_finish(self)
-	self.state = id
-	self.get_state(id).on_start(self)
-end
-
-function working_villages.register_state(id,def)
-	if working_villages.registered_states[id]~=nil then
-		error("state \"".. id .. "\" already registered")
-	end
-	if not def.on_start then def.on_start = function() end end
-	if not def.on_finish then def.on_finish = function() end end
-	if not def.on_step then def.on_step = function() end end
-	working_villages.registered_states[id] = def
-	--minetest.log("debug","registered state: "..id)
-end
-
-dofile(working_villages.modpath.."/states.lua") --load states
---TODO: move states to async_actions
 
 ---------------------------------------------------------------------
 
