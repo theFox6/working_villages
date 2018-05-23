@@ -25,6 +25,8 @@ minetest.register_tool("working_villages:commanding_sceptre", {
 					if type(job.on_pause)=="function" then
 						job.on_pause(luaentity)
 					end
+					self.object:setvelocity{x = 0, y = 0, z = 0}
+					self:set_animation(working_villages.animation_frames.STAND)
 					luaentity:update_infotext()
 				end
 			end
