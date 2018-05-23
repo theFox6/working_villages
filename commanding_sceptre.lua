@@ -14,16 +14,13 @@ minetest.register_tool("working_villages:commanding_sceptre", {
 
 			local job = luaentity:get_job()
 			if job ~= nil then
-				if luaentity.state == "idle" then
+				if luaentity.pause == "resting" then
 					luaentity.pause = "active"
 					if type(job.on_resume)=="function" then
 						job.on_resume(luaentity)
 					end
-					luaentity:set_state("job")
 					luaentity:update_infotext()
-
 				else
-					luaentity:set_state("idle")
 					luaentity.pause = "resting"
 					if type(job.on_pause)=="function" then
 						job.on_pause(luaentity)
