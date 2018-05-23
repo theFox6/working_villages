@@ -778,7 +778,7 @@ function working_villages.register_villager(product_name, def)
 			end
 		end
 		if coroutine.status(self.job_thread) == "suspended" then
-			local state, err = coroutine.resume(self.job_thread, self)
+			local state, err = coroutine.resume(self.job_thread, self, dtime)
 			if state == false then
 				error("error in job_thread " .. err)
 			end

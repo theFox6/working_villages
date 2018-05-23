@@ -102,7 +102,6 @@ function working_villages.villager:place(itemname,pos)
 		for _=0,15 do coroutine.yield() end
 		--get wielded item
 		local stack = self:get_wield_item_stack()
-		local itemname = stack:get_name()
 		--create pointed_thing
 		local pointed_thing = {
 			type = "node",
