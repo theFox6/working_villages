@@ -64,6 +64,39 @@ working_villages.register_state("goto_dest",{
 	end
 })
 
+working_villages.register_state("dig_target",{
+	on_start = function(self)
+		self:set_timer("dig_target:animation",0)
+		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self:set_animation(working_villages.animation_frames.MINE)
+		self:set_yaw_by_direction(vector.subtract(self.target, self.object:getpos()))
+	end,
+	on_step = function(self)
+		if self:timer_exceeded("dig_target:animation",30) then
+			local destnode = minetest.get_node(self.target)
+			minetest.remove_node(self.target)
+			local stacks = minetest.get_node_drops(destnode.name)
+			for _, stack in ipairs(stacks) do
+				local leftover = self:add_item_to_main(stack)
+				minetest.add_item(self.target, leftover)
+			end
+			local sounds = minetest.registered_nodes[destnode.name].sounds
+			if sounds then
+				local sound = sounds.dug
+				if sound then
+					minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
+				end
+			end
+			self:set_state("job")
+		else
+			self:count_timer("dig_target:animation")
+		end
+	end,
+	on_finish = function(self)
+		self:set_animation(working_villages.animation_frames.STAND)
+	end
+})
+
 local func = working_villages.func
 
 function working_villages.func.villager_state_machine_job(job_name,job_description,actions, sprop)

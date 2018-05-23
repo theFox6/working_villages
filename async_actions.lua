@@ -62,9 +62,25 @@ function working_villages.villager:go_to(pos)
 end
 
 function working_villages.villager:dig(pos)
-	self.target = pos
-	self:set_state("dig_target")
-	coroutine.yield()
+	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self:set_animation(working_villages.animation_frames.MINE)
+	self:set_yaw_by_direction(vector.subtract(pos, self.object:getpos()))
+	for _=0,30 do coroutine.yield() end --wait 30 steps
+	local destnode = minetest.get_node(pos)
+	minetest.remove_node(pos)
+	local stacks = minetest.get_node_drops(destnode.name)
+	for _, stack in ipairs(stacks) do
+		local leftover = self:add_item_to_main(stack)
+		minetest.add_item(pos, leftover)
+	end
+	local sounds = minetest.registered_nodes[destnode.name].sounds
+	if sounds then
+		local sound = sounds.dug
+		if sound then
+			minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
+		end
+	end
+	self:set_animation(working_villages.animation_frames.STAND)
 end
 
 function working_villages.villager:place(itemname,pos)
