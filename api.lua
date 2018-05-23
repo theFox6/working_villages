@@ -413,6 +413,24 @@ end
 
 dofile(working_villages.modpath.."/async_actions.lua") --load states
 
+function working_villages.villager:set_state(id) --deprecated
+	if id == "idle" then
+		print("the idle state is deprecated")
+	elseif id == "goto_dest" then
+		print("use self:go_to(pos) instead of self:set_state(\"goto\")")
+		self:go_to(self.destination)
+	elseif id == "job" then
+		print("the job state is not nessecary anymore")
+	elseif id == "dig_target" then
+		print("use self:dig(pos) instead of self:set_state(\"dig_target\")")
+		self:dig(self.target)
+	elseif id == "place_wield" then
+		print("use self:place(itemname,pos) instead of self:set_state(\"place_wield\")")
+		local wield_stack = self:get_wield_item_stack()
+		self:place(wield_stack:get_name(),self.target)
+	end
+end
+
 ---------------------------------------------------------------------
 
 -- working_villages.manufacturing_data represents a table that contains manufacturing data.
@@ -556,6 +574,7 @@ function working_villages.register_villager(product_name, def)
 					local job = working_villages.registered_jobs[job_name]
 					if type(job.on_start)=="function" then
 						job.on_start(self)
+						self.job_thread = coroutine.create(job.on_step)
 					elseif type(job.jobfunc)=="function" then
 						self.job_thread = coroutine.create(job.jobfunc)
 					end
@@ -735,6 +754,11 @@ function working_villages.register_villager(product_name, def)
 			self.pause="active"
 		end
 
+		--[[ if owner didn't login, the villager does nothing.
+		if not minetest.get_player_by_name(self.owner_name) then
+			return
+		end--]]
+
 		-- pickup surrounding item.
 		self:pickup_item()
 
@@ -743,11 +767,25 @@ function working_villages.register_villager(product_name, def)
 			return
 		end
 
-		if self.get_state(self.state)==nil then
-			minetest.log("error", "state \""..self.state.."\" does not exist")
+		local job = self:get_job()
+		if not job then return end
+		if not self.job_thread and job.on_step then
+			job.on_start(self)
+			self.job_thread = coroutine.create(job.on_step)
 		end
-
-		self.get_state(self.state).on_step(self, dtime)
+		if coroutine.status(self.job_thread) == "dead" then
+			if job.jobfunc then
+				self.job_thread = coroutine.create(job.jobfunc)
+			else
+				self.job_thread = coroutine.create(job.on_step)
+			end
+		end
+		if coroutine.status(self.job_thread) == "suspended" then
+			local state, err = coroutine.resume(self.job_thread, self)
+			if state == false then
+				error("error in job_thread " .. err)
+			end
+		end
 	end
 
 	-- on_rightclick is a callback function that is called when a player right-click them.
