@@ -578,7 +578,6 @@ function working_villages.register_villager(product_name, def)
 					elseif type(job.jobfunc)=="function" then
 						self.job_thread = coroutine.create(job.jobfunc)
 					end
-					self:set_state("job")
 					self:update_infotext()
 				end
 			end,
@@ -599,7 +598,6 @@ function working_villages.register_villager(product_name, def)
 				if listname == "job" then
 					local job_name = stack:get_name()
 					local job = working_villages.registered_jobs[job_name]
-					self:set_state("idle")
 					self.time_counters = {}
 					if job then
 						if type(job.on_stop)=="function" then
@@ -628,12 +626,11 @@ function working_villages.register_villager(product_name, def)
 					if to_list == "job" then
 						if type(job.on_start)=="function" then
 							job.on_start(self)
+							self.job_thread = coroutine.create(job.on_step)
 						elseif type(job.jobfunc)=="function" then
 							self.job_thread = coroutine.create(job.jobfunc)
 						end
-						self:set_state("job")
 					elseif from_list == "job" then
-						self:set_state("idle")
 						if type(job.on_stop)=="function" then
 							job.on_stop(self)
 						elseif type(job.jobfunc)=="function" then
@@ -708,12 +705,11 @@ function working_villages.register_villager(product_name, def)
 		if job ~= nil then
 			if type(job.on_start)=="function" then
 				job.on_start(self)
+				self.job_thread = coroutine.create(job.on_step)
 			elseif type(job.jobfunc)=="function" then
 				self.job_thread = coroutine.create(job.jobfunc)
 			end
-			self:set_state("job")
 			if self.pause == "resting" then
-				self:set_state("idle")
 				if type(job.on_pause)=="function" then
 					job.on_pause(self)
 				end
