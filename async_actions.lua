@@ -84,11 +84,51 @@ function working_villages.villager:dig(pos)
 end
 
 function working_villages.villager:place(itemname,pos)
+	if type(pos)~="table" then
+		error("no target position given")
+	end
 	local wield_stack = self:get_wield_item_stack()
+	--move item to wield
 	if (wield_stack:get_name() == itemname or self:move_main_to_wield(function (name) return name == itemname end)) then
-		self.target = pos
-		self:set_state("place_wield")
-		coroutine.yield()
+		--set animation
+		if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+			self:set_animation(working_villages.animation_frames.MINE)
+		else
+			self:set_animation(working_villages.animation_frames.WALK_MINE)
+		end
+		--turn to target
+		self:set_yaw_by_direction(vector.subtract(pos, self.object:getpos()))
+		--wait 15 steps
+		for _=0,15 do coroutine.yield() end
+		--get wielded item
+		local stack = self:get_wield_item_stack()
+		local itemname = stack:get_name()
+		--create pointed_thing
+		local pointed_thing = {
+			type = "node",
+			above = pos,
+			under = vector.add(pos, {x = 0, y = -1, z = 0}),
+		}
+		--place item
+		--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
+		minetest.set_node(pointed_thing.above, {name = itemname})
+		--take item
+		stack:take_item(1)
+		self:set_wield_item_stack(stack)
+		--handle sounds
+		local sounds = minetest.registered_nodes[itemname].sounds
+		if sounds then
+			local sound = sounds.place
+			if sound then
+				minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
+			end
+		end
+		--reset animation
+		if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+			self:set_animation(working_villages.animation_frames.STAND)
+		else
+			self:set_animation(working_villages.animation_frames.WALK)
+		end
 	else
 		minetest.chat_send_player(self.owner_name,"villager couldn't place ".. itemname)
 	end
@@ -144,7 +184,7 @@ function working_villages.villager:goto_bed()
 			self.wait_until_dawn()
 		else
 			if working_villages.debug_logging then
-				minetest.log("info","his bed is at:" .. self.destination.x .. ",".. self.destination.y .. ",".. self.destination.z)
+				minetest.log("info","his bed is at:" .. bed_pos.x .. ",".. bed_pos.y .. ",".. bed_pos.z)
 			end
 			self:go_to(bed_pos)
 			self:sleep()
