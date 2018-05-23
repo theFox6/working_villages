@@ -251,12 +251,12 @@ end
 
 -- working_villages.villager.change_direction change direction to destination and velocity vector.
 function working_villages.villager:change_direction(destination)
-  local position = self.object:getpos()
-  local direction = vector.subtract(destination, position)
+	local position = self.object:getpos()
+	local direction = vector.subtract(destination, position)
 	direction.y = 0
-  local velocity = vector.multiply(vector.normalize(direction), 1.5)
+	local velocity = vector.multiply(vector.normalize(direction), 1.5)
 
-  self.object:setvelocity(velocity)
+	self.object:setvelocity(velocity)
 	self:set_yaw_by_direction(direction)
 end
 
@@ -270,6 +270,7 @@ function working_villages.villager:change_direction_randomly()
 	local velocity = vector.multiply(vector.normalize(direction), 1.5)
 	self.object:setvelocity(velocity)
 	self:set_yaw_by_direction(direction)
+	self:set_animation(working_villages.animation_frames.WALK)
 end
 
 -- working_villages.villager.get_timer get the value of a counter.
