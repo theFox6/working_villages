@@ -5,9 +5,9 @@ function working_villages.villager:go_to(pos)
 	end
 	local val_pos = working_villages.func.validate_pos(self.object:getpos())
 	self.path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
-	self:set_timer("goto_dest:find_path",0) -- find path interval
-	self:set_timer("goto_dest:change_dir",0)
-	self:set_timer("goto_dest:give_up",0)
+	self:set_timer("go_to:find_path",0) -- find path interval
+	self:set_timer("go_to:change_dir",0)
+	self:set_timer("go_to:give_up",0)
 	if self.path == nil then
 		self.path = {self.destination}
 	end
@@ -16,14 +16,14 @@ function working_villages.villager:go_to(pos)
 	self:set_animation(working_villages.animation_frames.WALK)
 
 	while #self.path ~= 0 do
-		self:count_timer("goto_dest:find_path")
-		self:count_timer("goto_dest:change_dir")
-		if self:timer_exceeded("goto_dest:find_path",100) then
+		self:count_timer("go_to:find_path")
+		self:count_timer("go_to:change_dir")
+		if self:timer_exceeded("go_to:find_path",100) then
 			val_pos = working_villages.func.validate_pos(self.object:getpos())
 			local path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
 			if path == nil then
-				self:count_timer("goto_dest:give_up")
-				if self:timer_exceeded("goto_dest:give_up",3) then
+				self:count_timer("go_to:give_up")
+				if self:timer_exceeded("go_to:give_up",3) then
 					self.destination=vector.round(self.destination)
 					if working_villages.func.walkable_pos(self.destination) then
 						self.destination=working_villages.pathfinder.get_ground_level(vector.round(self.destination))
@@ -36,7 +36,7 @@ function working_villages.villager:go_to(pos)
 			end
 		end
 
-		if self:timer_exceeded("goto_dest:change_dir",30) then
+		if self:timer_exceeded("go_to:change_dir",30) then
 			self:change_direction(self.path[1])
 		end
 
@@ -47,7 +47,7 @@ function working_villages.villager:go_to(pos)
 			if #self.path == 0 then -- end of path
 				break
 			else -- else next step, follow next path.
-				self:set_timer("goto_dest:find_path",0)
+				self:set_timer("go_to:find_path",0)
 				self:change_direction(self.path[1])
 			end
 		end
@@ -154,7 +154,7 @@ function working_villages.villager:sleep()
 		minetest.log("info","no bed found")
 	end
 	self:set_animation(working_villages.animation_frames.LAY)
-	self.object:setpos(vector.add(bed_pos,{x=0,y=1.5,z=0}))
+	self.object:setpos(bed_pos)
 	self.pause="sleeping"
 	self:update_infotext()
 
