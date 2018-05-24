@@ -185,7 +185,12 @@ function working_villages.villager:goto_bed()
 	end
 	if not self:has_home() then
 		self:set_animation(working_villages.animation_frames.SIT)
+		self.pause="sleeping"
+		self:update_infotext()
 		self.wait_until_dawn()
+		self:set_animation(working_villages.animation_frames.STAND)
+		self.pause="active"
+		self:update_infotext()
 	else
 		local bed_pos = self:get_home():get_bed()
 		if not bed_pos then
