@@ -9,6 +9,8 @@ function working_villages.villager:go_to(pos)
 	self:set_timer("go_to:change_dir",0)
 	self:set_timer("go_to:give_up",0)
 	if self.path == nil then
+		--TODO: actually no path shouldn't be accepted
+		--we'd have to check whether we can find a shorter path in the right direction
 		self.path = {self.destination}
 	end
 	--print("the first waypiont on his path:" .. minetest.pos_to_string(self.path[1]))
