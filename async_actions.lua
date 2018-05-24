@@ -83,13 +83,21 @@ function working_villages.villager:dig(pos)
 	self:set_animation(working_villages.animation_frames.STAND)
 end
 
-function working_villages.villager:place(itemname,pos)
+function working_villages.villager:place(item,pos)
 	if type(pos)~="table" then
 		error("no target position given")
 	end
+	local pred
+	if type(item)=="string" then
+		pred = function (name) return name == item end
+	elseif type(item)=="function" then
+		pred = item
+	else
+		error("no item to place given")
+	end
 	local wield_stack = self:get_wield_item_stack()
 	--move item to wield
-	if (wield_stack:get_name() == itemname or self:move_main_to_wield(function (name) return name == itemname end)) then
+	if pred(wield_stack:get_name()) or self:move_main_to_wield(pred) then
 		--set animation
 		if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
 			self:set_animation(working_villages.animation_frames.MINE)
@@ -108,6 +116,7 @@ function working_villages.villager:place(itemname,pos)
 			above = pos,
 			under = vector.add(pos, {x = 0, y = -1, z = 0}),
 		}
+		local itemname = stack:get_name()
 		--place item
 		--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
 		minetest.set_node(pointed_thing.above, {name = itemname})
@@ -134,9 +143,12 @@ function working_villages.villager:place(itemname,pos)
 end
 
 function working_villages.villager.wait_until_dawn()
-	while (minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76) do
+	local daytime = minetest.get_timeofday()
+	while (daytime < 0.2 or daytime > 0.76) do
 		coroutine.yield()
+		daytime = minetest.get_timeofday()
 	end
+	--print("wake up:"..daytime)
 end
 
 function working_villages.villager:sleep()
@@ -169,7 +181,7 @@ end
 
 function working_villages.villager:goto_bed()
 	if working_villages.debug_logging then
-		minetest.log("action","a villager is going home")
+		minetest.log("action",self.inventory_name.." is going home")
 	end
 	if not self:has_home() then
 		self:set_animation(working_villages.animation_frames.SIT)
@@ -187,6 +199,8 @@ function working_villages.villager:goto_bed()
 			end
 			self:go_to(bed_pos)
 			self:sleep()
+			--TODO: perhaps go back to the position we were at before going home
+			self:go_to(self:get_home():get_door())
 		end
 	end
 end

@@ -74,7 +74,6 @@ working_villages.register_job("working_villages:job_herbcollector", {
 					self:dig(target)
 				end
 			elseif self:timer_exceeded("herbcollector:change_dir",50) then
-				self:count_timer("herbcollector:search")
 				self:change_direction_randomly()
 			end
 		end

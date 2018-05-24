@@ -760,7 +760,6 @@ function working_villages.register_villager(product_name, def)
 		self:pickup_item()
 
 		if self.pause ~= "active" and self.pause ~= "sleeping" then
-			--TODO: get rid of self.pause
 			return
 		end
 
