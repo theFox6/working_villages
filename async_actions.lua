@@ -140,7 +140,7 @@ function working_villages.villager:place(item,pos)
 			self:set_animation(working_villages.animation_frames.WALK)
 		end
 	else
-		minetest.chat_send_player(self.owner_name,"villager couldn't place ".. itemname)
+		minetest.chat_send_player(self.owner_name,"villager couldn't place item")
 	end
 end
 
