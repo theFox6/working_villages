@@ -75,11 +75,13 @@ function working_villages.villager:dig(pos)
 		local leftover = self:add_item_to_main(stack)
 		minetest.add_item(pos, leftover)
 	end
-	local sounds = minetest.registered_nodes[destnode.name].sounds
+	local sounds = minetest.registered_nodes[destnode.name]
 	if sounds then
-		local sound = sounds.dug
-		if sound then
-			minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
+		if sounds.sounds then
+			local sound = sounds.sounds.dug
+			if sound then
+				minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
+			end
 		end
 	end
 	self:set_animation(working_villages.animation_frames.STAND)
@@ -94,12 +96,23 @@ function working_villages.villager:place(item,pos)
 		pred = function (name) return name == item end
 	elseif type(item)=="function" then
 		pred = item
+	elseif type(item)=="table" then
+		pred = function (name) return name == item.name end
 	else
 		error("no item to place given")
 	end
 	local wield_stack = self:get_wield_item_stack()
 	--move item to wield
-	if pred(wield_stack:get_name()) or self:move_main_to_wield(pred) then
+	local find_item = function(name)
+		if type(item)=="string" then
+			return name == working_villages.buildings.get_registered_nodename(item)
+		elseif type(item)=="table" then
+			return name == working_villages.buildings.get_registered_nodename(item.name)
+		else
+			return pred(name)
+		end
+	end
+	if find_item(wield_stack:get_name()) or self:move_main_to_wield(find_item) then
 		--set animation
 		if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
 			self:set_animation(working_villages.animation_frames.MINE)
@@ -120,17 +133,23 @@ function working_villages.villager:place(item,pos)
 		}
 		local itemname = stack:get_name()
 		--place item
-		--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
-		minetest.set_node(pointed_thing.above, {name = itemname})
+		if type(item)=="table" then
+			minetest.set_node(pointed_thing.above, item)
+		else
+			--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
+			minetest.set_node(pointed_thing.above, {name = itemname})
+		end
 		--take item
 		stack:take_item(1)
 		self:set_wield_item_stack(stack)
 		--handle sounds
-		local sounds = minetest.registered_nodes[itemname].sounds
+		local sounds = minetest.registered_nodes[itemname]
 		if sounds then
-			local sound = sounds.place
-			if sound then
-				minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
+			if sounds.sounds then
+				local sound = sounds.sounds.place
+				if sound then
+					minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
+				end
 			end
 		end
 		--reset animation
@@ -140,7 +159,7 @@ function working_villages.villager:place(item,pos)
 			self:set_animation(working_villages.animation_frames.WALK)
 		end
 	else
-		minetest.chat_send_player(self.owner_name,"villager couldn't place item")
+		minetest.chat_send_player(self.owner_name,"villager at " .. minetest.pos_to_string(self.object:getpos()) .. "couldn't place item")
 	end
 end
 
