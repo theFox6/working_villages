@@ -54,7 +54,7 @@ function working_villages.villager:go_to(pos)
 			end
 		end
 		-- if vilager is stopped by obstacles, the villager must jump.
-		self:handle_obstacles()
+		self:handle_obstacles(true)
 		-- end step
 		coroutine.yield()
 	end

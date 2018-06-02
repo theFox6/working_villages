@@ -93,6 +93,14 @@ local function load_schematic(filename,pos)
 	end
 end
 
+local get_materials = function(nodelist)
+	local materials = ""
+	for _,el in pairs(nodelist) do
+		materials = materials .. el.node.name .. ","
+	end
+	return materials:sub(1,#materials-1)
+end
+
 local function show_build_form(meta)
 	local title = meta:get_string("schematic"):gsub("%.we","")
 	local button_build = "button_exit[5.0,1.0;3.0,0.5;build_start;Begin Build]"
@@ -104,8 +112,8 @@ local function show_build_form(meta)
 	if not nodelist then nodelist = {} end
 	local formspec = "size[8,10]"
 		.."label[3.0,0.0;Project: "..title.."]"
-		.."label[3.0,1.0;"..(index/#nodelist).."% finished]"
-		--.."textlist[0.0,2.0;4.0,3.5;inv_sel;"..materials..";"..index..";]"
+		.."label[3.0,1.0;"..math.ceil(((index-1)/#nodelist)*100).."% finished]"
+		--.."textlist[0.0,2.0;4.0,3.5;inv_sel;"..get_materials(nodelist)..";"..index..";]"
 		..button_build
 		.."button_exit[5.0,3.0;3.0,0.5;build_cancel;Cancel Build]"
 	return formspec
@@ -166,11 +174,6 @@ local on_receive_fields = function(pos, _, fields, sender)
 		meta:set_string("paused","false")
 	end
 	meta:set_string("formspec",get_formspec(meta))
-end
-
-local get_materials = function(nodelist)
-	local materials = table.concat(nodelist, ",") or ""
-	return materials
 end
 
 minetest.register_node("working_villages:building_marker", {
