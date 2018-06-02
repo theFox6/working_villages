@@ -26,16 +26,19 @@ function working_villages.buildings.get(pos)
 	return working_villages.building[minetest.hash_node_position(pos)]
 end
 
-local function get_build_pos(meta)
+function working_villages.buildings.get_build_pos(meta)
 	return minetest.string_to_pos(meta:get_string("build_pos"))
 end
 
-local function get_registered_nodename(name)
-	if string.find(name, "^doors") then
-		name = name:gsub("_[tb]_[12]", "") 
-	elseif string.find(name, "^stairs") then
+function working_villages.buildings.get_registered_nodename(name)
+	if string.find(name, "doors") then
+		name = name:gsub("_[b]_[12]", "")
+		if string.find(name, "_t") then
+			name = nil
+		end
+	elseif string.find(name, "stairs") then
 		name = name:gsub("upside_down", "")
-	elseif string.find(name, "^farming") then
+	elseif string.find(name, "farming") then
 		name = name:gsub("_%d", "")
 	end
 	return name
@@ -76,17 +79,17 @@ local function load_schematic(filename,pos)
 		for i,v in ipairs(sorted) do
 			if v.name and v.param1 and v.param2 and v.x and v.y and v.z then
 				local node = {name=v.name, param1=v.param1, param2=v.param2}
-				local npos = vector.add(get_build_pos(meta), {x=v.x, y=v.y, z=v.z})
-				local name = get_registered_nodename(v.name)
+				local npos = vector.add(working_villages.buildings.get_build_pos(meta), {x=v.x, y=v.y, z=v.z})
+				local name = working_villages.buildings.get_registered_nodename(v.name)
 				if minetest.registered_items[name]==nil then
 					node = DEFAULT_NODE
 				end
 				nodedata[i] = {pos=npos, node=node}
 			end
 		end
-		working_villages.building[minetest.hash_node_position(get_build_pos(meta))] = nodedata
+		working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = nodedata
 	else
-		working_villages.building[minetest.hash_node_position(get_build_pos(meta))] = {}
+		working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = {}
 	end
 end
 
@@ -97,7 +100,7 @@ local function show_build_form(meta)
 		button_build = "button_exit[5.0,2.0;3.0,0.5;build_resume;Resume Build]"
 	end
 	local index = meta:get_int("index")
-	local nodelist = working_villages.buildings.get(get_build_pos(meta))
+	local nodelist = working_villages.buildings.get(working_villages.buildings.get_build_pos(meta))
 	if not nodelist then nodelist = {} end
 	local formspec = "size[8,10]"
 		.."label[3.0,0.0;Project: "..title.."]"
@@ -147,13 +150,13 @@ local on_receive_fields = function(pos, _, fields, sender)
 			end
 		elseif fields.build_cancel then
 			--reset_build()
-			working_villages.building[minetest.hash_node_position(get_build_pos(meta))] = nil
+			working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = nil
 			meta:set_string("schematic","")
 			meta:set_int("index",1)
 		end
 	end
 	if fields.build_start then
-		local nodelist = working_villages.buildings.get(get_build_pos(meta))
+		local nodelist = working_villages.buildings.get(working_villages.buildings.get_build_pos(meta))
 		for i,v in ipairs(nodelist) do
 			minetest.remove_node(v.pos)
 			--FIXME: the villager ought to do this
