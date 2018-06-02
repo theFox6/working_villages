@@ -10,7 +10,6 @@ working_villages.register_job("working_villages:job_builder", {
 			self:goto_bed()
 		else
 			self:count_timer("builder:search")
-			self:count_timer("builder:change_dir")
 			self:handle_obstacles()
 			if self:timer_exceeded("builder:search",20) then
 				local marker = working_villages.func.search_surrounding(self.object:getpos(), find_building, searching_range)
@@ -49,7 +48,6 @@ working_villages.register_job("working_villages:job_builder", {
 							end
 							return
 						end
-						self:set_timer("builder:change_dir",0)
 						local nnode = working_villages.buildings.get(build_pos)[meta:get_int("index")]
 						if nnode == nil then
 							meta:set_int("index",meta:get_int("index")+1)
@@ -90,13 +88,6 @@ working_villages.register_job("working_villages:job_builder", {
 							self:update_infotext()
 						end
 					end
-				end
-			elseif self:timer_exceeded("builder:change_dir",50) then
-				self:count_timer("builder:search")
-				local nbuilding = next(working_villages.building) --TODO: find the nearest
-				if nbuilding then
-					self:set_animation(working_villages.animation_frames.WALK)
-					self:change_direction(minetest.get_position_from_hash(nbuilding))
 				end
 			end
 		end
