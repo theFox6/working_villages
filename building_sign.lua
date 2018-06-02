@@ -113,7 +113,7 @@ local function show_build_form(meta)
 	local formspec = "size[8,10]"
 		.."label[3.0,0.0;Project: "..title.."]"
 		.."label[3.0,1.0;"..math.ceil(((index-1)/#nodelist)*100).."% finished]"
-		--.."textlist[0.0,2.0;4.0,3.5;inv_sel;"..get_materials(nodelist)..";"..index..";]"
+		.."textlist[0.0,2.0;4.0,3.5;inv_sel;"..get_materials(nodelist)..";"..index..";]"
 		..button_build
 		.."button_exit[5.0,3.0;3.0,0.5;build_cancel;Cancel Build]"
 	return formspec
@@ -136,7 +136,6 @@ local on_receive_fields = function(pos, _, fields, sender)
 	local player_name = sender:get_player_name()
 	local meta = minetest.get_meta(pos)
 	local sender_name = sender:get_player_name()
-	local failed = false
 	if minetest.is_protected(pos, sender_name) then
 		minetest.record_protection_violation(pos, sender_name)
 		return
@@ -165,7 +164,7 @@ local on_receive_fields = function(pos, _, fields, sender)
 	end
 	if fields.build_start then
 		local nodelist = working_villages.buildings.get(working_villages.buildings.get_build_pos(meta))
-		for i,v in ipairs(nodelist) do
+		for _,v in ipairs(nodelist) do
 			minetest.remove_node(v.pos)
 			--FIXME: the villager ought to do this
 		end
