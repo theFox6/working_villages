@@ -1,6 +1,5 @@
 local SCHEMS = {"simple_hut.we", "fancy_hut.we"}
 local DEFAULT_NODE = {name="air"}
-local MAX_POS = 3000
 
 working_villages.building = (function()
 	local file_name = minetest.get_worldpath() .. "/working_villages_building_sites"
