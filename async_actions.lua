@@ -205,6 +205,11 @@ function working_villages.villager:goto_bed()
 		minetest.log("action",self.inventory_name.." is going home")
 	end
 	if not self:has_home() then
+		local tod = minetest.get_timeofday()
+		while (tod > 0.2 and tod < 0.805) do
+			coroutine.yield()
+			tod = minetest.get_timeofday()
+		end
 		self:set_animation(working_villages.animation_frames.SIT)
 		self.pause="sleeping"
 		self:update_infotext()
@@ -217,6 +222,11 @@ function working_villages.villager:goto_bed()
 		if not bed_pos then
 			minetest.log("warning","villager couldn't find his bed")
 			--perhaps go home
+			local tod = minetest.get_timeofday()
+			while (tod > 0.2 and tod < 0.805) do
+				coroutine.yield()
+				tod = minetest.get_timeofday()
+			end
 			self:set_animation(working_villages.animation_frames.SIT)
 			self.wait_until_dawn()
 		else
