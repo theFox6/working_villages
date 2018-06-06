@@ -32,9 +32,10 @@ end
 
 function working_villages.buildings.get_registered_nodename(name)
 	if name:find("doors:") then
-		name = name:gsub("_[ab]_[12]", "")
+		name = name:gsub("_[b]_[12]", "")
+		name = name:gsub("_[a]", "")
 		if string.find(name, "_t") or name:find("hidden") then
-			name = nil
+			name = "air"
 		end
 	elseif string.find(name, "stairs") then
 		name = name:gsub("upside_down", "")
@@ -143,6 +144,7 @@ local on_receive_fields = function(pos, _, fields, sender)
 					meta:set_string("schematic",SCHEMS[id])
 					meta:set_string("build_pos",minetest.pos_to_string(bpos))
 					load_schematic(meta:get_string("schematic"),pos)
+					meta:set_string("paused","true")
 				end
 			end
 		elseif fields.build_cancel then
@@ -150,6 +152,7 @@ local on_receive_fields = function(pos, _, fields, sender)
 			working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = nil
 			meta:set_string("schematic","")
 			meta:set_int("index",1)
+			meta:set_string("paused","true")
 		end
 	end
 	if fields.build_start then

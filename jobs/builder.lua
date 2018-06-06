@@ -15,6 +15,7 @@ working_villages.register_job("working_villages:job_builder", {
 				local marker = working_villages.func.search_surrounding(self.object:getpos(), find_building, searching_range)
 				if marker ~= nil then
 					local meta = minetest.get_meta(marker)
+					if meta:get_string("paused") == "true" then return end
 					local build_pos = working_villages.buildings.get_build_pos(meta)
 					if build_pos ~= nil then
 						if working_villages.buildings.get(build_pos)==nil then
@@ -34,6 +35,8 @@ working_villages.register_job("working_villages:job_builder", {
 							if is_material(wield_stack:get_name()) or self:has_item_in_main(is_material) then
 								self:dig(marker)
 								self:place(is_material,marker)
+								meta = minetest.get_meta(marker)
+								meta:set_string("owner", self.owner_name)
 							else
 								local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have a home marker"
 								if self.owner_name then
@@ -66,6 +69,11 @@ working_villages.register_job("working_villages:job_builder", {
 						local wield_stack = self:get_wield_item_stack()
 						if nname:find("beds:") and nname:find("_top") then
 							self:add_item_to_main(ItemStack(nname))
+						end
+						if nname=="default:torch_wall" then
+							if self:has_item_in_main(function (name) return name == "default:torch" end) then
+								self:replace_item_from_main(ItemStack("default:torch"),ItemStack(nname))
+							end
 						end
 						if is_material(wield_stack:get_name()) or self:has_item_in_main(is_material) then
 							local destination = working_villages.func.find_adjacent_clear(npos)

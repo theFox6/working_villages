@@ -213,6 +213,12 @@ function working_villages.villager:add_item_to_main(stack)
 	return inv:add_item("main", stack)
 end
 
+function working_villages.villager:replace_item_from_main(rstack,astack)
+	local inv = self:get_inventory()
+	inv:remove_item("main", rstack)
+	inv:add_item("main", astack)
+end
+
 -- working_villages.villager.move_main_to_wield moves itemstack from main to wield.
 -- if this function fails then returns false, else returns true.
 function working_villages.villager:move_main_to_wield(pred)

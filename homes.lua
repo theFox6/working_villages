@@ -24,12 +24,11 @@ end) ()
 
 local function out_of_limit(pos)
 	if (pos.x>30927 or pos.x<-30912
-		or pos.y>30927 or pos.y<-30912
-		or pos.z>30927 or pos.z<-30912) then
-
-		return false
+	or  pos.y>30927 or pos.y<-30912
+	or  pos.z>30927 or pos.z<-30912) then
+		return true
 	end
-	return true
+	return false
 end
 
 minetest.register_node("working_villages:home_marker", {
