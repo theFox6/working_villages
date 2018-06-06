@@ -64,6 +64,9 @@ working_villages.register_job("working_villages:job_builder", {
 							return name == nname
 						end
 						local wield_stack = self:get_wield_item_stack()
+						if nname:find("beds:") and nname:find("_top") then
+							self:add_item_to_main(ItemStack(nname))
+						end
 						if is_material(wield_stack:get_name()) or self:has_item_in_main(is_material) then
 							local destination = working_villages.func.find_adjacent_clear(npos)
 							if destination==false then

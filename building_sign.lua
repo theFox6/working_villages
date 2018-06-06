@@ -1,4 +1,4 @@
-local SCHEMS = {"basic_hut.we"}
+local SCHEMS = {"simple_hut.we", "fancy_hut.we"}
 local DEFAULT_NODE = {name="air"}
 local MAX_POS = 3000
 
@@ -31,9 +31,9 @@ function working_villages.buildings.get_build_pos(meta)
 end
 
 function working_villages.buildings.get_registered_nodename(name)
-	if string.find(name, "doors") then
-		name = name:gsub("_[b]_[12]", "")
-		if string.find(name, "_t") then
+	if name:find("doors:") then
+		name = name:gsub("_[ab]_[12]", "")
+		if string.find(name, "_t") or name:find("hidden") then
 			name = nil
 		end
 	elseif string.find(name, "stairs") then
@@ -47,50 +47,40 @@ end
 local function load_schematic(filename,pos)
 	local meta = minetest.get_meta(pos)
 	local input = io.open(working_villages.modpath.."/schems/"..filename, "r")
-	if input then
-		local data = minetest.deserialize(input:read('*all'))
-		io.close(input)
-		table.sort(data, function(a,b)
-			if a.y == b.y then
-				if a.z == b.z then
-					return a.x > b.x
-				end
-				return a.z > b.z
-			end
-			return a.y > b.y
-		end)
-		local sorted = {}
-		local lpos = {x=0, y=0, z=0}
-		while #data > 0 do
-			local index = 1
-			local min_pos = {x=MAX_POS, y=MAX_POS, z=MAX_POS}
-			for i,v in ipairs(data) do
-				if v.y < min_pos.y or vector.distance(lpos, v) < vector.distance(lpos, min_pos) then
-					min_pos = v
-					index = i
-				end
-			end
-			local node = data[index]
-			table.insert(sorted, node)
-			table.remove(data, index)
-			lpos = {x=node.x, y=node.y, z=node.z}
-		end
-		local nodedata = {}
-		for i,v in ipairs(sorted) do
-			if v.name and v.param1 and v.param2 and v.x and v.y and v.z then
-				local node = {name=v.name, param1=v.param1, param2=v.param2}
-				local npos = vector.add(working_villages.buildings.get_build_pos(meta), {x=v.x, y=v.y, z=v.z})
-				local name = working_villages.buildings.get_registered_nodename(v.name)
-				if minetest.registered_items[name]==nil then
-					node = DEFAULT_NODE
-				end
-				nodedata[i] = {pos=npos, node=node}
-			end
-		end
-		working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = nodedata
-	else
+	if not input then
+		minetest.log("warning","schematic \""..working_villages.modpath.."/schems/"..filename.."\" does not exist")
 		working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = {}
+		return
 	end
+	local data = minetest.deserialize(input:read('*all'))
+	io.close(input)
+	if not data then
+		minetest.log("warning","schematic \""..working_villages.modpath.."/schems/"..filename.."\" is broken")
+		working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = {}
+		return
+	end
+	table.sort(data, function(a,b)
+		if a.y == b.y then
+			if a.z == b.z then
+				return a.x < b.x
+			end
+			return a.z < b.z
+		end
+		return a.y < b.y
+	end)
+	local nodedata = {}
+	for i,v in ipairs(data) do --TODO: this is actually not nessecary
+		if v.name and v.x and v.y and v.z then
+			local node = {name=v.name, param1=v.param1, param2=v.param2}
+			local npos = vector.add(working_villages.buildings.get_build_pos(meta), {x=v.x, y=v.y, z=v.z})
+			local name = working_villages.buildings.get_registered_nodename(v.name)
+			if minetest.registered_items[name]==nil then
+				node = DEFAULT_NODE
+			end
+			nodedata[i] = {pos=npos, node=node}
+		end
+	end
+	working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = nodedata
 end
 
 local get_materials = function(nodelist)
@@ -203,6 +193,7 @@ minetest.register_node("working_villages:building_marker", {
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("formspec",get_formspec(meta))
+		meta:set_int("index",1)
 	end,
 	on_receive_fields = on_receive_fields,
 	can_dig = function(pos, player)
