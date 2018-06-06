@@ -166,11 +166,10 @@ end
 
 function working_villages.villager.wait_until_dawn()
 	local daytime = minetest.get_timeofday()
-	while (daytime < 0.2 or daytime > 0.76) do
+	while (daytime < 0.2 or daytime > 0.805) do
 		coroutine.yield()
 		daytime = minetest.get_timeofday()
 	end
-	--print("wake up:"..daytime)
 end
 
 function working_villages.villager:sleep()
@@ -225,8 +224,13 @@ function working_villages.villager:goto_bed()
 				minetest.log("info","his bed is at:" .. bed_pos.x .. ",".. bed_pos.y .. ",".. bed_pos.z)
 			end
 			self:go_to(bed_pos)
+			local tod = minetest.get_timeofday()
+			while (tod > 0.2 and tod < 0.805) do
+				coroutine.yield()
+				tod = minetest.get_timeofday()
+			end
 			self:sleep()
-			--TODO: perhaps go back to the position we were at before going home
+			--perhaps go back to the position we were at before going home
 			self:go_to(self:get_home():get_door())
 		end
 	end
