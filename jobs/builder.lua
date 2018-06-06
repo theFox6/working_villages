@@ -10,7 +10,6 @@ working_villages.register_job("working_villages:job_builder", {
 			self:goto_bed()
 		else
 			self:count_timer("builder:search")
-			self:handle_obstacles()
 			if self:timer_exceeded("builder:search",20) then
 				local marker = working_villages.func.search_surrounding(self.object:getpos(), find_building, searching_range)
 				if marker ~= nil then
@@ -33,8 +32,9 @@ working_villages.register_job("working_villages:job_builder", {
 							end
 							local wield_stack = self:get_wield_item_stack()
 							if is_material(wield_stack:get_name()) or self:has_item_in_main(is_material) then
+								local param2 = minetest.get_node(marker).param2
 								self:dig(marker)
-								self:place(is_material,marker)
+								self:place({name = "working_villages:home_marker", param2 = param2},marker)
 								meta = minetest.get_meta(marker)
 								meta:set_string("owner", self.owner_name)
 							else

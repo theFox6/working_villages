@@ -94,9 +94,13 @@ end
 
 local function show_build_form(meta)
 	local title = meta:get_string("schematic"):gsub("%.we","")
-	local button_build = "button_exit[5.0,1.0;3.0,0.5;build_start;Begin Build]"
-	if meta:get_string("paused") == "true" then
+	local button_build
+	if meta:get_int("index")==0 then
+		button_build = "button_exit[5.0,1.0;3.0,0.5;build_start;Begin Build]"
+	elseif meta:get_string("paused") == "true" then
 		button_build = "button_exit[5.0,2.0;3.0,0.5;build_resume;Resume Build]"
+	else
+		button_build = "button_exit[5.0,2.0;3.0,0.5;build_pause;Pause Build]"
 	end
 	local index = meta:get_int("index")
 	local nodelist = working_villages.buildings.get(working_villages.buildings.get_build_pos(meta))
@@ -144,6 +148,7 @@ local on_receive_fields = function(pos, _, fields, sender)
 					meta:set_string("schematic",SCHEMS[id])
 					meta:set_string("build_pos",minetest.pos_to_string(bpos))
 					load_schematic(meta:get_string("schematic"),pos)
+					meta:set_int("index",0)
 					meta:set_string("paused","true")
 				end
 			end
@@ -151,7 +156,7 @@ local on_receive_fields = function(pos, _, fields, sender)
 			--reset_build()
 			working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = nil
 			meta:set_string("schematic","")
-			meta:set_int("index",1)
+			meta:set_int("index",0)
 			meta:set_string("paused","true")
 		end
 	end
@@ -164,6 +169,8 @@ local on_receive_fields = function(pos, _, fields, sender)
 		meta:set_int("index",1)
 	elseif fields.build_resume then
 		meta:set_string("paused","false")
+	elseif fields.build_pause then
+		meta:set_string("paused","true")
 	end
 	meta:set_string("formspec",get_formspec(meta))
 end

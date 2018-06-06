@@ -372,7 +372,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 		elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
 			local door = doors.get(self:get_front())
 			door:open()
-		elseif minetest.registered_nodes[front_node.name].walkable
+		elseif minetest.registered_nodes[front_node.name].walkable --TODO analyse nodeboxes
 			and not(minetest.registered_nodes[above_node.name].walkable) then
 
 			self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
