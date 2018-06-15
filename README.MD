@@ -29,3 +29,13 @@ features:
   * torcher (following player and placing torches in the dark, night active)
 
 for developining jobs read (api.MD)
+
+## License
+* working_villages by theFox6 is avalible under the MIT License
+
+Exceptions to the above:
+* villager skin textures from the Homedecor mod: CC-by-SA 3.0 or higher
+* the base of the api is the source code of the Maidroid mod: [LGPLv2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt) or later license.
+* the egg textures are included in the Maidroid mod: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) or later license.
+* the letters texture is from the Memorandum mod
+* the sign textures are from the default mod in minetest_game and from Gambit: CC BY-SA 3.0
