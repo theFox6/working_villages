@@ -796,14 +796,14 @@ function working_villages.register_villager(product_name, def)
 		if wielded_stack:get_name() == "working_villages:commanding_sceptre"
 			and clicker:get_player_name() == self.owner_name then
 
-			working_villages.forms.show_inv_formspec(self, clicker:get_player_name())
+			working_villages.forms.show_formspec(self, "working_villages:inv_gui", clicker:get_player_name())
 		else
-			working_villages.forms.show_talking_formspec(self, clicker:get_player_name())
+			working_villages.forms.show_formspec(self, "working_villages:talking_menu", clicker:get_player_name())
 		end
 		self:update_infotext()
 	end
 
-	-- on_punch is a callback function that is called when a player punch then.
+	-- on_punch is a callback function that is called when a player punches a villager.
 	local function on_punch()--self, puncher, time_from_last_punch, tool_capabilities, dir
 		--TODO: aggression
 	end
