@@ -63,6 +63,8 @@ function working_villages.villager:go_to(pos)
 	self:set_animation(working_villages.animation_frames.STAND)
 end
 
+--FIXME: actions like dig etc. only if we are near the target
+
 function working_villages.villager:dig(pos)
 	self.object:setvelocity{x = 0, y = 0, z = 0}
 	self:set_animation(working_villages.animation_frames.MINE)
@@ -173,7 +175,7 @@ function working_villages.villager.wait_until_dawn()
 end
 
 function working_villages.villager:sleep()
-	minetest.log("action","a villager is laying down")
+	working_villages.log.action(self.inventory_name,"is laying down")
 	self.object:setvelocity{x = 0, y = 0, z = 0}
 	local bed_pos=self:get_home():get_bed()
 	local bed_top = working_villages.func.find_adjacent_pos(bed_pos,
@@ -183,7 +185,7 @@ function working_villages.villager:sleep()
 	if bed_top and bed_bottom then
 		self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
 	else
-		minetest.log("info","no bed found")
+		working_villages.log.info(self.inventory_name,"found no bed")
 	end
 	self:set_animation(working_villages.animation_frames.LAY)
 	self.object:setpos(bed_pos)
@@ -194,16 +196,14 @@ function working_villages.villager:sleep()
 
 	local pos=self.object:getpos()
 	self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
-	minetest.log("action","a villager gets up")
+	working_villages.log.action(self.inventory_name,"gets up")
 	self:set_animation(working_villages.animation_frames.STAND)
 	self.pause="active"
 	self:update_infotext()
 end
 
 function working_villages.villager:goto_bed()
-	if working_villages.debug_logging then
-		minetest.log("action",self.inventory_name.." is going home")
-	end
+	working_villages.log.action(self.inventory_name,"is going home")
 	if not self:has_home() then
 		local tod = minetest.get_timeofday()
 		while (tod > 0.2 and tod < 0.805) do
@@ -220,7 +220,7 @@ function working_villages.villager:goto_bed()
 	else
 		local bed_pos = self:get_home():get_bed()
 		if not bed_pos then
-			minetest.log("warning","villager couldn't find his bed")
+			working_villages.log.warning(self.inventory_name,"couldn't find his bed")
 			--perhaps go home
 			local tod = minetest.get_timeofday()
 			while (tod > 0.2 and tod < 0.805) do
@@ -230,9 +230,7 @@ function working_villages.villager:goto_bed()
 			self:set_animation(working_villages.animation_frames.SIT)
 			self.wait_until_dawn()
 		else
-			if working_villages.debug_logging then
-				minetest.log("info","his bed is at:" .. bed_pos.x .. ",".. bed_pos.y .. ",".. bed_pos.z)
-			end
+			working_villages.log.info(self.inventory_name,"bed is at:" .. minetest.pos_to_string(bed_pos))
 			self:go_to(bed_pos)
 			local tod = minetest.get_timeofday()
 			while (tod > 0.2 and tod < 0.805) do

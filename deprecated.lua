@@ -1,8 +1,8 @@
 local func = working_villages.func
 
 function working_villages.func.villager_state_machine_job(job_name,job_description,actions, sprop)
-	minetest.log("warning","old util jobdef should be replaced by jobfunc registration")
-	minetest.log("warning","old util jobdef: "..job_name)
+	working_villages.log.warning(false, "old util jobdef should be replaced by jobfunc registration")
+	working_villages.log.warning(false, "old util jobdef: "..job_name)
 
 	--special properties
 	if sprop.night_active ~= true then
@@ -45,10 +45,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 							destination = target
 						end
 						local val_pos = working_villages.func.validate_pos(self.object:getpos())
-						if working_villages.debug_logging then
-							minetest.log("info","looking for a path from " .. minetest.pos_to_string(val_pos) ..
-								" to " .. minetest.pos_to_string(destination))
-						end
+						working_villages.log.info(self.inventory_name, "looking for a path from " .. minetest.pos_to_string(val_pos) ..
+							" to " .. minetest.pos_to_string(destination))
 						if working_villages.pathfinder.get_reachable(val_pos,destination,self) then
 							--print("path found to: " .. minetest.pos_to_string(destination))
 							if search_state.to_state then
@@ -68,10 +66,8 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 
 							local destination = working_villages.func.validate_pos(target)
 							local val_pos = working_villages.func.validate_pos(self.object:getpos())
-							if working_villages.debug_logging then
-								minetest.log("info","looking for a path from " .. minetest.pos_to_string(val_pos) ..
-									" to " .. minetest.pos_to_string(destination))
-							end
+							working_villages.log.info(self.inventory_name, "looking for a path from " .. minetest.pos_to_string(val_pos) ..
+								" to " .. minetest.pos_to_string(destination))
 							if working_villages.pathfinder.get_reachable(val_pos,destination,self) then
 								--print("path found to: " .. minetest.pos_to_string(destination))
 								if search_state.to_state then
@@ -165,7 +161,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		if not(minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76) then
 			local pos=self.object:getpos()
 			self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
-			minetest.log("action","a villager gets up")
+			working_villages.log.action(self.inventory_name,"gets up")
 			self:set_animation(working_villages.animation_frames.STAND)
 			self.pause="active"
 			self:update_infotext()
@@ -174,7 +170,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		return false
 	end
 	local function to_sleep(self)
-		minetest.log("action","a villager is laying down")
+		working_villages.log.action(self.inventory_name,"is laying down")
 		self.object:setvelocity{x = 0, y = 0, z = 0}
 		local bed_pos=self:get_home():get_bed()
 		local bed_top = working_villages.func.find_adjacent_pos(bed_pos,
@@ -184,7 +180,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		if bed_top and bed_bottom then
 			self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
 		else
-			minetest.log("info","no bed found")
+			working_villages.log.info(self.inventory_name,"found no bed")
 		end
 		self:set_animation(working_villages.animation_frames.LAY)
 		self.object:setpos(vector.add(bed_pos,{x=0,y=1.5,z=0}))
@@ -192,17 +188,13 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		self:update_infotext()
 	end
 	local function to_walk_home(self)
-		if working_villages.debug_logging then
-			minetest.log("action","a villager is going home")
-		end
+		working_villages.log.action(self.inventory_name,"is going home")
 		self.destination=self:get_home():get_bed()
 		if not self.destination then
-			minetest.log("warning","villager couldn't find his bed")
+			working_villages.log.warning(self.inventory_name, "couldn't find his bed")
 			return
 		end
-		if working_villages.debug_logging then
-			minetest.log("info","his bed is at:" .. self.destination.x .. ",".. self.destination.y .. ",".. self.destination.z)
-		end
+		working_villages.log.info(self.inventory_name,"his bed is at:" .. minetest.pos_to_string(self.destination))
 		self:set_state("goto_dest")
 	end
 	--list all states
@@ -221,9 +213,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		newStates.GO_OUT	= {number=1,
 					func=function() return true end,
 					to_state=function(self)
-						if working_villages.debug_logging then
-							minetest.log("action","a villager stood up and is going outside")
-						end
+						working_villages.log.action(self.inventory_name,"stood up and is going outside")
 						self.destination=self:get_home():get_door()
 						self:set_state("goto_dest")
 					end,

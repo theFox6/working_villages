@@ -48,14 +48,14 @@ local function load_schematic(filename,pos)
 	local meta = minetest.get_meta(pos)
 	local input = io.open(working_villages.modpath.."/schems/"..filename, "r")
 	if not input then
-		minetest.log("warning","schematic \""..working_villages.modpath.."/schems/"..filename.."\" does not exist")
+		working_villages.log.warning(false,"schematic \"%s/schems/%s\" does not exist", working_villages.modpath, filename)
 		working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = {}
 		return
 	end
 	local data = minetest.deserialize(input:read('*all'))
 	io.close(input)
 	if not data then
-		minetest.log("warning","schematic \""..working_villages.modpath.."/schems/"..filename.."\" is broken")
+		working_villages.log.warning(false, "schematic \"%s/schems/%s\" is broken", working_villages.modpath, filename)
 		working_villages.building[minetest.hash_node_position(working_villages.buildings.get_build_pos(meta))] = {}
 		return
 	end

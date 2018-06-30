@@ -1,17 +1,13 @@
 local init = os.clock()
-if minetest.settings:get_bool("log_mods") then
-  minetest.log("action", "[MOD] "..minetest.get_current_modname()..": loading")
-else
-  print("[MOD] "..minetest.get_current_modname()..": loading")
-end
+minetest.log("action", "["..minetest.get_current_modname().."] loading...")
 
 working_villages={
 	modpath=minetest.get_modpath("working_villages"),
-	debug_logging=true,
 	func = {}
 }
 
 --helpers
+dofile(working_villages.modpath.."/util.lua")
 dofile(working_villages.modpath.."/pathfinder.lua")
 dofile(working_villages.modpath.."/forms.lua")
 dofile(working_villages.modpath.."/homes.lua")
@@ -38,8 +34,4 @@ dofile(working_villages.modpath.."/jobs/snowclearer.lua")
 
 --ready
 local time_to_load= os.clock() - init
-if minetest.settings:get_bool("log_mods") then
-  minetest.log("action", string.format("[MOD] "..minetest.get_current_modname()..": loaded in %.4f s", time_to_load))
-else
-  print(string.format("[MOD] "..minetest.get_current_modname()..": loaded in %.4f s", time_to_load))
-end
+working_villages.log.action(false, "loaded in %.4f s", time_to_load)

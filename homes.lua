@@ -158,10 +158,8 @@ function working_villages.home:get_marker_meta()
 		minetest.get_voxel_manip():read_from_map(home_marker_pos, home_marker_pos)
 	end
 	if minetest.get_node(home_marker_pos).name ~= "working_villages:home_marker" then
-		if working_villages.debug_logging and not(vector.equals(home_marker_pos,{x=0,y=0,z=0})) then
-			minetest.log("warning", "The door position of an invalid home was requested.")
-			minetest.log("warning", "Given home position:" .. minetest.pos_to_string(home_marker_pos))
-		end
+		working_villages.log.warning(false, "The door position of an invalid home was requested.")
+		working_villages.log.warning(false, "Given home position: %s", minetest.pos_to_string(home_marker_pos))
 		return false
 	end
 	return minetest.get_meta(home_marker_pos)
@@ -175,11 +173,9 @@ function working_villages.home:get_door()
 	local meta = self:get_marker_meta()
 	local door_pos = meta:get_string("door")
 	if not door_pos then
-		if working_villages.debug_logging then
-			local home_marker_pos = self:get_marker()
-			minetest.log("warning", "The position outside the house was not entered for the home at:" ..
-				minetest.pos_to_string(home_marker_pos))
-		end
+		local home_marker_pos = self:get_marker()
+		working_villages.log.warning(false, "The position outside the house was not entered for the home at: %s",
+			minetest.pos_to_string(home_marker_pos))
 		return false
 	end
 	self.door = minetest.string_to_pos(door_pos)
@@ -195,11 +191,9 @@ function working_villages.home:get_bed()
 	local meta = self:get_marker_meta()
 	local bed_pos = meta:get_string("bed")
 	if not bed_pos then
-		if working_villages.debug_logging then
-			local home_marker_pos = self:get_marker()
-			minetest.log("warning", "The position of the bed was not entered for the home at:" ..
-				minetest.pos_to_string(home_marker_pos))
-		end
+		local home_marker_pos = self:get_marker()
+		working_villages.log.warning(false, "The position of the bed was not entered for the home at: %s",
+			minetest.pos_to_string(home_marker_pos))
 		return false
 	end
 	self.bed = minetest.string_to_pos(bed_pos)

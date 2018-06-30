@@ -3,7 +3,7 @@ working_villages.registered_forms = {}
 
 function working_villages.forms.register_page(name, def)
 	if working_villages.registered_forms[name]~=nil then
-		minetest.log("warning", "overwriting formspec page "..name)
+		working_villages.log.warning(false, "overwriting formspec page %s",name)
 	end
 	assert(type(def.constructor)=="function")
 	if def.receiver then assert(type(def.receiver)=="function") end
@@ -18,7 +18,7 @@ function working_villages.forms.show_formspec(self, formname, playername)
 	home_pos = minetest.pos_to_string(home_pos)
 	local page = working_villages.registered_forms[formname]
 	if page == nil then
-		minetest.log("warning", "page not registered")
+		working_villages.log.warning(false, "page %s not registered", formname)
 		page = working_villages.registered_forms["working_villages:talking_menu"]
 	end
 	minetest.show_formspec(playername, formname.."_"..self.inventory_name, page.constructor(self, playername))
