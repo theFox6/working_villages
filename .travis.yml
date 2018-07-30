@@ -15,7 +15,7 @@ matrix:
     env: CONFIG=.luacheck_tidy
 script: 
 - echo $CONFIG .
-- $HOME/.luarocks/bin/luacheck -config $CONFIG .
+- $HOME/.luarocks/bin/luacheck -config $CONFIG -files .
 notifications:
   email:
     on_failure: change
