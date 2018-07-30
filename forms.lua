@@ -11,9 +11,6 @@ function working_villages.forms.register_page(name, def)
 end
 
 function working_villages.forms.show_formspec(self, formname, playername)
-	if self:has_home() then
-		home_pos = self:get_home():get_marker()
-	end
 	local page = working_villages.registered_forms[formname]
 	if page == nil then
 		working_villages.log.warning(false, "page %s not registered", formname)
