@@ -1,6 +1,6 @@
 local function is_night() return minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76 end
 local function find_building(p) return minetest.get_node(p).name == "working_villages:building_marker" end
-local searching_range = {x = 10, y = 3, z = 10}
+local searching_range = {x = 10, y = 6, z = 10}
 
 working_villages.register_job("working_villages:job_builder", {
 	description      = "working_villages job : builder",
