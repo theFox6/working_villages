@@ -14,8 +14,7 @@ matrix:
   - name: "beauty check"
     env: CONFIG=.luacheck_tidy
 script: 
-- echo $CONFIG .
-- $HOME/.luarocks/bin/luacheck -config $CONFIG -files .
+- $HOME/.luarocks/bin/luacheck --config $CONFIG .
 notifications:
   email:
     on_failure: change
