@@ -12,7 +12,7 @@ end
 
 working_villages.log.warning = working_villages.log.make_logger("warning")
 working_villages.log.action = working_villages.log.make_logger("action")
-working_villages.log.info = working_villages.make_logger("info")
+working_villages.log.info = working_villages.log.make_logger("info")
 
 function working_villages.check_modname_prefix(name)
 	if name:sub(1,1) == ":" then
