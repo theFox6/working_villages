@@ -11,11 +11,9 @@ function working_villages.forms.register_page(name, def)
 end
 
 function working_villages.forms.show_formspec(self, formname, playername)
-	local home_pos = {x = 0, y = 0, z = 0}
 	if self:has_home() then
 		home_pos = self:get_home():get_marker()
 	end
-	home_pos = minetest.pos_to_string(home_pos)
 	local page = working_villages.registered_forms[formname]
 	if page == nil then
 		working_villages.log.warning(false, "page %s not registered", formname)
@@ -40,7 +38,7 @@ minetest.register_on_player_receive_fields(
 )
 
 working_villages.forms.register_page("working_villages:talking_menu", {
-	constructor = function(self, playername)
+	constructor = function(self) --self, playername
 		local jobname = self:get_job()
 		if jobname then
 			jobname = jobname.description
@@ -59,12 +57,13 @@ working_villages.forms.register_page("working_villages:talking_menu", {
 		local sender_name = sender:get_player_name()
 		minetest.log("info",inv_name)
 		minetest.log("info",sender_name)
+		minetest.log("info",fields)
 		--TODO: event handling for menu
 	end,
 })
 
 working_villages.forms.register_page("working_villages:inv_gui", {
-	constructor = function(self, playername)
+	constructor = function(self) --self, playername
 		local home_pos = {x = 0, y = 0, z = 0}
 		if self:has_home() then
 			home_pos = self:get_home():get_marker()
