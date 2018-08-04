@@ -10,7 +10,6 @@ env:
   - CONFIG=.luacheckrc
   - CONFIG=.luacheck_tidy
 matrix:
-  include:
   - name: "health check"
     env: CONFIG=.luacheckrc
   allow_failures:

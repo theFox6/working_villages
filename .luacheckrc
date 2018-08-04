@@ -8,4 +8,4 @@ read_globals = {
 	table = { fields = { "copy" } }
 }
 
-ignore = {"211", "212", "213"}
+ignore = {"211", "212", "213", "631"}

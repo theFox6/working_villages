@@ -72,7 +72,8 @@ working_villages.register_job("working_villages:job_builder", {
 							if inv:room_for_item("main", ItemStack(nname)) then
 								inv:add_item("main", ItemStack(nname))
 							else
-								local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have enough inventory space"
+								local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) ..
+									" doesn't have enough inventory space"
 								if self.owner_name then
 									minetest.chat_send_player(self.owner_name,msg)
 								else
