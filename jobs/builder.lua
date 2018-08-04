@@ -68,7 +68,22 @@ working_villages.register_job("working_villages:job_builder", {
 						end
 						local wield_stack = self:get_wield_item_stack()
 						if nname:find("beds:") and nname:find("_top") then
-							self:add_item_to_main(ItemStack(nname))
+							local inv = self:get_inventory()
+							if inv:room_for_item("main", ItemStack(nname)) then
+								inv:add_item("main", ItemStack(nname))
+							else
+								local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have enough inventory space"
+								if self.owner_name then
+									minetest.chat_send_player(self.owner_name,msg)
+								else
+									print(msg)
+								end
+								self.pause = "resting"
+								self.object:setvelocity{x = 0, y = 0, z = 0}
+								self:set_animation(working_villages.animation_frames.STAND)
+								self:update_infotext()
+								return
+							end
 						end
 						if nname=="default:torch_wall" then
 							if self:has_item_in_main(function (name) return name == "default:torch" end) then
