@@ -54,7 +54,7 @@ working_villages.forms.register_page("working_villages:talking_menu", {
 		local sender_name = sender:get_player_name()
 		minetest.log("info",inv_name)
 		minetest.log("info",sender_name)
-		minetest.log("info",fields)
+		minetest.log("info",dump(fields))
 		--TODO: event handling for menu
 	end,
 })
