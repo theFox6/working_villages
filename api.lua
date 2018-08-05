@@ -362,7 +362,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 	for i,v in pairs(front_diff) do
 		local front_pos = vector.new(0,0,0)
 		front_pos[i]=v
-		front_pos = vector.add(front_pos, self.object:getpos())
+		front_pos = vector.add(front_pos, vector.round(self.object:getpos()))
 		local above_node = vector.new(front_pos)
 		local front_node = minetest.get_node(front_pos)
 		above_node = vector.add(above_node,{x=0,y=1,z=0})
@@ -378,9 +378,26 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 			end
 		elseif minetest.registered_nodes[front_node.name].walkable
 		and not(minetest.registered_nodes[above_node.name].walkable) then
-			--TODO compare nodebox and own pos.y
 			if velocity.y == 0 then
-				self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
+				local nBox = minetest.registered_nodes[front_node.name].node_box
+				if (nBox == nil) then
+					self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
+				else
+					nBox = minetest.registered_nodes[front_node.name].node_box.fixed
+					if type(nBox[1])=="table" then
+						for _,box in pairs(nBox) do
+							local nHeight = box[4]-.5 + front_pos.y
+							if nHeight > self.object:getpos().y then
+								self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
+							end
+						end
+					else
+						local nHeight = nBox[4]-.5 + front_pos.y
+						if nHeight > self.object:getpos().y then
+							self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
+						end
+					end
+				end
 			end
 		end
 	end
