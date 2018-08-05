@@ -354,37 +354,41 @@ end
 
 --working_villages.villager.handle_obstacles(ignore_fence,ignore_doors)
 --if the villager hits a walkable he wil jump
---if ignore_fence is false and the villager hits a door he opens it
 --if ignore_fence is false the villager will not jump over fences
+--if ignore_doors is false and the villager hits a door he opens it
 function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 	local velocity = self.object:getvelocity()
-	if velocity.y == 0 then
-		local front_diff = self:get_look_direction()
-		for i,v in pairs(front_diff) do
-			local front_pos = vector.new(0,0,0)
-			front_pos[i]=v
-			front_pos = vector.add(front_pos, self.object:getpos())
-			local above_node = vector.new(front_pos)
-			local front_node = minetest.get_node(front_pos)
-			above_node = vector.add(above_node,{x=0,y=1,z=0})
-			above_node = minetest.get_node(above_node)
-			if minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence) then
-				self:change_direction_randomly()
-			elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
-				local door = doors.get(front_pos)
-				door:open()
-			elseif minetest.registered_nodes[front_node.name].walkable
-			and not(minetest.registered_nodes[above_node.name].walkable) then
-				--TODO analyse nodeboxes (prevent jumping on top of slabs)
+	local front_diff = self:get_look_direction()
+	for i,v in pairs(front_diff) do
+		local front_pos = vector.new(0,0,0)
+		front_pos[i]=v
+		front_pos = vector.add(front_pos, self.object:getpos())
+		local above_node = vector.new(front_pos)
+		local front_node = minetest.get_node(front_pos)
+		above_node = vector.add(above_node,{x=0,y=1,z=0})
+		above_node = minetest.get_node(above_node)
+		if minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence) then
+			self:change_direction_randomly()
+		elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
+			local door = doors.get(front_pos)
+			local door_dir = vector.apply(minetest.facedir_to_dir(front_node.param2),math.abs)
+			local villager_dir = vector.round(vector.apply(front_diff,math.abs))
+			if vector.equals(door_dir,villager_dir) then
+				door:toggle()
+			end
+		elseif minetest.registered_nodes[front_node.name].walkable
+		and not(minetest.registered_nodes[above_node.name].walkable) then
+			--TODO compare nodebox and own pos.y
+			if velocity.y == 0 then
 				self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
 			end
-			if not ignore_doors then
-				local back_pos = self:get_back()
-				if string.find(minetest.get_node(back_pos).name,"doors:door") then
-					local door = doors.get(back_pos)
-					door:close()
-				end
-			end
+		end
+	end
+	if not ignore_doors then
+		local back_pos = self:get_back()
+		if string.find(minetest.get_node(back_pos).name,"doors:door") then
+			local door = doors.get(back_pos)
+			door:close()
 		end
 	end
 end
