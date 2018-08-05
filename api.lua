@@ -361,8 +361,9 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 	local front_diff = self:get_look_direction()
 	for i,v in pairs(front_diff) do
 		local front_pos = vector.new(0,0,0)
-		front_pos[i]=v
+		front_pos[i] = v
 		front_pos = vector.add(front_pos, vector.round(self.object:getpos()))
+		front_pos.y = math.floor(self.object:getpos().y)+0.5
 		local above_node = vector.new(front_pos)
 		local front_node = minetest.get_node(front_pos)
 		above_node = vector.add(above_node,{x=0,y=1,z=0})
@@ -380,22 +381,20 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 		and not(minetest.registered_nodes[above_node.name].walkable) then
 			if velocity.y == 0 then
 				local nBox = minetest.registered_nodes[front_node.name].node_box
+				local nBox_fixed = nil
 				if (nBox == nil) then
-					self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
+					nBox_fixed = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
 				else
-					nBox = minetest.registered_nodes[front_node.name].node_box.fixed
-					if type(nBox[1])=="table" then
-						for _,box in pairs(nBox) do
-							local nHeight = box[4]-.5 + front_pos.y
-							if nHeight > self.object:getpos().y then
-								self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
-							end
-						end
-					else
-						local nHeight = nBox[4]-.5 + front_pos.y
-						if nHeight > self.object:getpos().y then
-							self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
-						end
+					nBox_fixed = nBox.fixed
+				end
+				local nBox_table = nBox_fixed
+				if type(nBox_fixed[1])=="number" then
+					nBox_table = {nBox_fixed}
+				end
+				for _,box in pairs(nBox_table) do
+					local nHeight = (box[5] - box[2]) + front_pos.y
+					if nHeight > self.object:getpos().y + .5 then
+						self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
 					end
 				end
 			end
@@ -844,6 +843,7 @@ function working_villages.register_villager(product_name, def)
 	villager_def.visual               = "mesh"
 	villager_def.visual_size          = {x = 1, y = 1}
 	villager_def.collisionbox         = {-0.25, 0, -0.25, 0.25, 1.75, 0.25}
+	villager_def.stepheight           = 0.6
 	villager_def.is_visible           = true
 	villager_def.makes_footstep_sound = true
 	villager_def.infotext             = ""
