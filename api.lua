@@ -381,17 +381,15 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 		and not(minetest.registered_nodes[above_node.name].walkable) then
 			if velocity.y == 0 then
 				local nBox = minetest.registered_nodes[front_node.name].node_box
-				local nBox_fixed = nil
 				if (nBox == nil) then
-					nBox_fixed = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
+					nBox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
 				else
-					nBox_fixed = nBox.fixed
+					nBox = nBox.fixed
 				end
-				local nBox_table = nBox_fixed
-				if type(nBox_fixed[1])=="number" then
-					nBox_table = {nBox_fixed}
+				if type(nBox[1])=="number" then
+					nBox = {nBox}
 				end
-				for _,box in pairs(nBox_table) do
+				for _,box in pairs(nBox) do
 					local nHeight = (box[5] - box[2]) + front_pos.y
 					if nHeight > self.object:getpos().y + .5 then
 						self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
@@ -827,7 +825,7 @@ function working_villages.register_villager(product_name, def)
 
 	-- on_punch is a callback function that is called when a player punches a villager.
 	local function on_punch()--self, puncher, time_from_last_punch, tool_capabilities, dir
-		--TODO: aggression
+		--TODO: aggression (add player ratings table)
 	end
 
 	-- register a definition of a new villager.
