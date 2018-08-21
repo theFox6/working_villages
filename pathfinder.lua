@@ -113,7 +113,8 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 	local entity_fear_height = 2
 	local entity_jump_height = 1
 	if entity then
-		entity_height = math.ceil(entity.collisionbox[5] - entity.collisionbox[2])
+		local collisionbox = entity.collisionbox or entity.initial_properties.collisionbox
+		entity_height = math.ceil(collisionbox[5] - collisionbox[2])
 		entity_fear_height = entity.fear_height or 2
 		entity_jump_height = entity.jump_height or 1
 	end

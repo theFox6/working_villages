@@ -71,7 +71,7 @@ function working_villages.villager:dig(pos)
 	self:set_yaw_by_direction(vector.subtract(pos, self.object:getpos()))
 	for _=0,30 do coroutine.yield() end --wait 30 steps
 	local destnode = minetest.get_node(pos)
-	minetest.remove_node(pos)
+	minetest.remove_node(pos) --TODO local leftover = minetest.dig_node(pos)
 	local stacks = minetest.get_node_drops(destnode.name)
 	for _, stack in ipairs(stacks) do
 		local leftover = self:add_item_to_main(stack)
@@ -127,7 +127,7 @@ function working_villages.villager:place(item,pos)
 		for _=0,15 do coroutine.yield() end
 		--get wielded item
 		local stack = self:get_wield_item_stack()
-		--create pointed_thing
+		--create pointed_thing FIXME check how a pointed_thing actualy works
 		local pointed_thing = {
 			type = "node",
 			above = pos,
@@ -136,10 +136,10 @@ function working_villages.villager:place(item,pos)
 		local itemname = stack:get_name()
 		--place item
 		if type(item)=="table" then
-			minetest.set_node(pointed_thing.above, item)
+			minetest.set_node(pointed_thing.above, item) --TODO: minetest.place_node(pos, node)
 		else
 			--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
-			minetest.set_node(pointed_thing.above, {name = itemname})
+			minetest.set_node(pointed_thing.above, {name = itemname}) --TODO: minetest.place_node(pos, node)
 		end
 		--take item
 		stack:take_item(1)

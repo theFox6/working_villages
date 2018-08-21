@@ -389,7 +389,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 				if type(nBox[1])=="number" then
 					nBox = {nBox}
 				end
-				for _,box in pairs(nBox) do
+				for _,box in pairs(nBox) do --TODO: check rotation of the nodebox
 					local nHeight = (box[5] - box[2]) + front_pos.y
 					if nHeight > self.object:getpos().y + .5 then
 						self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
@@ -831,42 +831,48 @@ function working_villages.register_villager(product_name, def)
 	-- register a definition of a new villager.
 
 	local villager_def = table.copy(working_villages.villager)
-	-- basic initial properties
-	villager_def.hp_max               = def.hp_max
-	villager_def.weight               = def.weight
-	villager_def.mesh                 = def.mesh
-	villager_def.textures             = def.textures
+	-- Object properties
+	villager_def.initial_properties = {
+		hp_max                      = def.hp_max,
+		weight                      = def.weight,
+		mesh                        = def.mesh,
+		textures                    = def.textures,
 
-	villager_def.physical             = true
-	villager_def.visual               = "mesh"
-	villager_def.visual_size          = {x = 1, y = 1}
-	villager_def.collisionbox         = {-0.25, 0, -0.25, 0.25, 1.75, 0.25}
-	villager_def.stepheight           = 0.6
-	villager_def.is_visible           = true
-	villager_def.makes_footstep_sound = true
-	villager_def.infotext             = ""
-	villager_def.nametag              = ""
+		--TODO: put these into working_villagers.villager
+		physical                    = true,
+		visual                      = "mesh",
+		visual_size                 = {x = 1, y = 1},
+		collisionbox                = {-0.25, 0, -0.25, 0.25, 1.75, 0.25},
+		pointable                   = true,
+		stepheight                  = 0.6,
+		is_visible                  = true,
+		makes_footstep_sound        = true,
+		automatic_face_movement_dir = false,
+		infotext                    = "",
+		nametag                     = "",
+		static_save                 = true,
+	}
 
 	-- extra initial properties
-	villager_def.pause                = "active"
-	villager_def.state                = "job"
-	villager_def.job_thread           = false
-	villager_def.product_name         = ""
-	villager_def.manufacturing_number = -1
-	villager_def.owner_name           = ""
-	villager_def.time_counters        = {}
-	villager_def.destination          = vector.new(0,0,0)
+	villager_def.pause                       = "active"
+	villager_def.state                       = "job"
+	villager_def.job_thread                  = false
+	villager_def.product_name                = ""
+	villager_def.manufacturing_number        = -1
+	villager_def.owner_name                  = ""
+	villager_def.time_counters               = {}
+	villager_def.destination                 = vector.new(0,0,0)
 
 	-- callback methods
-	villager_def.on_activate          = on_activate
-	villager_def.on_step              = on_step
-	villager_def.on_rightclick        = on_rightclick
-	villager_def.on_punch             = on_punch
-	villager_def.get_staticdata       = get_staticdata
+	villager_def.on_activate                 = on_activate
+	villager_def.on_step                     = on_step
+	villager_def.on_rightclick               = on_rightclick
+	villager_def.on_punch                    = on_punch
+	villager_def.get_staticdata              = get_staticdata
 
 	-- home methods
-	villager_def.get_home             = working_villages.get_home
-	villager_def.has_home             = working_villages.is_valid_home
+	villager_def.get_home                    = working_villages.get_home
+	villager_def.has_home                    = working_villages.is_valid_home
 
 
 	minetest.register_entity(product_name, villager_def)
