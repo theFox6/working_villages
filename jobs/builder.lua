@@ -58,7 +58,7 @@ working_villages.register_job("working_villages:job_builder", {
 							self.pause = "resting"
 							self.object:setvelocity{x = 0, y = 0, z = 0}
 							self:set_animation(working_villages.animation_frames.STAND)
-							self:update_infotext()
+							self:set_displayed_action("waiting for a home marker")
 						end
 						return
 					end
@@ -93,7 +93,7 @@ working_villages.register_job("working_villages:job_builder", {
 							self.pause = "resting"
 							self.object:setvelocity{x = 0, y = 0, z = 0}
 							self:set_animation(working_villages.animation_frames.STAND)
-							self:update_infotext()
+							self:set_displayed_action("waiting")
 							return
 						end
 					end
@@ -123,7 +123,7 @@ working_villages.register_job("working_villages:job_builder", {
 						self.pause = "resting"
 						self.object:setvelocity{x = 0, y = 0, z = 0}
 						self:set_animation(working_villages.animation_frames.STAND)
-						self:update_infotext()
+						self:set_displayed_action("waiting for materials")
 					end
 				end
 			end

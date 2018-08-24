@@ -332,17 +332,22 @@ function working_villages.villager:update_infotext()
 		job_name = job_name.description
 		infotext = infotext .. job_name .. "\n"
 	else
-		infotext = infotext .. "this villager is inactive\nNo job\n"
+		infotext = infotext .. "no job\n"
+		self.disp_action = "inactive"
 	end
 	infotext = infotext .. "[Owner] : " .. self.owner_name
-	if self.pause=="resting" then
-		infotext = infotext .. "\nthis villager is resting"
-	elseif self.pause=="sleeping" then
-		infotext = infotext .. "\nthis villager is sleeping"
-	elseif self.pause=="active" then
-		infotext = infotext .. "\nthis villager is active"
+	infotext = infotext .. "\nthis villager is " .. self.disp_action
+	if self.pause~="active" then
+		infotext = infotext .. ", [paused]"
 	end
 	self.object:set_properties{infotext = infotext}
+end
+
+-- working_villages.villager.set_displayed_action sets the text to be displayed after "this villager is "
+function working_villages.villager:set_displayed_action(msg)
+	assert(type(msg)=="string")
+	self.disp_action = msg
+	self:update_infotext()
 end
 
 -- working_villages.villager.is_near checks if the villager is withing the radius of a position
@@ -605,7 +610,7 @@ function working_villages.register_villager(product_name, def)
 					elseif type(job.jobfunc)=="function" then
 						self.job_thread = coroutine.create(job.jobfunc)
 					end
-					self:update_infotext()
+					self:set_displayed_action("active")
 				end
 			end,
 
@@ -665,7 +670,7 @@ function working_villages.register_villager(product_name, def)
 						end
 					end
 
-					self:update_infotext()
+					self:set_displayed_action("active")
 				end
 			end,
 
@@ -719,7 +724,7 @@ function working_villages.register_villager(product_name, def)
 			end
 		end
 
-		self:update_infotext()
+		self:set_displayed_action("active")
 
 		self.object:set_nametag_attributes{
 			text = self.nametag
@@ -820,7 +825,6 @@ function working_villages.register_villager(product_name, def)
 		else
 			working_villages.forms.show_formspec(self, "working_villages:talking_menu", clicker:get_player_name())
 		end
-		self:update_infotext()
 	end
 
 	-- on_punch is a callback function that is called when a player punches a villager.
@@ -855,6 +859,7 @@ function working_villages.register_villager(product_name, def)
 
 	-- extra initial properties
 	villager_def.pause                       = "active"
+	villager_def.disp_action                 = "inactive\nNo job"
 	villager_def.state                       = "job"
 	villager_def.job_thread                  = false
 	villager_def.product_name                = ""

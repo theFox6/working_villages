@@ -190,7 +190,7 @@ function working_villages.villager:sleep()
 	self:set_animation(working_villages.animation_frames.LAY)
 	self.object:setpos(bed_pos)
 	self.pause="sleeping"
-	self:update_infotext()
+	self:set_displayed_action("sleeping")
 
 	self.wait_until_dawn()
 
@@ -199,12 +199,13 @@ function working_villages.villager:sleep()
 	working_villages.log.action(self.inventory_name,"gets up")
 	self:set_animation(working_villages.animation_frames.STAND)
 	self.pause="active"
-	self:update_infotext()
+	self:set_displayed_action("active")
 end
 
 function working_villages.villager:goto_bed()
 	if not self:has_home() then
 		working_villages.log.action(self.inventory_name,"is waiting until dawn")
+		self:set_displayed_action("waiting until dawn")
 		local tod = minetest.get_timeofday()
 		while (tod > 0.2 and tod < 0.805) do
 			coroutine.yield()
@@ -212,17 +213,17 @@ function working_villages.villager:goto_bed()
 		end
 		self:set_animation(working_villages.animation_frames.SIT)
 		self.pause="sleeping"
-		self:update_infotext()
 		self.wait_until_dawn()
 		self:set_animation(working_villages.animation_frames.STAND)
 		self.pause="active"
-		self:update_infotext()
+		self:set_displayed_action("active")
 	else
 		working_villages.log.action(self.inventory_name,"is going home")
 		local bed_pos = self:get_home():get_bed()
 		if not bed_pos then
 			working_villages.log.warning(self.inventory_name,"couldn't find his bed")
 			--perhaps go home
+			self:set_displayed_action("waiting until dawn")
 			local tod = minetest.get_timeofday()
 			while (tod > 0.2 and tod < 0.805) do
 				coroutine.yield()
@@ -233,6 +234,7 @@ function working_villages.villager:goto_bed()
 		else
 			working_villages.log.info(self.inventory_name,"bed is at:" .. minetest.pos_to_string(bed_pos))
 			self:go_to(bed_pos)
+			self:set_displayed_action("waiting for dusk")
 			local tod = minetest.get_timeofday()
 			while (tod > 0.2 and tod < 0.805) do
 				coroutine.yield()

@@ -164,7 +164,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 			working_villages.log.action(self.inventory_name,"gets up")
 			self:set_animation(working_villages.animation_frames.STAND)
 			self.pause="active"
-			self:update_infotext()
+			self:set_displayed_action("active")
 			return true
 		end
 		return false
@@ -185,7 +185,7 @@ function working_villages.func.villager_state_machine_job(job_name,job_descripti
 		self:set_animation(working_villages.animation_frames.LAY)
 		self.object:setpos(vector.add(bed_pos,{x=0,y=1.5,z=0}))
 		self.pause="sleeping"
-		self:update_infotext()
+		self:set_displayed_action("sleeping")
 	end
 	local function to_walk_home(self)
 		working_villages.log.action(self.inventory_name,"is going home")
