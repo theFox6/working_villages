@@ -124,7 +124,7 @@ end
 
 function working_villages.buildings.find_beds(nodedata) --TODO: save beds and use them
 	local toplist = {}
-	local bottomlist = {}
+	--local bottomlist = {}
 	for id,el in pairs(nodedata) do
 		if string.find(el.node.name,"bed") then
 			if string.find(el.node.name, "_top") then
@@ -136,7 +136,7 @@ function working_villages.buildings.find_beds(nodedata) --TODO: save beds and us
 	end
 	local bedlist = {}
 	--FIXME: find bottoms fitting to tops
-	for id,el in pairs(toplist) do
+	for _,el in pairs(toplist) do
 		local botpos = vector.add(el.pos, minetest.facedir_to_dir(el.param2))
 		table.insert(bedlist, vector.divide(vector.add(el.pos, botpos), 2))
 	end

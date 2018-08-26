@@ -39,7 +39,7 @@ working_villages.register_job("working_villages:job_builder", {
 						end
 						self:go_to(destination)
 						meta:set_string("state","built")
-						meta:set_string("house_label", "house " .. minetest.pos_to_string(pos))
+						meta:set_string("house_label", "house " .. minetest.pos_to_string(marker))
 						--TODO: save beds
 						meta:set_string("formspec",working_villages.buildings.get_formspec(meta))
 						return
