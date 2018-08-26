@@ -98,14 +98,14 @@ working_villages.forms.register_page("working_villages:inv_gui", {
 				"do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.")
 			return
 		end
-		if minetest.get_node(coords).name ~= "working_villages:home_marker" then
+		if minetest.get_node(coords).name ~= "working_villages:building_marker" then
 			minetest.chat_send_player(sender_name, 'No home marker could be found at the entered position.')
 			return
 		end
 
 		working_villages.set_home(inv_name,coords)
 		minetest.chat_send_player(sender_name, 'Home set!')
-		if not minetest.get_meta(coords):get_string("bed") then
+		if minetest.get_meta(coords):get_string("valid") == "false" then
 			minetest.chat_send_player(sender_name, 'Home marker not configured, '..
 				'please right-click the home marker to configure it.')
 		end

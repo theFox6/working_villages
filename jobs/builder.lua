@@ -4,7 +4,7 @@ local function find_building(p)
 		return false
 	end
 	local meta = minetest.get_meta(p)
-	if meta:get_string("paused") == "true" then
+	if meta:get_string("state") ~= "begun" then
 		return false
 	end
 	local build_pos = working_villages.buildings.get_build_pos(meta)
@@ -38,28 +38,10 @@ working_villages.register_job("working_villages:job_builder", {
 							destination = marker
 						end
 						self:go_to(destination)
-						local function is_material(name)
-							return name == "working_villages:home_marker"
-						end
-						local wield_stack = self:get_wield_item_stack()
-						if is_material(wield_stack:get_name()) or self:has_item_in_main(is_material) then
-							local param2 = minetest.get_node(marker).param2
-							self:dig(marker)
-							self:place({name = "working_villages:home_marker", param2 = param2},marker)
-							meta = minetest.get_meta(marker)
-							meta:set_string("owner", self.owner_name)
-						else
-							local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have a home marker"
-							if self.owner_name then
-								minetest.chat_send_player(self.owner_name,msg)
-							else
-								print(msg)
-							end
-							self.pause = "resting"
-							self.object:setvelocity{x = 0, y = 0, z = 0}
-							self:set_animation(working_villages.animation_frames.STAND)
-							self:set_displayed_action("waiting for a home marker")
-						end
+						meta:set_string("state","built")
+						meta:set_string("house_label", "house " .. minetest.pos_to_string(pos))
+						--TODO: save beds
+						meta:set_string("formspec",working_villages.buildings.get_formspec(meta))
 						return
 					end
 					local nnode = working_villages.buildings.get(build_pos)[meta:get_int("index")]

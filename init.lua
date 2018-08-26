@@ -10,8 +10,7 @@ working_villages={
 dofile(working_villages.modpath.."/util.lua")
 dofile(working_villages.modpath.."/pathfinder.lua")
 dofile(working_villages.modpath.."/forms.lua")
-dofile(working_villages.modpath.."/homes.lua")
-dofile(working_villages.modpath.."/building_sign.lua")
+dofile(working_villages.modpath.."/building.lua")
 
 --base
 dofile(working_villages.modpath.."/api.lua")
