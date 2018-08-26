@@ -233,6 +233,7 @@ function working_villages.villager:goto_bed()
 			self.wait_until_dawn()
 		else
 			working_villages.log.info(self.inventory_name,"bed is at:" .. minetest.pos_to_string(bed_pos))
+			self:set_displayed_action("going home")
 			self:go_to(bed_pos)
 			self:set_displayed_action("waiting for dusk")
 			local tod = minetest.get_timeofday()
@@ -241,7 +242,7 @@ function working_villages.villager:goto_bed()
 				tod = minetest.get_timeofday()
 			end
 			self:sleep()
-			--perhaps go back to the position we were at before going home
+			--maybe go back to the position we were at before going home
 			self:go_to(self:get_home():get_door())
 		end
 	end

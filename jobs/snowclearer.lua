@@ -20,9 +20,11 @@ working_villages.register_job("working_villages:job_snowclearer", {
 						print("failure: no adjacent walkable found")
 						destination = target
 					end
+					self:set_displayed_action("clearing snow away")
 					self:go_to(destination)
 					self:dig(target)
 				end
+				self:set_displayed_action("looking for work")
 			elseif self:timer_exceeded("snowclearer:change_dir",50) then
 				self:count_timer("snowclearer:search")
 				self:change_direction_randomly()

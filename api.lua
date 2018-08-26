@@ -337,7 +337,7 @@ function working_villages.villager:update_infotext()
 	end
 	infotext = infotext .. "[Owner] : " .. self.owner_name
 	infotext = infotext .. "\nthis villager is " .. self.disp_action
-	if self.pause~="active" then
+	if self.pause=="resting" then
 		infotext = infotext .. ", [paused]"
 	end
 	self.object:set_properties{infotext = infotext}
@@ -346,8 +346,10 @@ end
 -- working_villages.villager.set_displayed_action sets the text to be displayed after "this villager is "
 function working_villages.villager:set_displayed_action(msg)
 	assert(type(msg)=="string")
-	self.disp_action = msg
-	self:update_infotext()
+	if self.disp_action ~= msg then
+		self.disp_action = msg
+		self:update_infotext()
+	end
 end
 
 -- working_villages.villager.is_near checks if the villager is withing the radius of a position
@@ -384,7 +386,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 			end
 		elseif minetest.registered_nodes[front_node.name].walkable
 		and not(minetest.registered_nodes[above_node.name].walkable) then
-			if velocity.y == 0 then
+			if velocity.y == 0 then --TODO: also check if node below is air
 				local nBox = minetest.registered_nodes[front_node.name].node_box
 				if (nBox == nil) then
 					nBox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
@@ -745,6 +747,7 @@ function working_villages.register_villager(product_name, def)
 				if type(job.on_pause)=="function" then
 					job.on_pause(self)
 				end
+				self:set_displayed_action("resting")
 			end
 		end
 	end

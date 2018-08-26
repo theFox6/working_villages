@@ -53,6 +53,7 @@ working_villages.register_job("working_villages:job_woodcutter", {
 					--print("found a sapling at:".. minetest.pos_to_string(pos))
 					local inv=self:get_inventory()
 					if inv:room_for_item("main", ItemStack(sapling:get_luaentity().itemstring)) then
+						self:set_displayed_action("collecting a sapling")
 						self:go_to(pos)
 						self:pickup_item()
 					end
@@ -60,6 +61,13 @@ working_villages.register_job("working_villages:job_woodcutter", {
 				local wield_stack = self:get_wield_item_stack()
 				if is_sapling(wield_stack:get_name()) or self:has_item_in_main(is_sapling) then
 					local target = working_villages.func.search_surrounding(self.object:getpos(), is_sapling_spot, searching_range)
+					local destination = working_villages.func.find_adjacent_clear(target)
+					if destination==false then
+						print("failure: no adjacent walkable found")
+						destination = target
+					end
+					self:set_displayed_action("planting a tree")
+					self:go_to(destination)
 					self:place(is_sapling, target)
 				end
 				local target = working_villages.func.search_surrounding(self.object:getpos(), find_tree, searching_range)
@@ -69,9 +77,11 @@ working_villages.register_job("working_villages:job_woodcutter", {
 						print("failure: no adjacent walkable found")
 						destination = target
 					end
+					self:set_displayed_action("cutting a tree")
 					self:go_to(destination)
 					self:dig(target)
 				end
+				self:set_displayed_action("looking for work")
 			elseif self:timer_exceeded("woodcutter:change_dir",50) then
 				self:change_direction_randomly()
 			end
