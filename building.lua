@@ -283,6 +283,11 @@ local on_receive_fields = function(pos, _, fields, sender)
 			meta:set_string("valid", "false")
 		end
 		meta:set_string("door", fields.door_pos)
+		for _,v in pairs(working_villages.homes) do
+			if vector.equals(v.marker, pos) then
+				v.update = table.copy(working_villages.home.update)
+			end
+		end
 	end
 	meta:set_string("formspec",working_villages.buildings.get_formspec(meta))
 end
@@ -331,7 +336,10 @@ minetest.register_node("working_villages:building_marker", {
 })
 
 -- home is a prototype home object
-working_villages.home = {version = 1}
+working_villages.home = {
+	version = 1,
+	update = {door = true, bed = true}
+}
 
 -- get the home of a villager
 function working_villages.get_home(self)
@@ -344,10 +352,14 @@ function working_villages.is_valid_home(self)
 	if home == nil then
 		return false
 	end
-	if not home.version~=1 then --update home
+	if home.version==nil then --update home
 		for k, v in pairs(working_villages.home) do
 			home[k] = v
 		end
+		home.version = 1
+	end
+	if home.update == nil then
+		home.update = table.copy(working_villages.home.update)
 	end
 	return true
 end
@@ -387,7 +399,7 @@ end
 
 -- get the position that marks "outside"
 function working_villages.home:get_door()
-	if self.door~=nil then
+	if self.door~=nil and self.update.door == false then
 		return self.door
 	end
 	local meta = self:get_marker_meta()
@@ -404,12 +416,13 @@ function working_villages.home:get_door()
 		return false
 	end
 	self.door = minetest.string_to_pos(door_pos)
+	self.update.door = false
 	return self.door
 end
 
 -- get the bed of a villager
 function working_villages.home:get_bed()
-	if self.bed~=nil then
+	if self.bed~=nil and self.update.bed == false then
 		return self.bed
 	end
 	local meta = self:get_marker_meta()
@@ -426,6 +439,7 @@ function working_villages.home:get_bed()
 		return false
 	end
 	self.bed = minetest.string_to_pos(bed_pos)
+	self.update.bed = false
 	return self.bed
 end
 
