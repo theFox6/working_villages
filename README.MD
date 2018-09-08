@@ -4,22 +4,37 @@ The plan is to make villagers build up their own villages.
 
 [working_villages forum page](https://forum.minetest.net/viewtopic.php?f=9&t=17429)
 
-Planned Features:
-* Villagers
+## Planned Features
+* villages
+  * built up by the villagers
+* villagers
   * trading and building up an economy
   * working / doing their jobs
-* Jobs: miner, farmer and many more
+* jobs
+  * miner, farmer, woodcutter and many more
 
-this version:
+## implemented Features
 no crafting recipes yet (you will have to use creative)
 features:
-* home markers to save the position of the door and the bed
+* building markers
+  * for building houses and saving the houses details
+  * save the position of the door and the bed
   * some jobs will let the villagers return home at night
   * at home the villagers will go to bed
 * spawn-eggs for villagers
   * female and male
-  * just for a nicer look
-* jobs:
+  * (just for a nicer look)
+* commanding sceptre
+  * leftclick villagers to let them pause their work
+  * rightclick villagers to open the inventory
+  * items can be exchanged in the inventory
+  * home can be set in the inventory
+  * jobs can be changed in the inventory
+* jobs
+  * jobs define what the villagers should do
+  * jobs can be changed in the inventory by clicking change job
+  * in the job change form the jobs can be changed by replacing the current job by one of the jobs below (shift+click possible)
+* registered jobs:
   * woodcutter/lumberjack (cutting trees and planting saplings)
   * plant collector (collecting all sort of fauna to produce dyes etc.)
   * player follower (following any player, night active)
@@ -28,7 +43,7 @@ features:
   * snowclearer (clearing snow away)
   * torcher (following player and placing torches in the dark, night active)
 
-for developining jobs read (api.MD)
+for developing jobs, villagers, etc. read [api.md](api.MD)
 
 ## License
 * working_villages by theFox6 is avalible under the MIT License

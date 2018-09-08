@@ -10,7 +10,7 @@ local texture_name = "villager_female.png"
 local egg_img_name = "villager_female_egg.png"
 working_villages.register_villager(product_name, {
 	hp_max     = 20,
-	weight     = 20,
+	weight     = 18,
 	mesh       = "character.b3d",
 	textures   = {texture_name},
 	egg_image  = egg_img_name,

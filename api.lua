@@ -399,7 +399,8 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 				for _,box in pairs(nBox) do --TODO: check rotation of the nodebox
 					local nHeight = (box[5] - box[2]) + front_pos.y
 					if nHeight > self.object:getpos().y + .5 then
-						self.object:setvelocity{x = velocity.x, y = 6, z = velocity.z}
+						local jump_force = math.sqrt(self.initial_properties.weight)*2
+						self.object:setvelocity{x = velocity.x, y = jump_force, z = velocity.z}
 					end
 				end
 			end
@@ -551,6 +552,16 @@ end
 
 ---------------------------------------------------------------------
 
+working_villages.job_inv = minetest.create_detached_inventory("working_villages:job_inv", {
+	on_take = function(inv, listname, _, stack) --inv, listname, index, stack, player
+		inv:add_item(listname,stack)
+	end,
+	on_put = function(inv, listname, _, stack)
+		inv:remove_item(listname, stack)
+	end,
+})
+working_villages.job_inv:set_size("main", 32)
+
 -- working_villages.register_job registers a definition of a new job.
 function working_villages.register_job(job_name, def)
 	working_villages.registered_jobs[job_name] = def
@@ -559,7 +570,11 @@ function working_villages.register_job(job_name, def)
 		stack_max       = 1,
 		description     = def.description,
 		inventory_image = def.inventory_image,
+		groups          = {not_in_creative_inventory = 1}
 	})
+
+	--working_villages.job_inv:set_size("main", #working_villages.registered_jobs)
+	working_villages.job_inv:add_item("main", ItemStack(job_name))
 end
 
 -- working_villages.register_egg registers a definition of a new egg.
@@ -615,19 +630,20 @@ function working_villages.register_villager(product_name, def)
 					self:set_displayed_action("active")
 				end
 			end,
-
-			allow_put = function(_, listname, _, stack) --inv, listname, index, stack, player
+			allow_put = function(inv, listname, _, stack) --inv, listname, index, stack, player
 				-- only jobs can put to a job inventory.
 				if listname == "main" then
 					return stack:get_count()
 				elseif listname == "job" and working_villages.is_job(stack:get_name()) then
+					if not inv:is_empty("job") then
+						inv:remove_item("job", inv:get_list("job")[1])
+					end
 					return stack:get_count()
 				elseif listname == "wield_item" then
 					return 0
 				end
 				return 0
 			end,
-
 			on_take = function(_, listname, _, stack) --inv, listname, index, stack, player
 				if listname == "job" then
 					local job_name = stack:get_name()
@@ -733,7 +749,7 @@ function working_villages.register_villager(product_name, def)
 		}
 
 		self.object:setvelocity{x = 0, y = 0, z = 0}
-		self.object:setacceleration{x = 0, y = -10, z = 0}
+		self.object:setacceleration{x = 0, y = -self.initial_properties.weight, z = 0}
 
 		local job = self:get_job()
 		if job ~= nil then
