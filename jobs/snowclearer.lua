@@ -3,7 +3,7 @@ local function find_snow(p) return minetest.get_node(p).name == "default:snow" e
 local searching_range = {x = 10, y = 3, z = 10}
 
 working_villages.register_job("working_villages:job_snowclearer", {
-	description      = "working_villages job : snowclearer",
+	description      = "snowclearer (working_villages)",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
 	jobfunc = function(self)
 		if is_night() then

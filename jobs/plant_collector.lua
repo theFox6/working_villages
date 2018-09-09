@@ -43,7 +43,7 @@ end
 local searching_range = {x = 10, y = 3, z = 10}
 
 working_villages.register_job("working_villages:job_herbcollector", {
-	description      = "working_villages job : herb collector",
+	description      = "herb collector (working_villages)",
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
 		if is_night() then

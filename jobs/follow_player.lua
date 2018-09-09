@@ -1,5 +1,5 @@
 working_villages.register_job("working_villages:job_folow_player", {
-	description      = "working_villages job : follower",
+	description      = "follower (working_villages)",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
 	jobfunc = function(self)
 		while (not self:is_active()) do

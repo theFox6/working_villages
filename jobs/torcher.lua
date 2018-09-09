@@ -4,7 +4,7 @@ local function is_dark(pos)
 end
 
 working_villages.register_job("working_villages:job_torcher", {
-	description      = "working_villages job : torcher",
+	description      = "torcher (working_villages)",
 	inventory_image  = "default_paper.png^working_villages_torcher.png",
 	jobfunc = function(self)
 		while (not self:is_active()) do
