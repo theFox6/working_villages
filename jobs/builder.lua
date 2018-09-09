@@ -20,7 +20,7 @@ local searching_range = {x = 10, y = 6, z = 10}
 
 working_villages.register_job("working_villages:job_builder", {
 	description      = "working_villages job : builder",
-	inventory_image  = "default_paper.png^memorandum_letters.png",
+	inventory_image  = "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		if is_night() then
 			self:goto_bed()

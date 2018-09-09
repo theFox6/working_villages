@@ -53,4 +53,5 @@ Exceptions to the above:
 * the base of the api is the source code of the Maidroid mod: [LGPLv2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt) or later license.
 * the egg textures are included in the Maidroid mod: [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) or later license.
 * the letters texture is from the Memorandum mod
-* the sign textures are from the default mod in minetest_game and from Gambit: CC BY-SA 3.0
+* the sign textures and the base of the torcher job texture are from the default mod in minetest_game and from Gambit: CC BY-SA 3.0
+* horsetail texture as base for the herb collectors job texture from Mossmanikin's Ferns: CC-By-SA 3.0

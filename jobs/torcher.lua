@@ -5,7 +5,7 @@ end
 
 working_villages.register_job("working_villages:job_torcher", {
 	description      = "working_villages job : torcher",
-	inventory_image  = "default_paper.png^memorandum_letters.png",
+	inventory_image  = "default_paper.png^working_villages_torcher.png",
 	jobfunc = function(self)
 		while (not self:is_active()) do
 			coroutine.yield()

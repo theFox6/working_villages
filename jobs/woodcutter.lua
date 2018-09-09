@@ -38,7 +38,7 @@ local searching_range = {x = 10, y = 10, z = 10, h = 5}
 
 working_villages.register_job("working_villages:job_woodcutter", {
 	description      = "working_villages job : woodcutter",
-	inventory_image  = "default_paper.png^memorandum_letters.png",
+	inventory_image  = "default_paper.png^working_villages_woodcutter.png",
 	jobfunc = function(self)
 		if is_night() then
 			self:goto_bed()
