@@ -283,9 +283,11 @@ local on_receive_fields = function(pos, _, fields, sender)
 			meta:set_string("valid", "false")
 		end
 		meta:set_string("door", fields.door_pos)
-		for _,v in pairs(working_villages.homes) do
-			if vector.equals(v.marker, pos) then
-				v.update = table.copy(working_villages.home.update)
+		for _,home in pairs(working_villages.homes) do
+			if vector.equals(home.marker, pos) then
+				for k, v in pairs(working_villages.home.update) do
+					home.update[k] = v
+				end
 			end
 		end
 	end
