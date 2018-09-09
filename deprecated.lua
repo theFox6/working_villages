@@ -1,3 +1,5 @@
+--working_villages.func.search_surrounding = working_villages.pathfinder.search_surrounding --TODO remove from util.lua
+
 local func = working_villages.func
 
 function working_villages.func.villager_state_machine_job(job_name,job_description,actions, sprop)

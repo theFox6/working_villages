@@ -14,3 +14,6 @@ if `pred(pos)` doesn't return true at all nil will be returned
 calls `pred(pos)` for every node next to pos and for pos itself
 if `pred(pos)` returns true it will return the position
 if `pred(pos)` doesn't return true at all false will be returned
+
+`working_villages.func.find_adjacent_clear(pos)`
+returns a location a villager can go to near pos

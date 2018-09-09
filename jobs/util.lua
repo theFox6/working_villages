@@ -37,7 +37,7 @@ end
 
 local find_adjacent_clear = working_villages.func.find_adjacent_clear
 
-function working_villages.func.search_surrounding(pos, pred, searching_range)
+local function search_surrounding(pos, pred, searching_range)
 	pos = vector.round(pos)
 	local max_xz = math.max(searching_range.x, searching_range.z)
 	local mod_y
@@ -93,6 +93,8 @@ function working_villages.func.search_surrounding(pos, pred, searching_range)
 	end
 	return nil
 end
+
+working_villages.func.search_surrounding = search_surrounding
 
 function working_villages.func.find_adjacent_pos(pos,pred)
 	local dest_pos
