@@ -55,7 +55,11 @@ end) ()
 working_villages.buildings = {}
 
 function working_villages.buildings.get(pos)
-	return working_villages.building[minetest.hash_node_position(pos)] or {}
+	local poshash = minetest.hash_node_position(pos)
+	if working_villages.building[poshash] == nil then
+		working_villages.building[poshash] = {}
+	end
+	return working_villages.building[poshash]
 end
 
 function working_villages.buildings.get_build_pos(meta)
@@ -111,7 +115,9 @@ function working_villages.buildings.load_schematic(filename,pos)
 			nodedata[i] = {pos=npos, node=node}
 		end
 	end
-	working_villages.buildings.get(working_villages.buildings.get_build_pos(meta)).nodedata = nodedata
+	local buildpos = working_villages.buildings.get_build_pos(meta)
+	local building = working_villages.buildings.get(buildpos)
+	building.nodedata = nodedata
 end
 
 function working_villages.buildings.get_materials(nodelist)
@@ -156,7 +162,9 @@ local function show_build_form(meta)
 		button_build = "button_exit[5.0,2.0;3.0,0.5;build_update;Update Build]"
 	end
 	local index = meta:get_int("index")
-	local nodelist = working_villages.buildings.get(working_villages.buildings.get_build_pos(meta)).nodedata
+	local buildpos = working_villages.buildings.get_build_pos(meta)
+	local building = working_villages.buildings.get(buildpos)
+	local nodelist = building.nodedata
 	if not nodelist then nodelist = {} end
 	local formspec = "size[8,10]"
 		.."label[3.0,0.0;Project: "..title.."]"
@@ -177,7 +185,7 @@ working_villages.buildings.get_formspec = function(meta)
 		local schemlist = table.concat(schemslist, ",") or ""
 		local formspec = "size[6,5]"
 			.."textlist[0.0,0.0;5.0,4.0;schemlist;"..schemlist..";;]"
-			.."button_exit[5.0,4.5;1.0,0.5;choose_schem;Ok]"
+			.."button_exit[5.0,4.5;1.0,0.5;exit;exit]"
 		return formspec
 	elseif state == "built" then
 		local formspec = "size[5,5]"..
@@ -201,7 +209,7 @@ local on_receive_fields = function(pos, _, fields, sender)
 	if meta:get_string("owner") ~= sender_name then
 		return
 	end
-	if fields.schemlist or fields.choose_schem then
+	if fields.schemlist then
 		local id = tonumber(string.match(fields.schemlist, "%d+"))
 		if id then
 			if SCHEMS[id] then

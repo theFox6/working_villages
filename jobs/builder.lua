@@ -31,7 +31,7 @@ working_villages.register_job("working_villages:job_builder", {
 				if marker ~= nil then
 					local meta = minetest.get_meta(marker)
 					local build_pos = working_villages.buildings.get_build_pos(meta)
-					if meta:get_int("index") > #working_villages.buildings.get(build_pos) then
+					if meta:get_int("index") > #working_villages.buildings.get(build_pos).nodedata then
 						local destination = working_villages.func.find_adjacent_clear(marker)
 						if destination==false then
 							print("failure: no adjacent walkable found")
@@ -44,7 +44,7 @@ working_villages.register_job("working_villages:job_builder", {
 						meta:set_string("formspec",working_villages.buildings.get_formspec(meta))
 						return
 					end
-					local nnode = working_villages.buildings.get(build_pos)[meta:get_int("index")]
+					local nnode = working_villages.buildings.get(build_pos).nodedata[meta:get_int("index")]
 					if nnode == nil then
 						meta:set_int("index",meta:get_int("index")+1)
 						return

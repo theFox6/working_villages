@@ -127,19 +127,22 @@ function working_villages.villager:place(item,pos)
 		for _=0,15 do coroutine.yield() end
 		--get wielded item
 		local stack = self:get_wield_item_stack()
-		--create pointed_thing FIXME check how a pointed_thing actualy works
+		--create pointed_thing facing upward
 		local pointed_thing = {
 			type = "node",
 			above = pos,
 			under = vector.add(pos, {x = 0, y = -1, z = 0}),
 		}
+		--TODO: try making a placer
 		local itemname = stack:get_name()
 		--place item
 		if type(item)=="table" then
-			minetest.set_node(pointed_thing.above, item) --TODO: minetest.place_node(pos, node)
+			minetest.set_node(pointed_thing.above, item)
+			--minetest.place_node(pos, item) --loses param2
 		else
 			--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
-			minetest.set_node(pointed_thing.above, {name = itemname}) --TODO: minetest.place_node(pos, node)
+			--minetest.set_node(pointed_thing.above, {name = itemname})
+			minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
 		end
 		--take item
 		stack:take_item(1)
