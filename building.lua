@@ -339,7 +339,6 @@ minetest.register_node("working_villages:building_marker", {
 
 -- home is a prototype home object
 working_villages.home = {
-	version = 1,
 	update = {door = true, bed = true}
 }
 
@@ -354,15 +353,8 @@ function working_villages.is_valid_home(self)
 	if home == nil then
 		return false
 	end
-	if home.version==nil then --update home
-		for k, v in pairs(working_villages.home) do
-			home[k] = v
-		end
-		home.version = 1
-	end
-	if home.update == nil then
-		home.update = table.copy(working_villages.home.update)
-	end
+	--update home
+	setmetatable(home, {__index = working_villages.home})
 	return true
 end
 
@@ -445,8 +437,11 @@ function working_villages.home:get_bed()
 	return self.bed
 end
 
+function working_villages.home:new(o)
+	return setmetatable(o or {}, {__index = self})
+end
+
 -- set the home of a villager
 function working_villages.set_home(inv_name,marker_pos)
-	working_villages.homes[inv_name] = table.copy(working_villages.home)
-	working_villages.homes[inv_name].marker = marker_pos
+	working_villages.homes[inv_name] = working_villages.home:new{marker = marker_pos}
 end

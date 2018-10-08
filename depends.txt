@@ -1,4 +1,3 @@
 default
 doors?
 beds?
-pathfinder?

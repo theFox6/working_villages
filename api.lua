@@ -441,6 +441,11 @@ function working_villages.villager:pickup_item()
 	end
 end
 
+-- working_villages.villager:new returns a new villager object.
+function working_villages.villager:new(o)
+	return setmetatable(o or {}, {__index = self})
+end
+
 -- working_villages.villager.is_active check if the villager is paused.
 function working_villages.villager:is_active()
 	return self.pause == "active"
@@ -853,28 +858,28 @@ function working_villages.register_villager(product_name, def)
 
 	-- register a definition of a new villager.
 
-	local villager_def = table.copy(working_villages.villager)
-	-- Object properties
-	villager_def.initial_properties = {
-		hp_max                      = def.hp_max,
-		weight                      = def.weight,
-		mesh                        = def.mesh,
-		textures                    = def.textures,
+	local villager_def = working_villages.villager:new({
+		initial_properties = {
+			hp_max                      = def.hp_max,
+			weight                      = def.weight,
+			mesh                        = def.mesh,
+			textures                    = def.textures,
 
-		--TODO: put these into working_villagers.villager
-		physical                    = true,
-		visual                      = "mesh",
-		visual_size                 = {x = 1, y = 1},
-		collisionbox                = {-0.25, 0, -0.25, 0.25, 1.75, 0.25},
-		pointable                   = true,
-		stepheight                  = 0.6,
-		is_visible                  = true,
-		makes_footstep_sound        = true,
-		automatic_face_movement_dir = false,
-		infotext                    = "",
-		nametag                     = "",
-		static_save                 = true,
-	}
+			--TODO: put these into working_villagers.villager
+			physical                    = true,
+			visual                      = "mesh",
+			visual_size                 = {x = 1, y = 1},
+			collisionbox                = {-0.25, 0, -0.25, 0.25, 1.75, 0.25},
+			pointable                   = true,
+			stepheight                  = 0.6,
+			is_visible                  = true,
+			makes_footstep_sound        = true,
+			automatic_face_movement_dir = false,
+			infotext                    = "",
+			nametag                     = "",
+			static_save                 = true,
+		}
+	})
 
 	-- extra initial properties
 	villager_def.pause                       = "active"

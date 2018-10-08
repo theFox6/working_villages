@@ -11,6 +11,7 @@ function working_villages.func.validate_pos(pos)
   end
 end
 
+--TODO: look in pathfinder whether defining this is even nessecary
 function working_villages.func.clear_pos(pos)
 	local node=minetest.get_node(pos)
 	local above_node=minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z})
