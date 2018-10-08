@@ -361,8 +361,6 @@ function working_villages.is_valid_home(self)
 	if home == nil then
 		return false
 	end
-	--update home
-	setmetatable(home, {__index = working_villages.home})
 	return true
 end
 

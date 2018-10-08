@@ -8,9 +8,6 @@ read_globals = {
 	"VoxelArea",
 	"ItemStack",
 	"default", "doors",
-	table = { fields = {
-			"copy"
-	} }
 }
 
 ignore = {
