@@ -28,6 +28,15 @@ working_villages.building = (function()
 	return {}
 end) ()
 
+-- home is a prototype home object
+working_villages.home = {
+	update = {door = true, bed = true}
+}
+
+function working_villages.home:new(o)
+	return setmetatable(o or {}, {__index = self})
+end
+
 -- working_villages.homes represents a table that contains the villagers homes.
 -- This table's keys are inventory names, and values are home objects.
 working_villages.homes = (function()
@@ -47,7 +56,12 @@ working_villages.homes = (function()
 	if file ~= nil then
 		local data = file:read("*a")
 		file:close()
-		return minetest.deserialize(data)
+		local load_data = minetest.deserialize(data)
+		local home_data = {}
+		for k,v in pairs(load_data) do
+			home_data[k] = working_villages.home:new(v)
+		end
+		return home_data
 	end
 	return {}
 end) ()
@@ -345,11 +359,6 @@ minetest.register_node("working_villages:building_marker", {
 	end,
 })
 
--- home is a prototype home object
-working_villages.home = {
-	update = {door = true, bed = true}
-}
-
 -- get the home of a villager
 function working_villages.get_home(self)
 	return working_villages.homes[self.inventory_name]
@@ -441,10 +450,6 @@ function working_villages.home:get_bed()
 	self.bed = minetest.string_to_pos(bed_pos)
 	self.update.bed = false
 	return self.bed
-end
-
-function working_villages.home:new(o)
-	return setmetatable(o or {}, {__index = self})
 end
 
 -- set the home of a villager
