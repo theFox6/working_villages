@@ -395,10 +395,10 @@ function working_villages.home:get_marker_meta()
 	if meta:get_string("valid")~="true" then
 		local owner = meta:get_string("owner")
 		if owner == "" then
-			minetest.log("warning", "The position of an unconfigured home was requested.")
+			minetest.log("warning", "The data of an unconfigured home was requested.")
 			minetest.log("warning", "Given home position:" .. minetest.pos_to_string(home_marker_pos))
 		else
-			minetest.chat_send_player(owner, "The position of an unconfigured home was requested.")
+			minetest.chat_send_player(owner, "The data of an unconfigured home was requested.")
 			minetest.chat_send_player(owner, "Given home position:" .. minetest.pos_to_string(home_marker_pos))
 		end
 		return false

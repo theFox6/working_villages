@@ -561,8 +561,11 @@ working_villages.job_inv = minetest.create_detached_inventory("working_villages:
 	on_take = function(inv, listname, _, stack) --inv, listname, index, stack, player
 		inv:add_item(listname,stack)
 	end,
-	on_put = function(inv, listname, _, stack)
-		inv:remove_item(listname, stack)
+	on_put = function(inv, listname, index, stack)
+		if inv:contains_item(listname, stack:peek_item(1)) then
+			--inv:remove_item(listname, stack)
+			stack:clear()
+		end
 	end,
 })
 working_villages.job_inv:set_size("main", 32)
