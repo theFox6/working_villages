@@ -10,6 +10,7 @@ function working_villages.log.make_logger(level)
 	end
 end
 
+working_villages.log.error = working_villages.log.make_logger("error")
 working_villages.log.warning = working_villages.log.make_logger("warning")
 working_villages.log.action = working_villages.log.make_logger("action")
 working_villages.log.info = working_villages.log.make_logger("info")

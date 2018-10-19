@@ -820,9 +820,15 @@ function working_villages.register_villager(product_name, def)
 
 		local job = self:get_job()
 		if not job then return end
-		if not self.job_thread and job.on_step then
-			job.on_start(self)
-			self.job_thread = coroutine.create(job.on_step)
+		if not self.job_thread then
+			if job.on_step then
+				job.on_start(self)
+				self.job_thread = coroutine.create(job.on_step)
+			elseif job.jobfunc then
+				self.job_thread = coroutine.create(job.jobfunc)
+			else
+				working_villages.log.error(self.inventory_name,"running invalid job")
+			end
 		end
 		if coroutine.status(self.job_thread) == "dead" then
 			if job.jobfunc then
