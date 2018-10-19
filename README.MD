@@ -1,4 +1,4 @@
-# minetest mod working_villages [![Build Status](https://travis-ci.org/theFox6/working_villages.svg?branch=master)](https://travis-ci.org/theFox6/working_villages)
+# minetest mod working_villages [![Luacheck Status][travis_badge]](https://travis-ci.org/theFox6/working_villages)
 This mod adds Villagers performing work.
 The plan is to make villagers build up their own villages.
 
@@ -45,6 +45,12 @@ features:
 
 for developing jobs, villagers, etc. read [api.md](api.MD)
 
+## screenshots
+[!Screenshot 1](screenshot.png)
+[!Screenshot 2](screenshot.2.png)
+[!Screenshot 3](screenshot.3.png)
+[!Screenshot 4](screenshot.4.png)
+
 ## License
 * working_villages by theFox6 is avalible under the MIT License
 
@@ -55,3 +61,5 @@ Exceptions to the above:
 * the letters texture is from the Memorandum mod
 * the sign textures and the base of the torcher job texture are from the default mod in minetest_game and from Gambit: CC BY-SA 3.0
 * horsetail texture as base for the herb collectors job texture from Mossmanikin's Ferns: CC-By-SA 3.0
+
+[travis_badge]: https://travis-ci.org/theFox6/working_villages.svg?branch=master
