@@ -1,3 +1,5 @@
+local fail = working_villages.failures
+
 local function is_dark(pos)
 	local light_level = minetest.get_node_light(pos)
 	return light_level <= 5
@@ -15,7 +17,30 @@ working_villages.register_job("working_villages:job_torcher", {
 			local front = self:get_front() -- if it is dark, set torch.
 			if is_dark(front) then
 				--FIXME: somehow the placement is wrong
-				self:place("default:torch",front)
+				local sucess, ret = self:place("default:torch",front)
+				if not sucess then
+					if ret == fail.too_far then
+						working_villages.log.error("placement in front of villager was too far away")
+					elseif ret == fail.blocked then
+						--try elsewhere
+					elseif ret == fail.not_in_inventory then
+						local msg = "torcher at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have torches"
+						local player = self:get_nearest_player(10)
+						if player ~= nil then
+							minetest.chat_send_player(player:get_player_name(),msg)
+						elseif self.owner_name then
+							minetest.chat_send_player(self.owner_name,msg)
+						else
+							print(msg)
+						end
+						self.pause = "resting"
+						self.object:setvelocity{x = 0, y = 0, z = 0}
+						self:set_animation(working_villages.animation_frames.STAND)
+						self:set_displayed_action("in need of torches")
+					else
+						working_villages.log.error("unknown failure in placement " .. ret)
+					end
+				end
 			end
 		end
 		local direction = vector.new(0,0,0)

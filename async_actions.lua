@@ -1,3 +1,5 @@
+local fail = working_villages.failures
+
 function working_villages.villager:go_to(pos)
 	self.destination=vector.round(pos)
 	if working_villages.func.walkable_pos(self.destination) then
@@ -11,6 +13,7 @@ function working_villages.villager:go_to(pos)
 	if self.path == nil then
 		--TODO: actually no path shouldn't be accepted
 		--we'd have to check whether we can find a shorter path in the right direction
+		--return false, fail.no_path
 		self.path = {self.destination}
 	end
 	--print("the first waypiont on his path:" .. minetest.pos_to_string(self.path[1]))
@@ -26,12 +29,8 @@ function working_villages.villager:go_to(pos)
 			if path == nil then
 				self:count_timer("go_to:give_up")
 				if self:timer_exceeded("go_to:give_up",3) then
-					self.destination=vector.round(self.destination)
-					if working_villages.func.walkable_pos(self.destination) then
-						self.destination=working_villages.pathfinder.get_ground_level(vector.round(self.destination))
-					end
 					print("villager can't find path")
-					--FIXME: we ought to give up at this point
+					return false, fail.no_path
 				end
 			else
 				self.path = path
@@ -61,14 +60,18 @@ function working_villages.villager:go_to(pos)
 	self.object:setvelocity{x = 0, y = 0, z = 0}
 	self.path = nil
 	self:set_animation(working_villages.animation_frames.STAND)
+	return true
 end
-
---FIXME: actions like dig etc. only if we are near the target
 
 function working_villages.villager:dig(pos)
 	self.object:setvelocity{x = 0, y = 0, z = 0}
+	local dist = vector.subtract(pos, self.object:getpos())
+	if vector.length(dist) > 5 then
+		self:set_animation(working_villages.animation_frames.STAND)
+		return false, fail.too_far
+	end
 	self:set_animation(working_villages.animation_frames.MINE)
-	self:set_yaw_by_direction(vector.subtract(pos, self.object:getpos()))
+	self:set_yaw_by_direction(dist)
 	for _=0,30 do coroutine.yield() end --wait 30 steps
 	local destnode = minetest.get_node(pos)
 	minetest.remove_node(pos) --TODO local leftover = minetest.dig_node(pos)
@@ -87,33 +90,32 @@ function working_villages.villager:dig(pos)
 		end
 	end
 	self:set_animation(working_villages.animation_frames.STAND)
+	return true
 end
 
 function working_villages.villager:place(item,pos)
 	if type(pos)~="table" then
 		error("no target position given")
 	end
-	local pred
-	if type(item)=="string" then
-		pred = function (name) return name == item end
-	elseif type(item)=="function" then
-		pred = item
-	elseif type(item)=="table" then
-		pred = function (name) return name == item.name end
-	else
-		error("no item to place given")
+	local dist = vector.subtract(pos, self.object:getpos())
+	if vector.length(dist) > 5 then
+		return false, fail.too_far
 	end
-	local wield_stack = self:get_wield_item_stack()
-	--move item to wield
+	--TODO: check if there is already a block -> fail.blocked
 	local find_item = function(name)
 		if type(item)=="string" then
 			return name == working_villages.buildings.get_registered_nodename(item)
 		elseif type(item)=="table" then
 			return name == working_villages.buildings.get_registered_nodename(item.name)
+		elseif type(item)=="function" then
+			return item(name)
 		else
-			return pred(name)
+			working_villages.log.error(false, "got %s instead of an item",item)
+			error("no item to place given")
 		end
 	end
+	local wield_stack = self:get_wield_item_stack()
+	--move item to wield
 	if find_item(wield_stack:get_name()) or self:move_main_to_wield(find_item) then
 		--set animation
 		if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
@@ -122,7 +124,7 @@ function working_villages.villager:place(item,pos)
 			self:set_animation(working_villages.animation_frames.WALK_MINE)
 		end
 		--turn to target
-		self:set_yaw_by_direction(vector.subtract(pos, self.object:getpos()))
+		self:set_yaw_by_direction(dist)
 		--wait 15 steps
 		for _=0,15 do coroutine.yield() end
 		--get wielded item
@@ -164,8 +166,9 @@ function working_villages.villager:place(item,pos)
 			self:set_animation(working_villages.animation_frames.WALK)
 		end
 	else
-		minetest.chat_send_player(self.owner_name,
-			"villager at " .. minetest.pos_to_string(self.object:getpos()) .. "couldn't place item")
+		working_villages.log.info(self.owner_name,
+			"villager at " .. minetest.pos_to_string(self.object:getpos()) .. "couldn't place item") --TODO: remove this
+		return false, fail.not_in_inventory
 	end
 end
 
@@ -225,7 +228,7 @@ function working_villages.villager:goto_bed()
 		local bed_pos = self:get_home():get_bed()
 		if not bed_pos then
 			working_villages.log.warning(self.inventory_name,"couldn't find his bed")
-			--perhaps go home
+			--TODO: go home anyway
 			self:set_displayed_action("waiting until dawn")
 			local tod = minetest.get_timeofday()
 			while (tod > 0.2 and tod < 0.805) do
@@ -245,8 +248,8 @@ function working_villages.villager:goto_bed()
 				tod = minetest.get_timeofday()
 			end
 			self:sleep()
-			--maybe go back to the position we were at before going home
 			self:go_to(self:get_home():get_door())
 		end
 	end
+	return true
 end

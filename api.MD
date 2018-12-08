@@ -30,3 +30,22 @@ working_villages.register_villager([entity name for the villager], {
 ```
 
 examples: [register.lua](register.lua)
+
+##async actions
+
+* actions that are run for more than one step
+* called with `villager:action()`
+* return true for sucess
+* return false, fail for failure, the failures are listed in [failures.lua](failures.lua)
+
+`go_to(pos)`
+looks for a path to pos and goes there
+
+`dig(pos)`
+diggs the node at the position
+
+`place(item,pos)`
+places the given item at the position
+
+`goto_bed()`
+rests for the night
