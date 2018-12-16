@@ -61,6 +61,12 @@ function working_villages.villager:get_job()
 	return nil
 end
 
+-- working_villages.villager.is_enemy returns if an object is an enemy.
+function working_villages.villager:is_enemy(obj)
+	--TODO
+	return false
+end
+
 -- working_villages.villager.get_nearest_player returns a player object who
 -- is the nearest to the villager.
 function working_villages.villager:get_nearest_player(range_distance)
@@ -82,6 +88,26 @@ function working_villages.villager:get_nearest_player(range_distance)
 	return player
 end
 
+-- working_villages.villager.get_nearest_enemy returns an enemy who is the nearest to the villager.
+function working_villages.villager:get_nearest_enemy(range_distance)
+	local enemy
+	local min_distance = range_distance
+	local position = self.object:getpos()
+
+	local all_objects = minetest.get_objects_inside_radius(position, range_distance)
+	for _, object in pairs(all_objects) do
+		if self:is_enemy(object) then
+			local object_position = object:getpos()
+			local distance = vector.distance(position, object_position)
+
+			if distance < min_distance then
+				min_distance = distance
+				enemy = object
+			end
+		end
+	end
+	return enemy
+end
 -- woriking_villages.villager.get_nearest_item_by_condition returns the position of
 -- an item that returns true for the condition
 function working_villages.villager:get_nearest_item_by_condition(cond, range_distance)
@@ -441,6 +467,25 @@ function working_villages.villager:pickup_item()
 	end
 end
 
+-- working_villages.villager.get_job_data get a job data field
+function working_villages.villager:get_job_data(key)
+	local actual_job_data = self.job_data[self:get_job_name()]
+	if actual_job_data == nil then
+		return nil
+	end
+	return actual_job_data[key]
+end
+
+-- working_villages.villager.set_job_data set a job data field
+function working_villages.villager:set_job_data(key, value)
+	local actual_job_data = self.job_data[self:get_job_name()]
+	if actual_job_data == nil then
+		actual_job_data = {}
+		self.job_data[self:get_job_name()] = actual_job_data
+	end
+	actual_job_data[key] = value
+end
+
 -- working_villages.villager:new returns a new villager object.
 function working_villages.villager:new(o)
 	return setmetatable(o or {}, {__index = self})
@@ -449,6 +494,14 @@ end
 -- working_villages.villager.is_active check if the villager is paused.
 function working_villages.villager:is_active()
 	return self.pause == "active"
+end
+
+--working_villages.villager.set_paused pause the villager.
+function working_villages.villager:set_paused(reason)
+	self.pause = "resting"
+	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self:set_animation(working_villages.animation_frames.STAND)
+	self:set_displayed_action(reason or "resting")
 end
 
 dofile(working_villages.modpath.."/async_actions.lua") --load states
@@ -743,6 +796,7 @@ function working_villages.register_villager(product_name, def)
 			self.nametag = data["nametag"]
 			self.owner_name = data["owner_name"]
 			self.pause = data["pause"]
+			self.job_data = data["job_data"]
 
 			local inventory = create_inventory(self)
 			for list_name, list in pairs(data["inventory"]) do
@@ -786,6 +840,7 @@ function working_villages.register_villager(product_name, def)
 			["owner_name"] = self.owner_name,
 			["inventory"] = {},
 			["pause"] = self.pause,
+			["job_data"] = self.job_data
 		}
 
 		-- set lists.
@@ -900,6 +955,7 @@ function working_villages.register_villager(product_name, def)
 	villager_def.owner_name                  = ""
 	villager_def.time_counters               = {}
 	villager_def.destination                 = vector.new(0,0,0)
+	villager_def.job_data                    = {}
 
 	-- callback methods
 	villager_def.on_activate                 = on_activate

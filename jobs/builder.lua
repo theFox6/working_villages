@@ -72,10 +72,7 @@ working_villages.register_job("working_villages:job_builder", {
 							else
 								print(msg)
 							end
-							self.pause = "resting"
-							self.object:setvelocity{x = 0, y = 0, z = 0}
-							self:set_animation(working_villages.animation_frames.STAND)
-							self:set_displayed_action("waiting")
+							self:set_paused("waiting")
 							return
 						end
 					end
@@ -102,10 +99,7 @@ working_villages.register_job("working_villages:job_builder", {
 						else
 							print(msg)
 						end
-						self.pause = "resting"
-						self.object:setvelocity{x = 0, y = 0, z = 0}
-						self:set_animation(working_villages.animation_frames.STAND)
-						self:set_displayed_action("waiting for materials")
+						self:set_paused("waiting for materials")
 					end
 				end
 			end

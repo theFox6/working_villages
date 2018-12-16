@@ -21,13 +21,10 @@ minetest.register_tool("working_villages:commanding_sceptre", {
 					end
 					luaentity:set_displayed_action("active")
 				else
-					luaentity.pause = "resting"
+					luaentity:set_paused()
 					if type(job.on_pause)=="function" then
 						job.on_pause(luaentity)
 					end
-					luaentity.object:setvelocity{x = 0, y = 0, z = 0}
-					luaentity:set_animation(working_villages.animation_frames.STAND)
-					luaentity:set_displayed_action("resting")
 				end
 			end
 

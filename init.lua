@@ -26,6 +26,7 @@ dofile(working_villages.modpath.."/jobs/empty.lua")
 
 dofile(working_villages.modpath.."/jobs/builder.lua")
 dofile(working_villages.modpath.."/jobs/follow_player.lua")
+dofile(working_villages.modpath.."/jobs/guard.lua")
 dofile(working_villages.modpath.."/jobs/plant_collector.lua")
 dofile(working_villages.modpath.."/jobs/woodcutter.lua")
 --testing jobs

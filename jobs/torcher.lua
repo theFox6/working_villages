@@ -33,10 +33,7 @@ working_villages.register_job("working_villages:job_torcher", {
 						else
 							print(msg)
 						end
-						self.pause = "resting"
-						self.object:setvelocity{x = 0, y = 0, z = 0}
-						self:set_animation(working_villages.animation_frames.STAND)
-						self:set_displayed_action("in need of torches")
+						self:set_paused("in need of torches")
 					else
 						working_villages.log.error("unknown failure in placement " .. ret)
 					end
