@@ -63,6 +63,7 @@ end
 
 -- working_villages.villager.is_enemy returns if an object is an enemy.
 function working_villages.villager:is_enemy(obj)
+	working_villages.log.verbose(self.inventory_name,obj)
 	--TODO
 	return false
 end

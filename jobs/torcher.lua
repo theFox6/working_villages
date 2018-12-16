@@ -22,7 +22,8 @@ working_villages.register_job("working_villages:job_torcher", {
 					if ret == fail.too_far then
 						working_villages.log.error("placement in front of villager was too far away")
 					elseif ret == fail.blocked then
-						--try elsewhere
+						--TODO:try elsewhere
+						working_villages.log.verbose("pos blocked")
 					elseif ret == fail.not_in_inventory then
 						local msg = "torcher at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have torches"
 						local player = self:get_nearest_player(10)

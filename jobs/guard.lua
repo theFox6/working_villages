@@ -28,10 +28,10 @@ working_villages.register_job("working_villages:job_guard", {
 			end
 
 			local target_position = escort_target:getpos()
-			local distance = vector.subtract(target_position, position)
+			local distance = vector.subtract(target_position, self.object:getpos())
 
 			local velocity = self.object:getvelocity()
-			if vector.length(direction) < 3 then
+			if vector.length(distance) < 3 then
 				if velocity.x~=0 or velocity.y~=0 then
 					self:set_animation(working_villages.animation_frames.STAND)
 					self.object:setvelocity{x = 0, y = velocity.y, z = 0}
@@ -41,15 +41,18 @@ working_villages.register_job("working_villages:job_guard", {
 					self:set_animation(working_villages.animation_frames.WALK)
 				end
 				--FIXME: don't run too fast, perhaps go_to
-				self.object:setvelocity{x = direction.x, y = velocity.y, z = direction.z}
-				self:set_yaw_by_direction(direction)
+				self.object:setvelocity{x = distance.x, y = velocity.y, z = distance.z}
+				self:set_yaw_by_direction(distance)
 
 				--if villager is stoped by obstacle, the villager must jump.
 				self:handle_obstacles(true)
 			end
 		elseif guard_mode == "patrol" then
-			--TODO: find nearest building, go there, remember the building, next building, until no further buildings can be found, then restart
+			working_villages.log.verbose("patroling")
+			--TODO: find nearest building, go there, remember the building
+			--      next building, until no further buildings can be found, then restart
 		elseif guard_mode == "wandering" then
+			working_villages.log.verbose("wandering")
 			--TODO: walk randomly
 		end
 
