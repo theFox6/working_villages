@@ -38,6 +38,9 @@ local searching_range = {x = 10, y = 10, z = 10, h = 5}
 
 working_villages.register_job("working_villages:job_woodcutter", {
 	description      = "woodcutter (working_villages)",
+	long_description = "I look for any Tree trunks around and chop them down.\
+I might also chop down a house. Don't get angry please I'm not the best at my job.\
+When I find a sappling I'll plant it on some soil near a bright place so a new tree can grow from it.",
 	inventory_image  = "default_paper.png^working_villages_woodcutter.png",
 	jobfunc = function(self)
 		if is_night() then

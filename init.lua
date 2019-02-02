@@ -11,6 +11,7 @@ dofile(working_villages.modpath.."/util.lua")
 dofile(working_villages.modpath.."/failures.lua")
 dofile(working_villages.modpath.."/pathfinder.lua")
 dofile(working_villages.modpath.."/forms.lua")
+dofile(working_villages.modpath.."/talking.lua")
 dofile(working_villages.modpath.."/building.lua")
 
 --base

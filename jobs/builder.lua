@@ -20,6 +20,8 @@ local searching_range = {x = 10, y = 6, z = 10}
 
 working_villages.register_job("working_villages:job_builder", {
 	description      = "builder (working_villages)",
+	long_description = "I look for the nearest building marker with a started building site. There I'll help building up the building.\
+If I have the materials of course. Also I'll look for building markers within a 10 block radius. And I ignore paused building sites.",
 	inventory_image  = "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		if is_night() then

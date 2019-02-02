@@ -2,6 +2,7 @@
 
 working_villages.register_job("working_villages:job_guard", {
 	description      = "guard (working_villages)",
+	long_description = "I'm here on guard defending against all those whom I see as enemies.",
 	inventory_image  = "default_paper.png^memorandum_letters.png", --TODO: sword/bow/shield
 	jobfunc = function(self)
 		local guard_mode = self:get_job_data("mode") or "stationary"

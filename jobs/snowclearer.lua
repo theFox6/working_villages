@@ -4,6 +4,10 @@ local searching_range = {x = 10, y = 3, z = 10}
 
 working_villages.register_job("working_villages:job_snowclearer", {
 	description      = "snowclearer (working_villages)",
+	long_description = "I clear away snow you know.\
+My job is for testing not for harvesting.\
+I must confess this job seems useless.\
+I'm doing anyway, clearing the snow away.",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
 	jobfunc = function(self)
 		if is_night() then
