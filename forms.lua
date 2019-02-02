@@ -76,7 +76,7 @@ minetest.register_on_player_receive_fields(
 )
 
 function working_villages.forms.form_base(width,height,villager)
-	local formname
+	local jobname
 
 	if villager then
 		jobname = villager:get_job()
@@ -108,9 +108,9 @@ function working_villages.forms.register_menu_page(pageid, title)
 			--TODO: random text from list
 			form = form .. "label["..(4-(#text/10))..",1;"..text.."]"
 			local y = 1
-			for description, pageid in pairs(self.link_to) do
+			for description, page_to in pairs(self.link_to) do
 				y = y + 1
-				form = form .. "button[0.5,"..y..";7,1;to_page-"..pageid..";"..minetest.formspec_escape(description).."]"
+				form = form .. "button[0.5,"..y..";7,1;to_page-"..page_to..";"..minetest.formspec_escape(description).."]"
 				if y >= formbottom-1 then
 					working_villages.log.warning(false, "too many linked pages")
 					--TODO: scroll down button
@@ -215,7 +215,7 @@ working_villages.forms.register_page("working_villages:job_change",{
 			.. "listring[]"
 			.. "button[6,".. cp.y + 0.5 ..";1,1;back;back]"
 	end,
-	receiver = function(self, villager, sender, fields)
+	receiver = function(_, villager, sender, fields)
 		local sender_name = sender:get_player_name()
 		if fields.back then
 			working_villages.forms.show_formspec(villager, "working_villages:inv_gui", sender_name)
@@ -255,7 +255,7 @@ working_villages.forms.register_page("working_villages:inv_gui", {
 			.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;home position;" .. home_pos .. "]"
 			.. "button_exit[" .. hp.x + 2 .. "," .. hp.y + 0.09 .. ";1,1;ok;set]"
 	end,
-	receiver = function(self, villager, sender, fields)
+	receiver = function(_, villager, sender, fields)
 		local sender_name = sender:get_player_name()
 		if fields.job then
 			working_villages.forms.show_formspec(villager, "working_villages:job_change", sender_name)
