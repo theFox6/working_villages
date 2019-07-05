@@ -1,4 +1,2 @@
 default
 modutil
-doors?
-beds?

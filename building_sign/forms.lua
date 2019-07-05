@@ -1,7 +1,10 @@
---TODO: cleanup
+local forms = {}
+local schems = building_sign.registered_schematics
+--TODO: replace outside prompt by outer door detection
+--TODO: replace bed position promt by detection
 --TODO: translations
 
-function building_sign.forms.build_form(meta)
+function forms.build_form(meta)
 	local title = meta:get_string("schematic"):gsub("%.we","")
 	local button_build
 	if meta:get_string("state") == "planned" then
@@ -27,12 +30,11 @@ function building_sign.forms.build_form(meta)
 	return formspec
 end
 
-function building_sign.forms.make_formspec(meta)
+function forms.make_formspec(meta)
 	local state = meta:get_string("state")
 	if state == "unplanned" then
-		local schemslist = {"[custom house]"}
-		--FIXME: check schems assigned to the sign
-		for _,el in pairs(SCHEMS) do
+		local schemslist = {}
+		for _,el in pairs(schems) do
 			table.insert(schemslist,minetest.formspec_escape(el))
 		end
 		local schemlist = table.concat(schemslist, ",") or ""
@@ -48,11 +50,11 @@ function building_sign.forms.make_formspec(meta)
 			"button_exit[1,4;2,1;assign_home;Write]"
 		return formspec
 	elseif state == "planned" or state == "paused" or state == "begun" then
-		return building_sign.forms.build_form(meta)
+		return forms.build_form(meta)
 	end
 end
 
-function building_sign.forms.on_receive_fields(pos, _, fields, sender)
+function forms.on_receive_fields(pos, _, fields, sender)
 	local meta = minetest.get_meta(pos)
 	local sender_name = sender:get_player_name()
 	if minetest.is_protected(pos, sender_name) then
@@ -65,9 +67,10 @@ function building_sign.forms.on_receive_fields(pos, _, fields, sender)
 	if fields.schemlist then
 		local id = tonumber(string.match(fields.schemlist, "%d+"))
 		if id then
-			if SCHEMS[id] then
-				meta:set_string("schematic",SCHEMS[id])
-				if SCHEMS[id] == "[custom house]" then
+			if schems[id] then
+				meta:set_string("schematic",schems[id])
+				if schems[id] == "[custom house]" then
+				  --TODO: ask for area
 					meta:set_string("state","built")
 					meta:set_string("house_label", "house " .. minetest.pos_to_string(pos))
 				else
@@ -125,7 +128,7 @@ function building_sign.forms.on_receive_fields(pos, _, fields, sender)
 				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
 				'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 			meta:set_string("valid", "false")
-		elseif out_of_limit(coords) then
+		elseif building_sign.out_of_limit(coords) then
 			minetest.chat_send_player(sender_name, 'The coordinates of your bed position '..
 				'do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
 			meta:set_string("valid", "false")
@@ -138,7 +141,7 @@ function building_sign.forms.on_receive_fields(pos, _, fields, sender)
 				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
 				'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
 			meta:set_string("valid", "false")
-		elseif out_of_limit(coords) then
+		elseif building_sign.out_of_limit(coords) then
 			minetest.chat_send_player(sender_name, 'The coordinates of your bed position '..
 				'do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.')
 			meta:set_string("valid", "false")
@@ -152,5 +155,8 @@ function building_sign.forms.on_receive_fields(pos, _, fields, sender)
 			end
 		end
 	end
-	meta:set_string("formspec",working_villages.buildings.get_formspec(meta))
+	meta:set_string("formspec",forms.make_formspec(meta))
 end
+
+building_sign.forms = forms
+return forms

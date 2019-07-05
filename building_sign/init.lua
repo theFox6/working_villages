@@ -4,10 +4,19 @@ minetest.log("action", "["..minetest.get_current_modname().."] loading...")
 building_sign = {
 	modpath=minetest.get_modpath("building_sign"),
 	DEFAULT_NODE = {name="air"},
+	registered_schematics = {"[custom house]"},
 }
+
+function building_sign.register_schematic(file)
+  table.insert(building_sign.registered_schematics,file)
+end
+
+--TODO: load world schematics
 
 dofile(building_sign.modpath .. "/util.lua")
 dofile(building_sign.modpath .. "/building_store.lua")
+dofile(building_sign.modpath .. "/forms.lua")
+dofile(building_sign.modpath .. "/areas.lua")
 
 local S = building_sign.S
 minetest.register_node("building_sign:building_marker", {
@@ -36,8 +45,8 @@ minetest.register_node("building_sign:building_marker", {
 	end,
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
-		local area = building_sign.areas.check_existing(pos)
-		if area then
+		local building = building_sign.areas.check_existing(pos)
+		if building then
 			--TODO: load from area
 		else
 			meta:set_string("configured","false")
@@ -54,6 +63,7 @@ minetest.register_node("building_sign:building_marker", {
 		end
 		return true
 	end,
+	--on_destruct
 	after_destruct = function(pos, oldnode)
 		--TODO: record sign removal
 	end,
