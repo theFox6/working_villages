@@ -13,6 +13,10 @@ working_villages.register_job("working_villages:job_folow_player", {
 			local player_position = player:getpos()
 			direction = vector.subtract(player_position, position)
 		end
+		
+		if direction.y > 0 and minetest.get_item_group(minetest.get_node(self.object:getpos()).name,"liquid") > 0 then
+		  self:jump()
+		end
 
 		local velocity = self.object:getvelocity()
 		if vector.length(direction) < 3 then

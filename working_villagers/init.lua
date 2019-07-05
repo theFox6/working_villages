@@ -2,12 +2,13 @@ local init = os.clock()
 minetest.log("action", "["..minetest.get_current_modname().."] loading...")
 
 working_villages={
-	modpath=minetest.get_modpath("working_villages"),
-	func = {}
+	modpath = minetest.get_modpath("working_villages"),
+	func = {},
+	log = modutil.require("log").make_loggers(),
+  check_modname_prefix = modutil.require("check_prefix"),
 }
 
 --helpers
-dofile(working_villages.modpath.."/util.lua")
 dofile(working_villages.modpath.."/failures.lua")
 dofile(working_villages.modpath.."/pathfinder.lua")
 dofile(working_villages.modpath.."/forms.lua")

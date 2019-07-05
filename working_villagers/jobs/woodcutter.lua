@@ -64,14 +64,16 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 				local wield_stack = self:get_wield_item_stack()
 				if is_sapling(wield_stack:get_name()) or self:has_item_in_main(is_sapling) then
 					local target = working_villages.func.search_surrounding(self.object:getpos(), is_sapling_spot, searching_range)
-					local destination = working_villages.func.find_adjacent_clear(target)
-					if destination==false then
-						print("failure: no adjacent walkable found")
-						destination = target
+					if target ~= nil then
+  					local destination = working_villages.func.find_adjacent_clear(target)
+  					if destination==false then
+  						print("failure: no adjacent walkable found")
+  						destination = target
+  					end
+  					self:set_displayed_action("planting a tree")
+  					self:go_to(destination)
+  					self:place(is_sapling, target)
 					end
-					self:set_displayed_action("planting a tree")
-					self:go_to(destination)
-					self:place(is_sapling, target)
 				end
 				local target = working_villages.func.search_surrounding(self.object:getpos(), find_tree, searching_range)
 				if target ~= nil then

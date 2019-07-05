@@ -212,12 +212,12 @@ function working_villages.villager:goto_bed()
 	if not self:has_home() then
 		working_villages.log.action(self.inventory_name,"is waiting until dawn")
 		self:set_displayed_action("waiting until dawn")
-		local tod = minetest.get_timeofday()
+		self:set_animation(working_villages.animation_frames.SIT)
+    local tod = minetest.get_timeofday()
 		while (tod > 0.2 and tod < 0.805) do
 			coroutine.yield()
 			tod = minetest.get_timeofday()
 		end
-		self:set_animation(working_villages.animation_frames.SIT)
 		self.pause="sleeping"
 		self.wait_until_dawn()
 		self:set_animation(working_villages.animation_frames.STAND)

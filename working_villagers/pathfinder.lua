@@ -96,6 +96,75 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 	end
 end
 
+local function get_neighbors(current_pos, entity_height, entity_jump_height, entity_fear_height)
+	local neighbors = {}
+	local neighbors_index = 1
+	for z = -1, 1 do
+	for x = -1, 1 do
+		local neighbor_pos = {x = current_pos.x + x, y = current_pos.y, z = current_pos.z + z}
+		local neighbor = minetest.get_node(neighbor_pos)
+		local neighbor_ground_level = get_neighbor_ground_level(neighbor_pos, entity_jump_height, entity_fear_height)
+		local neighbor_clearance = false
+		if neighbor_ground_level then
+			-- print(neighbor_ground_level.y - current_pos.y)
+			-- minetest.set_node(neighbor_ground_level, {name = "default:dry_shrub"})
+			local node_above_head = minetest.get_node(
+					{x = current_pos.x, y = current_pos.y + entity_height, z = current_pos.z})
+			if neighbor_ground_level.y - current_pos.y > 0 and not(walkable(node_above_head)) then
+				local height = -1
+				repeat
+					height = height + 1
+					local node = minetest.get_node(
+							{x = neighbor_ground_level.x,
+							y = neighbor_ground_level.y + height,
+							z = neighbor_ground_level.z})
+				until walkable(node) or height > entity_height
+				if height >= entity_height then
+					neighbor_clearance = true
+				end
+			elseif neighbor_ground_level.y - current_pos.y > 0 and walkable(node_above_head) then
+				neighbors[neighbors_index] = {
+						hash = nil,
+						pos = nil,
+						clear = nil,
+						walkable = nil,
+				}
+			else
+				local height = -1
+				repeat
+					height = height + 1
+					local node = minetest.get_node(
+							{x = neighbor_ground_level.x,
+							y = current_pos.y + height,
+							z = neighbor_ground_level.z})
+				until walkable(node) or height > entity_height
+				if height >= entity_height then
+					neighbor_clearance = true
+				end
+			end
+
+			neighbors[neighbors_index] = {
+					hash = minetest.hash_node_position(neighbor_ground_level),
+					pos = neighbor_ground_level,
+					clear = neighbor_clearance,
+					walkable = walkable(neighbor),
+			}
+		else
+			neighbors[neighbors_index] = {
+					hash = nil,
+					pos = nil,
+					clear = nil,
+					walkable = nil,
+			}
+		end
+		neighbors_index = neighbors_index + 1
+	end
+	end
+	return neighbors
+end
+
+--TODO: path to the nearest of multiple endpoints
+
 function working_villages.pathfinder.find_path(pos, endpos, entity)
 	--print("searching for a path to:" .. minetest.pos_to_string(endpos))
 	local start_index = minetest.hash_node_position(pos)
@@ -162,69 +231,7 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 
 		local current_pos = current_values.pos
 
-		local neighbors = {}
-		local neighbors_index = 1
-		for z = -1, 1 do
-		for x = -1, 1 do
-			local neighbor_pos = {x = current_pos.x + x, y = current_pos.y, z = current_pos.z + z}
-			local neighbor = minetest.get_node(neighbor_pos)
-			local neighbor_ground_level = get_neighbor_ground_level(neighbor_pos, entity_jump_height, entity_fear_height)
-			local neighbor_clearance = false
-			if neighbor_ground_level then
-				-- print(neighbor_ground_level.y - current_pos.y)
-				-- minetest.set_node(neighbor_ground_level, {name = "default:dry_shrub"})
-				local node_above_head = minetest.get_node(
-						{x = current_pos.x, y = current_pos.y + entity_height, z = current_pos.z})
-				if neighbor_ground_level.y - current_pos.y > 0 and not(walkable(node_above_head)) then
-					local height = -1
-					repeat
-						height = height + 1
-						local node = minetest.get_node(
-								{x = neighbor_ground_level.x,
-								y = neighbor_ground_level.y + height,
-								z = neighbor_ground_level.z})
-					until walkable(node) or height > entity_height
-					if height >= entity_height then
-						neighbor_clearance = true
-					end
-				elseif neighbor_ground_level.y - current_pos.y > 0 and walkable(node_above_head) then
-					neighbors[neighbors_index] = {
-							hash = nil,
-							pos = nil,
-							clear = nil,
-							walkable = nil,
-					}
-				else
-					local height = -1
-					repeat
-						height = height + 1
-						local node = minetest.get_node(
-								{x = neighbor_ground_level.x,
-								y = current_pos.y + height,
-								z = neighbor_ground_level.z})
-					until walkable(node) or height > entity_height
-					if height >= entity_height then
-						neighbor_clearance = true
-					end
-				end
-
-				neighbors[neighbors_index] = {
-						hash = minetest.hash_node_position(neighbor_ground_level),
-						pos = neighbor_ground_level,
-						clear = neighbor_clearance,
-						walkable = walkable(neighbor),
-				}
-			else
-				neighbors[neighbors_index] = {
-						hash = nil,
-						pos = nil,
-						clear = nil,
-						walkable = nil,
-				}
-			end
-			neighbors_index = neighbors_index + 1
-		end
-		end
+		local neighbors = get_neighbors(current_pos, entity_height, entity_jump_height, entity_fear_height)
 
 		for id, neighbor in pairs(neighbors) do
 			-- don't cut corners
@@ -273,7 +280,7 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 			end
 		end
 		if count > 100 then
-			--print("failed finding a path to:" minetest.pos_to_string(endpos.z))
+			--print("failed finding a path to:" minetest.pos_to_string(endpos))
 			return
 		end
 	until count < 1
@@ -282,16 +289,16 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 end
 
 working_villages.pathfinder.walkable = walkable
-local function get_ground_level(pos)
+
+function working_villages.pathfinder.get_ground_level(pos)
 	return get_neighbor_ground_level(pos, 30927, 30927)
 end
 
-working_villages.pathfinder.get_ground_level = get_ground_level
-
+--TODO: looks like a workaround: remove
 function working_villages.pathfinder.get_reachable(pos, endpos, entity)
 	local path = working_villages.pathfinder.find_path(pos, endpos, entity)
 	if path == nil then
-		local corr_dest = get_ground_level({x=endpos.x,y=endpos.y-1,z=endpos.z})
+		local corr_dest = working_villages.pathfinder.get_ground_level({x=endpos.x,y=endpos.y-1,z=endpos.z})
 		path = working_villages.pathfinder.find_path(pos, corr_dest, entity)
 	end
 	return path

@@ -24,6 +24,7 @@ function working_villages.func.walkable_pos(pos)
 end
 
 function working_villages.func.find_adjacent_clear(pos)
+  if not pos then error("didn't get a position") end
 	local found = working_villages.func.find_adjacent_pos(pos,working_villages.func.clear_pos)
 	if found~=false then
 		return found

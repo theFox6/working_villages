@@ -4,8 +4,3 @@ working_villages.failures = {
 	not_in_inventory = "villagers inventory doesn't contain item",
 	blocked = "a node blocks the position",
 }
-
---for later support of more detailed failures
-function working_villages.failures.eq(a, b)
-  return a == b
-end

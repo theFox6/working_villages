@@ -379,11 +379,38 @@ function working_villages.villager:set_displayed_action(msg)
 	end
 end
 
--- working_villages.villager.is_near checks if the villager is withing the radius of a position
+-- working_villages.villager.is_near checks if the villager is within the radius of a position
 function working_villages.villager:is_near(pos, distance)
 	local p = self.object:getpos()
 	p.y = p.y + 0.5
 	return vector.distance(p, pos) < distance
+end
+
+function working_villages.villager:handle_liquids()
+  local ctrl = self.object
+  local inside_node = minetest.get_node(self.object:getpos())
+  -- perhaps only when changed
+  if minetest.get_item_group(inside_node.name,"liquid") > 0 then
+    -- swim
+    local viscosity = minetest.registered_nodes[inside_node.name].liquid_viscosity
+    ctrl:setacceleration{x = 0, y = -self.initial_properties.weight/(100*viscosity), z = 0}
+  else
+    -- fall
+    ctrl:setacceleration{x = 0, y = -self.initial_properties.weight, z = 0}
+  end
+end
+
+function working_villages.villager:jump()
+  local ctrl = self.object
+  local below_node = minetest.get_node(vector.subtract(ctrl:getpos(),{x=0,y=1,z=0}))
+  local velocity = ctrl:getvelocity()
+  if below_node.name == "air" then return false end
+  local jump_force = math.sqrt(self.initial_properties.weight) * 1.5
+  if minetest.get_item_group(below_node.name,"liquid") > 0 then
+    local viscosity = minetest.registered_nodes[below_node.name].liquid_viscosity
+    jump_force = jump_force/(viscosity*100)
+  end
+  ctrl:setvelocity{x = velocity.x, y = jump_force, z = velocity.z}
 end
 
 --working_villages.villager.handle_obstacles(ignore_fence,ignore_doors)
@@ -413,7 +440,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 			end
 		elseif minetest.registered_nodes[front_node.name].walkable
 		and not(minetest.registered_nodes[above_node.name].walkable) then
-			if velocity.y == 0 then --TODO: also check if node below is air
+			if velocity.y == 0 then
 				local nBox = minetest.registered_nodes[front_node.name].node_box
 				if (nBox == nil) then
 					nBox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
@@ -426,8 +453,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
 				for _,box in pairs(nBox) do --TODO: check rotation of the nodebox
 					local nHeight = (box[5] - box[2]) + front_pos.y
 					if nHeight > self.object:getpos().y + .5 then
-						local jump_force = math.sqrt(self.initial_properties.weight)*2
-						self.object:setvelocity{x = velocity.x, y = jump_force, z = velocity.z}
+						self:jump()
 					end
 				end
 			end
@@ -869,6 +895,8 @@ function working_villages.register_villager(product_name, def)
 		if not minetest.get_player_by_name(self.owner_name) then
 			return
 		end--]]
+		
+		self:handle_liquids()
 
 		-- pickup surrounding item.
 		self:pickup_item()

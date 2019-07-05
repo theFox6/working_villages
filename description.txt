@@ -1,1 +1,0 @@
-A mod adding villager NPCs that are doing predefined work. Big features are planned.
