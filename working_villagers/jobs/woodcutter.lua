@@ -1,3 +1,5 @@
+local func = working_villages.require("jobs/util")
+
 local function find_tree(p)
 	local adj_node = minetest.get_node(p)
 	if minetest.get_item_group(adj_node.name, "tree") > 0 then
@@ -63,9 +65,9 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 				end
 				local wield_stack = self:get_wield_item_stack()
 				if is_sapling(wield_stack:get_name()) or self:has_item_in_main(is_sapling) then
-					local target = working_villages.func.search_surrounding(self.object:getpos(), is_sapling_spot, searching_range)
+					local target = func.search_surrounding(self.object:getpos(), is_sapling_spot, searching_range)
 					if target ~= nil then
-  					local destination = working_villages.func.find_adjacent_clear(target)
+  					local destination = func.find_adjacent_clear(target)
   					if destination==false then
   						print("failure: no adjacent walkable found")
   						destination = target
@@ -75,9 +77,9 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
   					self:place(is_sapling, target)
 					end
 				end
-				local target = working_villages.func.search_surrounding(self.object:getpos(), find_tree, searching_range)
+				local target = func.search_surrounding(self.object:getpos(), find_tree, searching_range)
 				if target ~= nil then
-					local destination = working_villages.func.find_adjacent_clear(target)
+					local destination = func.find_adjacent_clear(target)
 					if destination==false then
 						print("failure: no adjacent walkable found")
 						destination = target

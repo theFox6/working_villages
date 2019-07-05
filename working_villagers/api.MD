@@ -9,7 +9,7 @@ To register a new job use:
 working_villages.register_job("[itemstring for the job item]", {
 	description      = "[description for the job item]",
 	inventory_image  = "[texture for the job item]",
-	jobfunc = "[coroutine that is called every step]",
+	jobfunc = "[coroutine that is continued every step]",
 })
 ```
 

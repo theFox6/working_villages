@@ -1,40 +1,59 @@
 local init = os.clock()
-minetest.log("action", "["..minetest.get_current_modname().."] loading...")
+minetest.log("action", "["..minetest.get_current_modname().."] loading init")
+
+local modpath = minetest.get_modpath("working_villages")
+local log = modutil.require("log").make_loggers()
 
 working_villages={
-	modpath = minetest.get_modpath("working_villages"),
+	modpath = modpath,
 	func = {},
-	log = modutil.require("log").make_loggers(),
+	log = log,
   check_modname_prefix = modutil.require("check_prefix"),
 }
 
+local modules = {
+  init = working_villages, -- just in case anybody tries funny stuff
+  log = log -- caution: this will prevent loading a file named log.lua
+}
+
+function working_villages.require(module)
+  if not modules[module] then
+    log.info("loading "..module)
+    modules[module] = dofile(modpath.."/"..module..".lua") or true
+    log.info("loaded "..module)
+  end
+  return modules[module]
+end
+
 --helpers
-dofile(working_villages.modpath.."/failures.lua")
-dofile(working_villages.modpath.."/pathfinder.lua")
-dofile(working_villages.modpath.."/forms.lua")
-dofile(working_villages.modpath.."/talking.lua")
-dofile(working_villages.modpath.."/building.lua")
+working_villages.require("failures")
+working_villages.require("pathfinder")
+
+--content
+working_villages.require("forms")
+working_villages.require("talking")
+working_villages.require("building")
 
 --base
-dofile(working_villages.modpath.."/api.lua")
-dofile(working_villages.modpath.."/register.lua")
-dofile(working_villages.modpath.."/commanding_sceptre.lua")
+working_villages.require("api")
+working_villages.require("register")
+working_villages.require("commanding_sceptre")
 
-dofile(working_villages.modpath.."/deprecated.lua")
+working_villages.require("deprecated")
 
---jobs
-dofile(working_villages.modpath.."/jobs/util.lua")
-dofile(working_villages.modpath.."/jobs/empty.lua")
-
-dofile(working_villages.modpath.."/jobs/builder.lua")
-dofile(working_villages.modpath.."/jobs/follow_player.lua")
-dofile(working_villages.modpath.."/jobs/guard.lua")
-dofile(working_villages.modpath.."/jobs/plant_collector.lua")
-dofile(working_villages.modpath.."/jobs/woodcutter.lua")
+--job helpers
+working_villages.require("jobs/util")
+working_villages.require("jobs/empty")
+--base jobs
+working_villages.require("jobs/builder")
+working_villages.require("jobs/follow_player")
+working_villages.require("jobs/guard")
+working_villages.require("jobs/plant_collector")
+working_villages.require("jobs/woodcutter")
 --testing jobs
-dofile(working_villages.modpath.."/jobs/torcher.lua")
-dofile(working_villages.modpath.."/jobs/snowclearer.lua")
+working_villages.require("jobs/torcher")
+working_villages.require("jobs/snowclearer")
 
 --ready
 local time_to_load= os.clock() - init
-working_villages.log.action(false, "loaded in %.4f s", time_to_load)
+log.action("loaded init in %.4f s", time_to_load)

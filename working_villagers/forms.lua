@@ -1,21 +1,22 @@
-working_villages.forms = {}
-working_villages.registered_forms = {}
+local forms = {}
+local registered_forms = {}
+local log = working_villages.require("log")
 
-working_villages.forms.villagers = {}
-function working_villages.forms.get_villager(inv_name)
-	return working_villages.forms.villagers[inv_name]
+forms.villagers = {}
+function forms.get_villager(inv_name)
+	return forms.villagers[inv_name]
 end
 
-working_villages.forms.last_pages = {}
+forms.last_pages = {}
 
-function working_villages.forms.go_back(villager,player_name)
-	local last_page = working_villages.forms.last_pages[villager.inventory_name].last
-	working_villages.forms.show_formspec(villager, last_page, player_name)
+function forms.go_back(villager,player_name)
+	local last_page = forms.last_pages[villager.inventory_name].last
+	forms.show_formspec(villager, last_page, player_name)
 end
 
-function working_villages.forms.register_page(name, def)
-	if working_villages.registered_forms[name]~=nil then
-		working_villages.log.warning(false, "overwriting formspec page %s",name)
+function forms.register_page(name, def)
+	if registered_forms[name]~=nil then
+		log.warning("overwriting formspec page %s",name)
 	end
 	assert(type(def.constructor)=="function")
 	if def.receiver then assert(type(def.receiver)=="function") end
@@ -28,30 +29,30 @@ function working_villages.forms.register_page(name, def)
 		def.variables = {}
 	end
 	assert(type(def.variables)=="table")
-	working_villages.registered_forms[name] = def
+	registered_forms[name] = def
 end
 
-function working_villages.forms.put_link(source_page, target_page, description)
+function forms.put_link(source_page, target_page, description)
 	assert(type(source_page)=="string")
 	assert(type(target_page)=="string")
 	assert(type(description)=="string")
 
-	working_villages.registered_forms[source_page].link_to[description] = target_page
+	registered_forms[source_page].link_to[description] = target_page
 end
 
-function working_villages.forms.show_formspec(villager, formname, playername)
-	local page = working_villages.registered_forms[formname]
+function forms.show_formspec(villager, formname, playername)
+	local page = registered_forms[formname]
 	if page == nil then
-		working_villages.log.warning(false, "page %s not registered", formname)
-		page = working_villages.registered_forms["working_villages:talking_menu"]
+		log.warning("page %s not registered", formname)
+		page = registered_forms["working_villages:talking_menu"]
 	end
 	minetest.show_formspec(playername, formname.."_"..villager.inventory_name, page:constructor(villager, playername))
-	working_villages.forms.villagers[villager.inventory_name] = villager
+	forms.villagers[villager.inventory_name] = villager
 
-	if working_villages.forms.last_pages[villager.inventory_name] == nil then
-		working_villages.forms.last_pages[villager.inventory_name] = {}
+	if forms.last_pages[villager.inventory_name] == nil then
+		forms.last_pages[villager.inventory_name] = {}
 	end
-	local last_page_store = working_villages.forms.last_pages[villager.inventory_name]
+	local last_page_store = forms.last_pages[villager.inventory_name]
 	if last_page_store.current == nil then
 		last_page_store.last = formname
 	else
@@ -64,18 +65,18 @@ end
 
 minetest.register_on_player_receive_fields(
 	function(player, formname, fields)
-		for n,p in pairs(working_villages.registered_forms) do
+		for n,p in pairs(registered_forms) do
 			if string.find(formname, n.."_")==1 then
 				if p.receiver then
 					local inv_name = string.sub(formname, string.len(n.."_")+1)
-					p:receiver(working_villages.forms.get_villager(inv_name),player,fields)
+					p:receiver(forms.get_villager(inv_name),player,fields)
 				end
 			end
 		end
 	end
 )
 
-function working_villages.forms.form_base(width,height,villager)
+function forms.form_base(width,height,villager)
 	local jobname
 
 	if villager then
@@ -94,16 +95,16 @@ function working_villages.forms.form_base(width,height,villager)
 		.. "label[0,0;"..jobname.."]"
 end
 
-function working_villages.forms.register_menu_page(pageid, title)
+function forms.register_menu_page(pageid, title)
 	--TODO: conditional disabling buttons
-	working_villages.forms.register_page(pageid, {
+	forms.register_page(pageid, {
 		variables = {
 			form_bottom = 9,
 			title = title,
 		},
 		constructor = function(self,villager) --self, villager, playername
 			local formbottom = self.variables.form_bottom
-			local form = working_villages.forms.form_base(8,formbottom,villager)
+			local form = forms.form_base(8,formbottom,villager)
 			local text = self.variables.title
 			--TODO: random text from list
 			form = form .. "label["..(4-(#text/10))..",1;"..text.."]"
@@ -112,7 +113,7 @@ function working_villages.forms.register_menu_page(pageid, title)
 				y = y + 1
 				form = form .. "button[0.5,"..y..";7,1;to_page-"..page_to..";"..minetest.formspec_escape(description).."]"
 				if y >= formbottom-1 then
-					working_villages.log.warning(false, "too many linked pages")
+					log.warning("too many linked pages")
 					--TODO: scroll down button
 					break
 				end
@@ -125,7 +126,7 @@ function working_villages.forms.register_menu_page(pageid, title)
 			local button = next(fields)
 			if button:find("to_page-")==1 then
 				local page_to = button:sub(9)
-				working_villages.forms.show_formspec(villager, page_to, sender_name)
+				forms.show_formspec(villager, page_to, sender_name)
 			end
 		end,
 	})
@@ -160,7 +161,7 @@ local text_for_textlist = function(text, linelength)
 	return text
 end
 
-working_villages.forms.text_widget = function(x, y, width, height, widget_id, data)
+forms.text_widget = function(x, y, width, height, widget_id, data)
 	local baselength = TEXT_LINELENGTH
 	local widget_basewidth = 10
 	local linelength = math.max(20, math.floor(baselength * (width / widget_basewidth)))
@@ -174,10 +175,10 @@ working_villages.forms.text_widget = function(x, y, width, height, widget_id, da
 	return formstring
 end
 
-function working_villages.forms.register_text_page(pageid,text_constructor)
-	working_villages.forms.register_page(pageid, {
+function forms.register_text_page(pageid,text_constructor)
+	forms.register_page(pageid, {
 		constructor = function(_, villager, playername)
-			local form = working_villages.forms.form_base(6,8,villager)
+			local form = forms.form_base(6,8,villager)
 
 			local out_text = type(text_constructor)
 			if out_text=="string" then
@@ -186,23 +187,23 @@ function working_villages.forms.register_text_page(pageid,text_constructor)
 				out_text = text_constructor(villager, playername)
 			else
 				out_text = "invalid text_constructor type: " .. out_text
-				working_villages.log.error(false, out_text)
+				log.error(out_text)
 				out_text = "(error) " .. out_text
 			end
-			form = form .. working_villages.forms.text_widget(0,1,6,6,"out_text",out_text)
+			form = form .. forms.text_widget(0,1,6,6,"out_text",out_text)
 			form = form .. "button[2.5,7;1,1;back;ok]"
 			return form
 		end,
 		receiver = function(_,villager,sender,fields)
 			if fields.back then
 				local sender_name = sender:get_player_name()
-				working_villages.forms.go_back(villager,sender_name)
+				forms.go_back(villager,sender_name)
 			end
 		end,
 	})
 end
 
-working_villages.forms.register_page("working_villages:job_change",{
+forms.register_page("working_villages:job_change",{
 	constructor = function(_, villager) --self, villager, playername
 		local cp = { x = 3.5, y = 0 }
 		return "size[8,6]"
@@ -218,13 +219,13 @@ working_villages.forms.register_page("working_villages:job_change",{
 	receiver = function(_, villager, sender, fields)
 		local sender_name = sender:get_player_name()
 		if fields.back then
-			working_villages.forms.show_formspec(villager, "working_villages:inv_gui", sender_name)
+			forms.show_formspec(villager, "working_villages:inv_gui", sender_name)
 			return
 		end
 	end
 })
 
-working_villages.forms.register_page("working_villages:inv_gui", {
+forms.register_page("working_villages:inv_gui", {
 	constructor = function(_, villager) --self, villager, playername
 		local home_pos = {x = 0, y = 0, z = 0}
 		if villager:has_home() then
@@ -258,7 +259,7 @@ working_villages.forms.register_page("working_villages:inv_gui", {
 	receiver = function(_, villager, sender, fields)
 		local sender_name = sender:get_player_name()
 		if fields.job then
-			working_villages.forms.show_formspec(villager, "working_villages:job_change", sender_name)
+			forms.show_formspec(villager, "working_villages:job_change", sender_name)
 			return
 		end
 		if fields.home_pos == nil then
@@ -282,7 +283,7 @@ working_villages.forms.register_page("working_villages:inv_gui", {
 			return
 		end
 
-		working_villages.set_home(villager.inventory_name,coords)
+		set_home(villager.inventory_name,coords)
 		minetest.chat_send_player(sender_name, 'Home set!')
 		if minetest.get_meta(coords):get_string("valid") == "false" then
 			minetest.chat_send_player(sender_name, 'Home marker not configured, '..
@@ -290,3 +291,8 @@ working_villages.forms.register_page("working_villages:inv_gui", {
 		end
 	end,
 })
+
+working_villages.forms = forms
+working_villages.regisered_forms = registered_forms
+
+return forms

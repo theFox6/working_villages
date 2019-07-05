@@ -1,3 +1,5 @@
+local log = working_villages.require("log")
+
 --modes: stationary,escort,patrol,wandering
 
 working_villages.register_job("working_villages:job_guard", {
@@ -49,11 +51,11 @@ working_villages.register_job("working_villages:job_guard", {
 				self:handle_obstacles(true)
 			end
 		elseif guard_mode == "patrol" then
-			working_villages.log.verbose("patroling")
+			log.verbose("%s is patroling", self.inventory_name)
 			--TODO: find nearest building, go there, remember the building
 			--      next building, until no further buildings can be found, then restart
 		elseif guard_mode == "wandering" then
-			working_villages.log.verbose("wandering")
+			log.verbose("%s is wandering", self.inventory_name)
 			--TODO: walk randomly
 		end
 

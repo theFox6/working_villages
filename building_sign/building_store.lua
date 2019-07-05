@@ -24,10 +24,10 @@ end) ()
 
 function building_sign.get(pos)
 	local poshash = minetest.hash_node_position(pos)
-	if working_villages.building_store[poshash] == nil then
-		working_villages.building_store[poshash] = building:new()
+	if building_sign.building_store[poshash] == nil then
+		building_sign.building_store[poshash] = building:new()
 	end
-	return working_villages.building_store[poshash]
+	return building_sign.building_store[poshash]
 end
 
 building_sign.building = building

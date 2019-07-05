@@ -1,4 +1,5 @@
-local fail = working_villages.failures
+local fail = working_villages.require("failures")
+local log = working_villages.require("log")
 
 local function is_dark(pos)
 	local light_level = minetest.get_node_light(pos)
@@ -21,10 +22,10 @@ working_villages.register_job("working_villages:job_torcher", {
 				local sucess, ret = self:place("default:torch",front)
 				if not sucess then
 					if ret == fail.too_far then
-						working_villages.log.error("placement in front of villager was too far away")
+						log.error("torch placement in front of villager %s was too far away", self.inventory_name)
 					elseif ret == fail.blocked then
 						--TODO:try elsewhere
-						working_villages.log.verbose("pos blocked")
+						log.verbose("pos in front of villager %s blocked", self.inventory_name)
 					elseif ret == fail.not_in_inventory then
 						local msg = "torcher at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have torches"
 						local player = self:get_nearest_player(10)
@@ -37,7 +38,7 @@ working_villages.register_job("working_villages:job_torcher", {
 						end
 						self:set_paused("in need of torches")
 					else
-						working_villages.log.error("unknown failure in placement " .. ret)
+						log.error("unknown failure in torch placement of villager %s %s",self.inventory_name,ret)
 					end
 				end
 			end

@@ -1,12 +1,15 @@
-local fail = working_villages.failures
+local fail = working_villages.require("failures")
+local log = working_villages.require("log")
+local func = working_villages.require("jobs/util")
+local pathfinder = working_villages.require("pathfinder")
 
 function working_villages.villager:go_to(pos)
 	self.destination=vector.round(pos)
-	if working_villages.func.walkable_pos(self.destination) then
-		self.destination=working_villages.pathfinder.get_ground_level(vector.round(self.destination))
+	if func.walkable_pos(self.destination) then
+		self.destination=pathfinder.get_ground_level(vector.round(self.destination))
 	end
-	local val_pos = working_villages.func.validate_pos(self.object:getpos())
-	self.path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
+	local val_pos = func.validate_pos(self.object:getpos())
+	self.path = pathfinder.get_reachable(val_pos,self.destination,self)
 	self:set_timer("go_to:find_path",0) -- find path interval
 	self:set_timer("go_to:change_dir",0)
 	self:set_timer("go_to:give_up",0)
@@ -24,8 +27,8 @@ function working_villages.villager:go_to(pos)
 		self:count_timer("go_to:find_path")
 		self:count_timer("go_to:change_dir")
 		if self:timer_exceeded("go_to:find_path",100) then
-			val_pos = working_villages.func.validate_pos(self.object:getpos())
-			local path = working_villages.pathfinder.get_reachable(val_pos,self.destination,self)
+			val_pos = func.validate_pos(self.object:getpos())
+			local path = pathfinder.get_reachable(val_pos,self.destination,self)
 			if path == nil then
 				self:count_timer("go_to:give_up")
 				if self:timer_exceeded("go_to:give_up",3) then
@@ -110,7 +113,7 @@ function working_villages.villager:place(item,pos)
 		elseif type(item)=="function" then
 			return item(name)
 		else
-			working_villages.log.error(false, "got %s instead of an item",item)
+			log.error("got %s instead of an item",item)
 			error("no item to place given")
 		end
 	end
@@ -166,8 +169,6 @@ function working_villages.villager:place(item,pos)
 			self:set_animation(working_villages.animation_frames.WALK)
 		end
 	else
-		working_villages.log.info(self.owner_name,
-			"villager at " .. minetest.pos_to_string(self.object:getpos()) .. "couldn't place item") --TODO: remove this
 		return false, fail.not_in_inventory
 	end
 end
@@ -181,17 +182,17 @@ function working_villages.villager.wait_until_dawn()
 end
 
 function working_villages.villager:sleep()
-	working_villages.log.action(self.inventory_name,"is laying down")
+	log.action("villager %s is laying down",self.inventory_name)
 	self.object:setvelocity{x = 0, y = 0, z = 0}
 	local bed_pos=self:get_home():get_bed()
-	local bed_top = working_villages.func.find_adjacent_pos(bed_pos,
+	local bed_top = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_top") end)
-	local bed_bottom = working_villages.func.find_adjacent_pos(bed_pos,
+	local bed_bottom = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_bottom") end)
 	if bed_top and bed_bottom then
 		self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
 	else
-		working_villages.log.info(self.inventory_name,"found no bed")
+		log.info("villager %s found no bed", self.inventory_name)
 	end
 	self:set_animation(working_villages.animation_frames.LAY)
 	self.object:setpos(bed_pos)
@@ -202,7 +203,7 @@ function working_villages.villager:sleep()
 
 	local pos=self.object:getpos()
 	self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
-	working_villages.log.action(self.inventory_name,"gets up")
+	log.action("villager %s gets up", self.invenory_name)
 	self:set_animation(working_villages.animation_frames.STAND)
 	self.pause="active"
 	self:set_displayed_action("active")
@@ -210,7 +211,7 @@ end
 
 function working_villages.villager:goto_bed()
 	if not self:has_home() then
-		working_villages.log.action(self.inventory_name,"is waiting until dawn")
+		log.action("villager %s is waiting until dawn", self.inventory_name)
 		self:set_displayed_action("waiting until dawn")
 		self:set_animation(working_villages.animation_frames.SIT)
     local tod = minetest.get_timeofday()
@@ -224,10 +225,10 @@ function working_villages.villager:goto_bed()
 		self.pause="active"
 		self:set_displayed_action("active")
 	else
-		working_villages.log.action(self.inventory_name,"is going home")
+		log.action("villager %s is going home", self.inventory_name)
 		local bed_pos = self:get_home():get_bed()
 		if not bed_pos then
-			working_villages.log.warning(self.inventory_name,"couldn't find his bed")
+			log.warning("villager %s couldn't find his bed",self.inventory_name)
 			--TODO: go home anyway
 			self:set_displayed_action("waiting until dawn")
 			local tod = minetest.get_timeofday()
@@ -238,7 +239,7 @@ function working_villages.villager:goto_bed()
 			self:set_animation(working_villages.animation_frames.SIT)
 			self.wait_until_dawn()
 		else
-			working_villages.log.info(self.inventory_name,"bed is at:" .. minetest.pos_to_string(bed_pos))
+			log.info("villager %s bed is at: %s", self.inventory_name, minetest.pos_to_string(bed_pos))
 			self:set_displayed_action("going home")
 			self:go_to(bed_pos)
 			self:set_displayed_action("waiting for dusk")

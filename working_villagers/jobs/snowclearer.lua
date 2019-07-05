@@ -1,3 +1,5 @@
+local func = working_villages.require("jobs/util")
+--TODO: is this function really nessecary?
 local function is_night() return minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76 end
 local function find_snow(p) return minetest.get_node(p).name == "default:snow" end
 local searching_range = {x = 10, y = 3, z = 10}
@@ -17,9 +19,9 @@ I'm doing anyway, clearing the snow away.",
 			self:count_timer("snowclearer:change_dir")
 			self:handle_obstacles()
 			if self:timer_exceeded("snowclearer:search",20) then
-				local target = working_villages.func.search_surrounding(self.object:getpos(), find_snow, searching_range)
+				local target = func.search_surrounding(self.object:getpos(), find_snow, searching_range)
 				if target ~= nil then
-					local destination = working_villages.func.find_adjacent_clear(target)
+					local destination = func.find_adjacent_clear(target)
 					if destination==false then
 						print("failure: no adjacent walkable found")
 						destination = target

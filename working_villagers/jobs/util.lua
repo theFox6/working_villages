@@ -1,4 +1,7 @@
-function working_villages.func.validate_pos(pos)
+local func = working_villages.func
+local pathfinder = working_villages.require("pathfinder")
+
+function func.validate_pos(pos)
   local resultp = vector.round(pos)
   local node = minetest.get_node(resultp)
   if minetest.registered_nodes[node.name].walkable then
@@ -12,32 +15,32 @@ function working_villages.func.validate_pos(pos)
 end
 
 --TODO: look in pathfinder whether defining this is even nessecary
-function working_villages.func.clear_pos(pos)
+function func.clear_pos(pos)
 	local node=minetest.get_node(pos)
 	local above_node=minetest.get_node({x=pos.x,y=pos.y+1,z=pos.z})
-	return not(working_villages.pathfinder.walkable(node) or working_villages.pathfinder.walkable(above_node))
+	return not(pathfinder.walkable(node) or pathfinder.walkable(above_node))
 end
 
-function working_villages.func.walkable_pos(pos)
+function func.walkable_pos(pos)
 	local node=minetest.get_node(pos)
-	return working_villages.pathfinder.walkable(node)
+	return pathfinder.walkable(node)
 end
 
-function working_villages.func.find_adjacent_clear(pos)
+function func.find_adjacent_clear(pos)
   if not pos then error("didn't get a position") end
-	local found = working_villages.func.find_adjacent_pos(pos,working_villages.func.clear_pos)
+	local found = func.find_adjacent_pos(pos,func.clear_pos)
 	if found~=false then
 		return found
 	end
 	found = vector.add(pos,{x=0,y=-2,z=0})
-	if working_villages.func.clear_pos(found) then
+	if func.clear_pos(found) then
 		return found
 	end
 	return false
 
 end
 
-local find_adjacent_clear = working_villages.func.find_adjacent_clear
+local find_adjacent_clear = func.find_adjacent_clear
 
 local function search_surrounding(pos, pred, searching_range)
 	pos = vector.round(pos)
@@ -96,9 +99,9 @@ local function search_surrounding(pos, pred, searching_range)
 	return nil
 end
 
-working_villages.func.search_surrounding = search_surrounding
+func.search_surrounding = search_surrounding
 
-function working_villages.func.find_adjacent_pos(pos,pred)
+function func.find_adjacent_pos(pos,pred)
 	local dest_pos
 	if pred(pos) then
 		return pos
@@ -129,3 +132,5 @@ function working_villages.func.find_adjacent_pos(pos,pred)
 	end
 	return false
 end
+
+return func

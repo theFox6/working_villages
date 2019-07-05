@@ -1,3 +1,5 @@
+local func = working_villages.require("jobs/util")
+
 local function is_night() return minetest.get_timeofday() < 0.2 or minetest.get_timeofday() > 0.76 end
 local function find_building(p)
 	if minetest.get_node(p).name ~= "working_villages:building_marker" then
@@ -31,12 +33,12 @@ If I have the materials of course. Also I'll look for building markers within a 
 		else
 			self:count_timer("builder:search")
 			if self:timer_exceeded("builder:search",20) then
-				local marker = working_villages.func.search_surrounding(self.object:getpos(), find_building, searching_range)
+				local marker = func.search_surrounding(self.object:getpos(), find_building, searching_range)
 				if marker ~= nil then
 					local meta = minetest.get_meta(marker)
 					local build_pos = working_villages.buildings.get_build_pos(meta)
 					if meta:get_int("index") > #working_villages.buildings.get(build_pos).nodedata then
-						local destination = working_villages.func.find_adjacent_clear(marker)
+						local destination = func.find_adjacent_clear(marker)
 						if destination==false then
 							print("failure: no adjacent walkable found")
 							destination = marker
@@ -86,7 +88,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 						end
 					end
 					if is_material(wield_stack:get_name()) or self:has_item_in_main(is_material) then
-						local destination = working_villages.func.find_adjacent_clear(npos)
+						local destination = func.find_adjacent_clear(npos)
 						if destination==false then
 							print("failure: no adjacent walkable found")
 							destination = npos

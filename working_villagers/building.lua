@@ -1,3 +1,4 @@
+--TODO: replace with building_sign mod
 local SCHEMS = {"simple_hut.we", "fancy_hut.we", "[custom house]"}
 local DEFAULT_NODE = {name="air"}
 

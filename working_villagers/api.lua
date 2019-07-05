@@ -1,3 +1,7 @@
+--TODO: split this into single modules
+
+local log = working_villages.require("log")
+
 working_villages.animation_frames = {
 	STAND     = { x=  0, y= 79, },
 	LAY       = { x=162, y=166, },
@@ -63,7 +67,7 @@ end
 
 -- working_villages.villager.is_enemy returns if an object is an enemy.
 function working_villages.villager:is_enemy(obj)
-	working_villages.log.verbose(self.inventory_name,obj)
+	log.verbose("villager %s checks if %s is hostile",self.inventory_name,obj)
 	--TODO
 	return false
 end
@@ -327,7 +331,7 @@ end
 -- working_villages.villager.count_timer count a counter up by 1.
 function working_villages.villager:count_timer(timerId)
 	if not self.time_counters[timerId] then
-		working_villages.log.info(self.inventory_name, "timer \""..timerId.."\" was not initialized")
+		log.info("villager %s timer %q was not initialized", self.inventory_name,timerId)
 		self.time_counters[timerId] = 0
 	end
 	self.time_counters[timerId] = self.time_counters[timerId] + 1
@@ -914,7 +918,7 @@ function working_villages.register_villager(product_name, def)
 			elseif job.jobfunc then
 				self.job_thread = coroutine.create(job.jobfunc)
 			else
-				working_villages.log.error(self.inventory_name,"running invalid job")
+				log.error("villager %s is running an invalid job",self.inventory_name)
 			end
 		end
 		if coroutine.status(self.job_thread) == "dead" then

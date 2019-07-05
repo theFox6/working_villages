@@ -1,4 +1,4 @@
-working_villages.pathfinder = {}
+local pathfinder = {}
 
 --[[
 minetest.get_content_id(name)
@@ -165,7 +165,7 @@ end
 
 --TODO: path to the nearest of multiple endpoints
 
-function working_villages.pathfinder.find_path(pos, endpos, entity)
+function pathfinder.find_path(pos, endpos, entity)
 	--print("searching for a path to:" .. minetest.pos_to_string(endpos))
 	local start_index = minetest.hash_node_position(pos)
 	local target_index = minetest.hash_node_position(endpos)
@@ -288,18 +288,22 @@ function working_villages.pathfinder.find_path(pos, endpos, entity)
 	return {endpos}
 end
 
-working_villages.pathfinder.walkable = walkable
+pathfinder.walkable = walkable
 
-function working_villages.pathfinder.get_ground_level(pos)
+function pathfinder.get_ground_level(pos)
 	return get_neighbor_ground_level(pos, 30927, 30927)
 end
 
 --TODO: looks like a workaround: remove
-function working_villages.pathfinder.get_reachable(pos, endpos, entity)
-	local path = working_villages.pathfinder.find_path(pos, endpos, entity)
+function pathfinder.get_reachable(pos, endpos, entity)
+	local path = pathfinder.find_path(pos, endpos, entity)
 	if path == nil then
-		local corr_dest = working_villages.pathfinder.get_ground_level({x=endpos.x,y=endpos.y-1,z=endpos.z})
-		path = working_villages.pathfinder.find_path(pos, corr_dest, entity)
+		local corr_dest = pathfinder.get_ground_level({x=endpos.x,y=endpos.y-1,z=endpos.z})
+		path = pathfinder.find_path(pos, corr_dest, entity)
 	end
 	return path
 end
+
+working_villages.pathfinder = pathfinder
+
+return pathfinder
