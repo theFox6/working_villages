@@ -9,7 +9,7 @@ function working_villages.villager:go_to(pos)
 		self.destination=pathfinder.get_ground_level(vector.round(self.destination))
 	end
 	local val_pos = func.validate_pos(self.object:getpos())
-	self.path = pathfinder.get_reachable(val_pos,self.destination,self)
+	self.path = pathfinder.find_path(val_pos, self.destination, self)
 	self:set_timer("go_to:find_path",0) -- find path interval
 	self:set_timer("go_to:change_dir",0)
 	self:set_timer("go_to:give_up",0)
@@ -28,7 +28,10 @@ function working_villages.villager:go_to(pos)
 		self:count_timer("go_to:change_dir")
 		if self:timer_exceeded("go_to:find_path",100) then
 			val_pos = func.validate_pos(self.object:getpos())
-			local path = pathfinder.get_reachable(val_pos,self.destination,self)
+			if func.walkable_pos(self.destination) then
+        self.destination=pathfinder.get_ground_level(vector.round(self.destination))
+      end
+			local path = pathfinder.find_path(val_pos,self.destination,self)
 			if path == nil then
 				self:count_timer("go_to:give_up")
 				if self:timer_exceeded("go_to:give_up",3) then
@@ -77,11 +80,16 @@ function working_villages.villager:dig(pos)
 	self:set_yaw_by_direction(dist)
 	for _=0,30 do coroutine.yield() end --wait 30 steps
 	local destnode = minetest.get_node(pos)
-	minetest.remove_node(pos) --TODO local leftover = minetest.dig_node(pos)
+	--[[if not minetest.dig_node(pos) then --somehow this drops the items
+	 return false, fail.dig_fail
+	end]]
+	minetest.remove_node(pos)
 	local stacks = minetest.get_node_drops(destnode.name)
 	for _, stack in ipairs(stacks) do
 		local leftover = self:add_item_to_main(stack)
-		minetest.add_item(pos, leftover)
+		if not leftover:is_empty() then
+  		minetest.add_item(pos, leftover)
+		end
 	end
 	local sounds = minetest.registered_nodes[destnode.name]
 	if sounds then
@@ -104,7 +112,10 @@ function working_villages.villager:place(item,pos)
 	if vector.length(dist) > 5 then
 		return false, fail.too_far
 	end
-	--TODO: check if there is already a block -> fail.blocked
+	local destnode = minetest.get_node(pos)
+	if not minetest.registered_nodes[destnode.name].buildable_to then
+	 return false, fail.blocked
+	end
 	local find_item = function(name)
 		if type(item)=="string" then
 			return name == working_villages.buildings.get_registered_nodename(item)
@@ -119,58 +130,60 @@ function working_villages.villager:place(item,pos)
 	end
 	local wield_stack = self:get_wield_item_stack()
 	--move item to wield
-	if find_item(wield_stack:get_name()) or self:move_main_to_wield(find_item) then
-		--set animation
-		if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
-			self:set_animation(working_villages.animation_frames.MINE)
-		else
-			self:set_animation(working_villages.animation_frames.WALK_MINE)
-		end
-		--turn to target
-		self:set_yaw_by_direction(dist)
-		--wait 15 steps
-		for _=0,15 do coroutine.yield() end
-		--get wielded item
-		local stack = self:get_wield_item_stack()
-		--create pointed_thing facing upward
-		local pointed_thing = {
-			type = "node",
-			above = pos,
-			under = vector.add(pos, {x = 0, y = -1, z = 0}),
-		}
-		--TODO: try making a placer
-		local itemname = stack:get_name()
-		--place item
-		if type(item)=="table" then
-			minetest.set_node(pointed_thing.above, item)
-			--minetest.place_node(pos, item) --loses param2
-		else
-			--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
-			--minetest.set_node(pointed_thing.above, {name = itemname})
-			minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
-		end
-		--take item
-		stack:take_item(1)
-		self:set_wield_item_stack(stack)
-		--handle sounds
-		local sounds = minetest.registered_nodes[itemname]
-		if sounds then
-			if sounds.sounds then
-				local sound = sounds.sounds.place
-				if sound then
-					minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
-				end
+	if not (find_item(wield_stack:get_name()) or self:move_main_to_wield(find_item)) then
+	 return false, fail.not_in_inventory
+	end
+	--set animation
+	if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+		self:set_animation(working_villages.animation_frames.MINE)
+	else
+		self:set_animation(working_villages.animation_frames.WALK_MINE)
+	end
+	--turn to target
+	self:set_yaw_by_direction(dist)
+	--wait 15 steps
+	for _=0,15 do coroutine.yield() end
+	--get wielded item
+	local stack = self:get_wield_item_stack()
+	--create pointed_thing facing upward
+	--TODO: support given pointed thing via function parameter
+	local pointed_thing = {
+		type = "node",
+		above = pos,
+		under = vector.add(pos, {x = 0, y = -1, z = 0}),
+	}
+	--TODO: try making a placer
+	local itemname = stack:get_name()
+	--place item
+	if type(item)=="table" then
+		minetest.set_node(pointed_thing.above, item)
+		--minetest.place_node(pos, item) --loses param2
+	else
+		--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
+		--minetest.set_node(pointed_thing.above, {name = itemname})
+		minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
+	end
+	--take item
+	stack:take_item(1)
+	self:set_wield_item_stack(stack)
+	--handle sounds
+	local sounds = minetest.registered_nodes[itemname]
+	if sounds then
+		if sounds.sounds then
+			local sound = sounds.sounds.place
+			if sound then
+				minetest.sound_play(sound,{object=self.object, max_hear_distance = 10})
 			end
 		end
-		--reset animation
-		if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
-			self:set_animation(working_villages.animation_frames.STAND)
-		else
-			self:set_animation(working_villages.animation_frames.WALK)
-		end
-	else
-		return false, fail.not_in_inventory
 	end
+	--reset animation
+	if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+		self:set_animation(working_villages.animation_frames.STAND)
+	else
+		self:set_animation(working_villages.animation_frames.WALK)
+	end
+	
+	return true
 end
 
 function working_villages.villager.wait_until_dawn()
@@ -230,13 +243,14 @@ function working_villages.villager:goto_bed()
 		if not bed_pos then
 			log.warning("villager %s couldn't find his bed",self.inventory_name)
 			--TODO: go home anyway
-			self:set_displayed_action("waiting until dawn")
+			self:set_displayed_action("waiting for dusk")
 			local tod = minetest.get_timeofday()
 			while (tod > 0.2 and tod < 0.805) do
 				coroutine.yield()
 				tod = minetest.get_timeofday()
 			end
-			self:set_animation(working_villages.animation_frames.SIT)
+			self:set_displayed_action("waiting until dawn")
+      self:set_animation(working_villages.animation_frames.SIT)
 			self.wait_until_dawn()
 		else
 			log.info("villager %s bed is at: %s", self.inventory_name, minetest.pos_to_string(bed_pos))
@@ -253,4 +267,11 @@ function working_villages.villager:goto_bed()
 		end
 	end
 	return true
+end
+
+function working_villages.villager:handle_night()
+  local tod = minetest.get_timeofday() 
+  if  tod < 0.2 or tod > 0.76 then
+    self:goto_bed()
+  end
 end

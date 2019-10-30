@@ -1,6 +1,25 @@
 local func = working_villages.func
 local pathfinder = working_villages.require("pathfinder")
 
+--TODO:this is used as a workaround
+-- it has to be replaced by routing
+--  to the nearest possible position
+function func.find_ground_below(position)
+  local pos = vector.new(position)
+  local height = 0
+  local node
+  repeat
+      height = height + 1
+      pos.y = pos.y - 1
+      node = minetest.get_node(pos)
+      if height > 10 then
+        return false
+      end
+  until pathfinder.walkable(node)
+  pos.y = pos.y + 1
+  return pos
+end
+
 function func.validate_pos(pos)
   local resultp = vector.round(pos)
   local node = minetest.get_node(resultp)

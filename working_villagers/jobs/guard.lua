@@ -1,4 +1,5 @@
 local log = working_villages.require("log")
+local co_command = working_villages.require("job_coroutines").commands
 
 --modes: stationary,escort,patrol,wandering
 
@@ -27,7 +28,7 @@ working_villages.register_job("working_villages:job_guard", {
 
 			if escort_target == nil then
 				--perhaps only wait until the target returns
-				self:set_paused()
+				return co_command.pause, "escort target not on server" 
 			end
 
 			local target_position = escort_target:getpos()

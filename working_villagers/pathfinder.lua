@@ -19,6 +19,8 @@ current_value
 
 --print("loading pathfinder")
 
+--TODO: route via climbable
+
 local openSet = {}
 local closedSet = {}
 
@@ -164,6 +166,7 @@ local function get_neighbors(current_pos, entity_height, entity_jump_height, ent
 end
 
 --TODO: path to the nearest of multiple endpoints
+-- or first path nearest to the endpoint
 
 function pathfinder.find_path(pos, endpos, entity)
 	--print("searching for a path to:" .. minetest.pos_to_string(endpos))
@@ -292,16 +295,6 @@ pathfinder.walkable = walkable
 
 function pathfinder.get_ground_level(pos)
 	return get_neighbor_ground_level(pos, 30927, 30927)
-end
-
---TODO: looks like a workaround: remove
-function pathfinder.get_reachable(pos, endpos, entity)
-	local path = pathfinder.find_path(pos, endpos, entity)
-	if path == nil then
-		local corr_dest = pathfinder.get_ground_level({x=endpos.x,y=endpos.y-1,z=endpos.z})
-		path = pathfinder.find_path(pos, corr_dest, entity)
-	end
-	return path
 end
 
 working_villages.pathfinder = pathfinder

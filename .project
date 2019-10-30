@@ -3,6 +3,7 @@
 	<name>working_villages</name>
 	<comment></comment>
 	<projects>
+		<project>modutil</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

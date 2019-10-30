@@ -4,6 +4,20 @@ local pathfinder = working_villages.require("pathfinder")
 
 --func.search_surrounding = pathfinder.search_surrounding --TODO: remove from util.lua
 
+-- this was a workaround for the woodcutter and the builder
+function pathfinder.get_reachable(pos, endpos, entity)
+  local path = pathfinder.find_path(pos, endpos, entity)
+  if path == nil then
+    print("get_reachable corrected position to ground level")
+    local corr_dest = pathfinder.get_ground_level({x=endpos.x,y=endpos.y-1,z=endpos.z})
+    path = pathfinder.find_path(pos, corr_dest, entity)
+    if path == nil then
+      print("but it was of no use")
+    end
+  end
+  return path
+end
+
 --TODO: remove this crap or test and fix it
 
 function func.villager_state_machine_job(job_name,job_description,actions, sprop)

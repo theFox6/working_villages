@@ -1,3 +1,5 @@
+building_sign.require("building_store")
+
 local areas = {}
 
 function areas.to_string(area)

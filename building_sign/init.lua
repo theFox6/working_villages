@@ -1,11 +1,38 @@
 local init = os.clock()
 minetest.log("action", "["..minetest.get_current_modname().."] loading...")
 
+local modpath = minetest.get_modpath("building_sign")
+local log = modutil.require("log").make_loggers()
+
 building_sign = {
-	modpath=minetest.get_modpath("building_sign"),
-	DEFAULT_NODE = {name="air"},
-	registered_schematics = {"[custom house]"},
+  log = log,
+  S = modutil.require("translations")(),
+  DEFAULT_NODE = {name="air"},
+  registered_schematics = {"[custom house]"},
 }
+
+local modules = {
+  init = building_sign, -- just in case anybody tries funny stuff
+  log = log -- caution: this will prevent loading a file named log.lua
+}
+
+function building_sign.require(module)
+  if not modules[module] then
+    log.info("loading "..module)
+    modules[module] = dofile(modpath.."/"..module..".lua") or true
+    log.info("loaded "..module)
+  end
+  return modules[module]
+end
+
+function building_sign.out_of_limit(pos)
+  if (pos.x>30927 or pos.x<-30912
+  or  pos.y>30927 or pos.y<-30912
+  or  pos.z>30927 or pos.z<-30912) then
+    return true
+  end
+  return false
+end
 
 function building_sign.register_schematic(file)
   table.insert(building_sign.registered_schematics,file)
@@ -13,10 +40,9 @@ end
 
 --TODO: load world schematics
 
-dofile(building_sign.modpath .. "/util.lua")
-dofile(building_sign.modpath .. "/building_store.lua")
-dofile(building_sign.modpath .. "/forms.lua")
-dofile(building_sign.modpath .. "/areas.lua")
+building_sign.require("building_store")
+building_sign.require("forms")
+building_sign.require("areas")
 
 local S = building_sign.S
 minetest.register_node("building_sign:building_marker", {
@@ -70,4 +96,4 @@ minetest.register_node("building_sign:building_marker", {
 })
 
 local time_to_load= os.clock() - init
-building_sign.log.action("loaded in %.4f s", time_to_load)
+building_sign.log.action("loaded init in %.4f s", time_to_load)

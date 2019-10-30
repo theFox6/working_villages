@@ -1,5 +1,6 @@
 local fail = working_villages.require("failures")
 local log = working_villages.require("log")
+local co_command = working_villages.require("job_coroutines").commands
 
 local function is_dark(pos)
 	local light_level = minetest.get_node_light(pos)
@@ -18,9 +19,10 @@ working_villages.register_job("working_villages:job_torcher", {
 		if is_dark(position) then
 			local front = self:get_front() -- if it is dark, set torch.
 			if is_dark(front) then
-				--FIXME: somehow the placement is wrong
+				--FIXME: check if a node is below to support the torch
+				--perhaps check if there are nodes to the at the sides to support the torch and place to walls
 				local sucess, ret = self:place("default:torch",front)
-				if not sucess then
+				if sucess == false then
 					if ret == fail.too_far then
 						log.error("torch placement in front of villager %s was too far away", self.inventory_name)
 					elseif ret == fail.blocked then
@@ -36,9 +38,9 @@ working_villages.register_job("working_villages:job_torcher", {
 						else
 							print(msg)
 						end
-						self:set_paused("in need of torches")
+						return co_command.pause,"in need of torches"
 					else
-						log.error("unknown failure in torch placement of villager %s %s",self.inventory_name,ret)
+						log.error("unknown failure in torch placement of villager %s: %s",self.inventory_name,ret)
 					end
 				end
 			end

@@ -527,7 +527,7 @@ function working_villages.villager:is_active()
 	return self.pause == "active"
 end
 
---working_villages.villager.set_paused pause the villager.
+--working_villages.villager.set_paused set the villager to paused state
 function working_villages.villager:set_paused(reason)
 	self.pause = "resting"
 	self.object:setvelocity{x = 0, y = 0, z = 0}
@@ -695,6 +695,8 @@ function working_villages.register_egg(egg_name, def)
 		end,
 	})
 end
+
+local job_coroutines = working_villages.require("job_coroutines")
 
 -- working_villages.register_villager registers a definition of a new villager.
 function working_villages.register_villager(product_name, def)
@@ -896,6 +898,7 @@ function working_villages.register_villager(product_name, def)
 		end
 
 		--[[ if owner didn't login, the villager does nothing.
+		-- perhaps add a check for this to be used in jobfuncs etc.
 		if not minetest.get_player_by_name(self.owner_name) then
 			return
 		end--]]
@@ -908,32 +911,7 @@ function working_villages.register_villager(product_name, def)
 		if self.pause ~= "active" and self.pause ~= "sleeping" then
 			return
 		end
-
-		local job = self:get_job()
-		if not job then return end
-		if not self.job_thread then
-			if job.on_step then
-				job.on_start(self)
-				self.job_thread = coroutine.create(job.on_step)
-			elseif job.jobfunc then
-				self.job_thread = coroutine.create(job.jobfunc)
-			else
-				log.error("villager %s is running an invalid job",self.inventory_name)
-			end
-		end
-		if coroutine.status(self.job_thread) == "dead" then
-			if job.jobfunc then
-				self.job_thread = coroutine.create(job.jobfunc)
-			else
-				self.job_thread = coroutine.create(job.on_step)
-			end
-		end
-		if coroutine.status(self.job_thread) == "suspended" then
-			local state, err = coroutine.resume(self.job_thread, self, dtime)
-			if state == false then
-				error("error in job_thread " .. err)
-			end
-		end
+		job_coroutines.resume(self,dtime)
 	end
 
 	-- on_rightclick is a callback function that is called when a player right-click them.
