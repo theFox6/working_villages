@@ -1,34 +1,15 @@
 local init = os.clock()
-minetest.log("action", "["..minetest.get_current_modname().."] loading init")
-
-local modpath = minetest.get_modpath("working_villages")
-local log = modutil.require("log").make_loggers()
+minetest.log("action", "["..minetest.get_current_modname().."] loading init") 
 
 working_villages={
-	modpath = modpath,
-	func = {},
-	log = log,
-  check_modname_prefix = modutil.require("check_prefix"),
+	modpath = minetest.get_modpath("working_villages"),
+	check_modname_prefix = modutil.require("check_prefix"),
 }
 
-local modules = {
-  init = working_villages, -- just in case anybody tries funny stuff
-  log = log -- caution: this will prevent loading a file named log.lua
-}
+modutil.require("local_require")(working_villages)
+local log = working_villages.require("log")
 
-function working_villages.require(module)
-  if not modules[module] then
-    log.info("loading "..module)
-    modules[module] = dofile(modpath.."/"..module..".lua") or true
-    log.info("loaded "..module)
-  end
-  return modules[module]
-end
-
---helpers
-working_villages.require("failures")
-working_villages.require("pathfinder")
-
+--TODO: check if preloading is needed
 --content
 working_villages.require("forms")
 working_villages.require("talking")

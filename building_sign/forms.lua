@@ -97,7 +97,8 @@ function forms.on_receive_fields(pos, _, fields, sender)
 		local nodelist = working_villages.buildings.get(working_villages.buildings.get_build_pos(meta)).nodedata
 		for _,v in ipairs(nodelist) do
 			minetest.remove_node(v.pos)
-			--FIXME: the villager ought to do this
+			--FIXME: remove the removal
+			-- (the villager ought to do this)
 		end
 		meta:set_int("index",1)
 		meta:set_string("state","paused")

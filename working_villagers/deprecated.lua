@@ -1,6 +1,11 @@
-local func = working_villages.func
 local log = working_villages.require("log")
+local func = working_villages.require("jobs/util")
 local pathfinder = working_villages.require("pathfinder")
+
+working_villages.func = func
+working_villages.pathfinder = pathfinder
+working_villages.failures = working_villages.require("failures")
+working_villages.forms = working_villages.require("forms")
 
 --func.search_surrounding = pathfinder.search_surrounding --TODO: remove from util.lua
 

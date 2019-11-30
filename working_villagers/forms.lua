@@ -292,7 +292,7 @@ forms.register_page("working_villages:inv_gui", {
 	end,
 })
 
-working_villages.forms = forms
+--TODO: see if working_villages.registered_forms should really be public
 working_villages.regisered_forms = registered_forms
 
 return forms

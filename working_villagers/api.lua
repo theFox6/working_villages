@@ -697,6 +697,7 @@ function working_villages.register_egg(egg_name, def)
 end
 
 local job_coroutines = working_villages.require("job_coroutines")
+local forms = working_villages.require("forms")
 
 -- working_villages.register_villager registers a definition of a new villager.
 function working_villages.register_villager(product_name, def)
@@ -920,9 +921,9 @@ function working_villages.register_villager(product_name, def)
 		if wielded_stack:get_name() == "working_villages:commanding_sceptre"
 			and clicker:get_player_name() == self.owner_name then
 
-			working_villages.forms.show_formspec(self, "working_villages:inv_gui", clicker:get_player_name())
+			forms.show_formspec(self, "working_villages:inv_gui", clicker:get_player_name())
 		else
-			working_villages.forms.show_formspec(self, "working_villages:talking_menu", clicker:get_player_name())
+			forms.show_formspec(self, "working_villages:talking_menu", clicker:get_player_name())
 		end
 	end
 

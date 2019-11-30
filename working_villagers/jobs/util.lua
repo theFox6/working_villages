@@ -1,4 +1,4 @@
-local func = working_villages.func
+local func = {}
 local pathfinder = working_villages.require("pathfinder")
 
 --TODO:this is used as a workaround

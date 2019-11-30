@@ -297,6 +297,4 @@ function pathfinder.get_ground_level(pos)
 	return get_neighbor_ground_level(pos, 30927, 30927)
 end
 
-working_villages.pathfinder = pathfinder
-
 return pathfinder

@@ -6,6 +6,4 @@ local failures = {
 	dig_fail = "dig_node returned false (eg. due to protected location)",
 }
 
-working_villages.failures = failures
-
 return failures
