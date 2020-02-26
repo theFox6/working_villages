@@ -1,0 +1,3 @@
+[submodule "working_villagers/modutil"]
+	path = working_villagers/modutil
+	url = https://github.com/theFox6/modutil

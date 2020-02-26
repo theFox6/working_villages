@@ -4,41 +4,43 @@
 --@field #table anchor the anchor point of the schematic
 local building = {}
 
-function building:new(o)
-	return setmetatable(o or {}, {__index = self})
-end
+fn building.new(o) {
+	return setmetatable(o or {}, {__index = building})
+}
 
 -- #table all buildings that ever were in the world
 local building_store
-building_store = (function()
+building_store = (() => {
 	local file_name = minetest.get_worldpath() .. "/building_signs"
 
-	minetest.register_on_shutdown(function()
+	minetest.register_on_shutdown(() => {
 		local file = io.open(file_name, "w")
 		file:write(minetest.serialize(building_store))
 		file:close()
-	end)
+	})
 
 	local file = io.open(file_name, "r")
-	if file ~= nil then
+	if file ~= nil {
 		local data = file:read("*a")
 		file:close()
 		local ret = {}
-		for i,v in pairs(minetest.deserialize(data)) do
-		  ret[i] = building:new(v)
-		end
+		for i,v in pairs(minetest.deserialize(data)) {
+		  ret[i] = building.new(v)
+		}
 		return ret
-	end
+	}
 	return {}
-end) ()
+}) ()
 
-function building_sign.get(pos, create)
+fn building_sign.get(pos, create) {
 	local poshash = minetest.hash_node_position(pos)
-	if building_sign.building_store[poshash] == nil and create then
-		building_sign.building_store[poshash] = building:new()
-	end
+	if building_sign.building_store[poshash] == nil and create {
+		building_sign.building_store[poshash] = building.new()
+	}
 	return building_sign.building_store[poshash]
-end
+}
 
 building_sign.building = building
 building_sign.building_store = building_store
+
+return building_store

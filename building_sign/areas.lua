@@ -1,4 +1,4 @@
-building_sign.require("building_store")
+building_sign.require("building_store","venus")
 
 local areas = {}
 

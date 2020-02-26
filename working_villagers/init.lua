@@ -3,13 +3,17 @@ minetest.log("action", "["..minetest.get_current_modname().."] loading init")
 
 working_villages={
 	modpath = minetest.get_modpath("working_villages"),
-	check_modname_prefix = modutil.require("check_prefix"),
 }
+
+if not modutil then
+    dofile(working_villages.modpath.."/modutil/portable.lua")
+end
 
 modutil.require("local_require")(working_villages)
 local log = working_villages.require("log")
 
---TODO: check if preloading is needed
+--TODO: check for which preloading is needed
+working_villages.check_modname_prefix = modutil.require("check_prefix","venus")
 --content
 working_villages.require("forms")
 working_villages.require("talking")
