@@ -84,7 +84,20 @@ If I have the materials of course. Also I'll look for building markers within a 
 				end
 				if nname=="default:torch_wall" then
 					if self:has_item_in_main(function (name) return name == "default:torch" end) then
-						self:replace_item_from_main(ItemStack("default:torch"),ItemStack(nname))
+					  local inv = self:get_inventory()
+					  if inv:room_for_item("main", ItemStack(nname)) then
+						  self:replace_item_from_main(ItemStack("default:torch"),ItemStack(nname))
+					  else
+              local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) ..
+                " doesn't have enough inventory space"
+              if self.owner_name then
+                minetest.chat_send_player(self.owner_name,msg)
+              else
+               print(msg)
+              end
+              -- should later be intelligent enough to use his own or any other chest
+              return co_command.pause, "waiting for inventory space"
+				    end
 					end
 				end
 				if is_material(wield_stack:get_name()) or self:has_item_in_main(is_material) then

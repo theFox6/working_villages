@@ -398,6 +398,9 @@ function working_villages.villager:handle_liquids()
     -- swim
     local viscosity = minetest.registered_nodes[inside_node.name].liquid_viscosity
     ctrl:setacceleration{x = 0, y = -self.initial_properties.weight/(100*viscosity), z = 0}
+  elseif minetest.registered_nodes[inside_node.name].climbable then
+    --go down slowly
+    ctrl:setacceleration{x = 0, y = -0.1, z = 0}
   else
     -- fall
     ctrl:setacceleration{x = 0, y = -self.initial_properties.weight, z = 0}
