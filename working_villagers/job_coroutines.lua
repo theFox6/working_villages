@@ -3,7 +3,8 @@ local job_coroutines = {}
 local commands = {
   ---command to suspend villagers job
   -- expected values after this:
-  -- * reason the reason for suspending to show in infotext 
+  -- * reason #string
+  --   * the reason for suspending to show in infotext
   pause = "pause the villagers job",
 }
 job_coroutines.commands = commands

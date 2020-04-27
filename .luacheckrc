@@ -19,3 +19,8 @@ ignore = {
 	"621",
 	"631"
 }
+
+exclude_files = {
+	"working_villagers/development",
+	"working_villagers/modutil/VenusParser/testout"
+}

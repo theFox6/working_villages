@@ -9,3 +9,7 @@ read_globals = {
 	"ItemStack",
 	"default", "doors",
 }
+
+exclude_files = {
+	"working_villagers/modutil/VenusParser/testout"
+}
