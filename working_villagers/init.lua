@@ -12,6 +12,17 @@ end
 modutil.require("local_require")(working_villages)
 local log = working_villages.require("log")
 
+function working_villages.setting_enabled(name, default)
+  local b = minetest.settings:get_bool("working_villages_enable_"..name)
+  if b == nil then
+    if default == nil then
+      return false
+    end
+    return default
+  end
+  return b
+end
+
 --TODO: check for which preloading is needed
 working_villages.check_modname_prefix = modutil.require("check_prefix","venus")
 --content
@@ -38,6 +49,10 @@ working_villages.require("jobs/woodcutter")
 --testing jobs
 working_villages.require("jobs/torcher")
 working_villages.require("jobs/snowclearer")
+
+if working_villages.setting_enabled("debug_tools",false) then
+  working_villages.require("util_test")
+end
 
 --ready
 local time_to_load= os.clock() - init

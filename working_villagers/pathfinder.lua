@@ -225,11 +225,14 @@ function pathfinder.find_path(pos, endpos, entity)
 					return
 				end
 			until start_index == current_index
-			repeat
-				table.insert(reverse_path, table.remove(path))
-			until #path == 0
+			for _,wp in pairs(path) do
+				table.insert(reverse_path, 1, wp)
+			end
+			if #path ~= #reverse_path then
+			 print("path's length is "..#path.." but reverse path has length "..#reverse_path)
+			end
 			--print("path length: "..#reverse_path)
-			return reverse_path
+			return reverse_path,path
 		end
 
 		local current_pos = current_values.pos

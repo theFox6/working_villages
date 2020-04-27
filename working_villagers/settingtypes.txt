@@ -1,0 +1,11 @@
+[debugging]
+
+#    Enables the debug tools for working villages.
+#    They can be obtained ingame through the creative inventory.
+#    They affect the nearby nodes in some way that helps to see if working villages is working properly.
+working_villages_enable_debug_tools (debug tools) bool false
+
+#    Enables some extra asserts in the code that ensure everything runs as expected.
+#    This may have a small effect on the performance.
+#    It helps finding bugs within working villages and within mods using working villages.
+working_villages_enable_debug_checks (debug checks) bool true

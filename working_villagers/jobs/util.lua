@@ -1,6 +1,18 @@
 local func = {}
 local pathfinder = working_villages.require("pathfinder")
 
+function func.find_path_toward(pos,villager)
+  local dest = vector.round(pos)
+  --TODO: spiral outward from pos and try to find reverse paths
+  if func.walkable_pos(dest) then
+    dest = pathfinder.get_ground_level(dest)
+  end
+  local val_pos = func.validate_pos(villager.object:getpos())
+  --FIXME: this also reverses jump height and fear height
+  local path,rev = pathfinder.find_path(dest, val_pos, villager)
+  return rev
+end
+
 --TODO:this is used as a workaround
 -- it has to be replaced by routing
 --  to the nearest possible position
