@@ -47,10 +47,10 @@ features:
 for developing jobs, villagers, etc. read [api.md](api.MD)
 
 ## screenshots
-[!Screenshot 1](screenshot.png)
-[!Screenshot 2](screenshot.2.png)
-[!Screenshot 3](screenshot.3.png)
-[!Screenshot 4](screenshot.4.png)
+![Screenshot 1](screenshot.png)
+![Screenshot 2](screenshot.2.png)
+![Screenshot 3](screenshot.3.png)
+![Screenshot 4](screenshot.4.png)
 
 ## License
 * working_villages by theFox6 is avalible under the MIT License
