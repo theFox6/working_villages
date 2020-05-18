@@ -3,7 +3,7 @@ working_villages.register_job("working_villages:job_folow_player", {
 	long_description = "I'll just follow you wherever you go.",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
 	jobfunc = function(self)
-		while (not self:is_active()) do
+		while (self.pause) do
 			coroutine.yield()
 		end
 		local position = self.object:getpos()

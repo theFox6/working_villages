@@ -10,7 +10,7 @@ working_villages.register_job("working_villages:job_guard", {
 	jobfunc = function(self)
 		local guard_mode = self:get_job_data("mode") or "stationary"
 
-		if guard_mode == "stationary" or not self:is_active() then
+		if guard_mode == "stationary" or self.pause then
 			local guard_pos = self:get_job_data("guard_target")
 			if guard_pos == nil then
 				guard_pos = self.object:getpos()

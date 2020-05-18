@@ -14,14 +14,16 @@ minetest.register_tool("working_villages:commanding_sceptre", {
 
 			local job = luaentity:get_job()
 			if job ~= nil then
-				if luaentity.pause == "resting" then
-					luaentity.pause = "active"
+				if luaentity.pause then
+					luaentity:set_pause(false)
 					if type(job.on_resume)=="function" then
 						job.on_resume(luaentity)
 					end
 					luaentity:set_displayed_action("active")
+					luaentity:set_state_info("I'm continuing my job.")
 				else
 					luaentity:set_paused()
+					luaentity:set_state_info("I was asked to wait here.")
 					if type(job.on_pause)=="function" then
 						job.on_pause(luaentity)
 					end

@@ -12,7 +12,7 @@ working_villages.register_job("working_villages:job_torcher", {
 	long_description = "I'm following the nearest player enlightning his way by placing torches.",
 	inventory_image  = "default_paper.png^working_villages_torcher.png",
 	jobfunc = function(self)
-		while (not self:is_active()) do
+		while (self.pause) do
 			coroutine.yield()
 		end
 		local position = self.object:getpos()

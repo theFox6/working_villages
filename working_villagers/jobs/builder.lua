@@ -33,10 +33,13 @@ If I have the materials of course. Also I'll look for building markers within a 
 		self:count_timer("builder:search")
 		if self:timer_exceeded("builder:search",20) then
 			local marker = func.search_surrounding(self.object:getpos(), find_building, searching_range)
-			if marker ~= nil then
+			if marker == nil then
+			 self:set_state_info("I am currently looking for a building site nearby.\nHowever there wasn't one the last time I checked.")
+			else
 				local meta = minetest.get_meta(marker)
 				local build_pos = working_villages.buildings.get_build_pos(meta)
 				if meta:get_int("index") > #working_villages.buildings.get(build_pos).nodedata then
+				  self:set_state_info("I am currently marking a building as finished.")
 					local destination = func.find_adjacent_clear(marker)
 					destination = func.find_ground_below(destination)
 					if destination==false then
@@ -50,6 +53,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 					meta:set_string("formspec",working_villages.buildings.get_formspec(meta))
 					return
 				end
+				self:set_state_info("I am currently working on a building.")
 				local nnode = working_villages.buildings.get(build_pos).nodedata[meta:get_int("index")]
 				if nnode == nil then
 					meta:set_int("index",meta:get_int("index")+1)
@@ -79,6 +83,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 							print(msg)
 						end
 						-- should later be intelligent enough to use his own or any other chest
+						self:set_state_info("I am currently waiting to get some space in my inventory.")
 						return co_command.pause, "waiting for inventory space"
 					end
 				end
@@ -96,6 +101,7 @@ If I have the materials of course. Also I'll look for building markers within a 
                print(msg)
               end
               -- should later be intelligent enough to use his own or any other chest
+              self:set_state_info("I am currently waiting to get some space in my inventory.")
               return co_command.pause, "waiting for inventory space"
 				    end
 					end
@@ -108,6 +114,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 						print("failure: no adjacent walkable found")
 						destination = npos
 					end
+					self:set_state_info("I am building.")
 					self:go_to(destination)
 					self:place(nnode,npos)
 					if minetest.get_node(npos).name==nnode.name then
@@ -120,6 +127,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 					else
 						print(msg)
 					end
+					self:set_state_info(("I am currently waiting for somebody to give me some %s."):format(nname))
 					coroutine.yield(co_command.pause,"waiting for materials")
 				end
 			end

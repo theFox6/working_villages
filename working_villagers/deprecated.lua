@@ -188,8 +188,8 @@ function func.villager_state_machine_job(job_name,job_description,actions, sprop
 			self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
 			log.action("villager %s gets up", self.inventory_name)
 			self:set_animation(working_villages.animation_frames.STAND)
-			self.pause="active"
 			self:set_displayed_action("active")
+			self:set_state_info("I'm running my stale job. (ask the dev to update it)")
 			return true
 		end
 		return false
@@ -209,8 +209,8 @@ function func.villager_state_machine_job(job_name,job_description,actions, sprop
 		end
 		self:set_animation(working_villages.animation_frames.LAY)
 		self.object:setpos(vector.add(bed_pos,{x=0,y=1.5,z=0}))
-		self.pause="sleeping"
 		self:set_displayed_action("sleeping")
+		self:set_state_info("Zzzzzzz...murmur...")
 	end
 	local function to_walk_home(self)
 		log.action("villager %s is going home", self.inventory_name)
