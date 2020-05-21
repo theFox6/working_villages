@@ -24,7 +24,6 @@ function working_villages.setting_enabled(name, default)
 end
 
 --TODO: check for which preloading is needed
-working_villages.check_modname_prefix = modutil.require("check_prefix","venus")
 --content
 working_villages.require("forms")
 working_villages.require("talking")

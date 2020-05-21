@@ -1,6 +1,7 @@
 --TODO: split this into single modules
 
 local log = working_villages.require("log")
+local cmnp = modutil.require("check_prefix","venus")
 
 working_villages.animation_frames = {
   STAND     = { x=  0, y= 79, },
@@ -73,10 +74,11 @@ function working_villages.villager:is_enemy(obj)
 end
 
 -- working_villages.villager.get_nearest_player returns a player object who
--- is the nearest to the villager.
-function working_villages.villager:get_nearest_player(range_distance)
-  local player, min_distance = nil, range_distance
-  local position = self.object:getpos()
+-- is the nearest to the villager, the position of and the distance to the player.
+function working_villages.villager:get_nearest_player(range_distance,pos)
+  local min_distance = range_distance
+  local player,ppos
+  local position = pos or self.object:getpos()
 
   local all_objects = minetest.get_objects_inside_radius(position, range_distance)
   for _, object in pairs(all_objects) do
@@ -87,10 +89,11 @@ function working_villages.villager:get_nearest_player(range_distance)
       if distance < min_distance then
         min_distance = distance
         player = object
+        ppos = player_position
       end
     end
   end
-  return player
+  return player,ppos,min_distance
 end
 
 -- working_villages.villager.get_nearest_enemy returns an enemy who is the nearest to the villager.
@@ -661,9 +664,10 @@ working_villages.job_inv:set_size("main", 32)
 
 -- working_villages.register_job registers a definition of a new job.
 function working_villages.register_job(job_name, def)
-  working_villages.registered_jobs[job_name] = def
+  local name = cmnp(job_name)
+  working_villages.registered_jobs[name] = def
 
-  minetest.register_tool(job_name, {
+  minetest.register_tool(name, {
     stack_max       = 1,
     description     = def.description,
     inventory_image = def.inventory_image,
@@ -671,14 +675,15 @@ function working_villages.register_job(job_name, def)
   })
 
   --working_villages.job_inv:set_size("main", #working_villages.registered_jobs)
-  working_villages.job_inv:add_item("main", ItemStack(job_name))
+  working_villages.job_inv:add_item("main", ItemStack(name))
 end
 
 -- working_villages.register_egg registers a definition of a new egg.
 function working_villages.register_egg(egg_name, def)
-  working_villages.registered_eggs[egg_name] = def
+  local name = cmnp(egg_name)
+  working_villages.registered_eggs[name] = def
 
-  minetest.register_tool(egg_name, {
+  minetest.register_tool(name, {
     description     = def.description,
     inventory_image = def.inventory_image,
     stack_max       = 1,
@@ -706,11 +711,12 @@ local forms = working_villages.require("forms")
 
 -- working_villages.register_villager registers a definition of a new villager.
 function working_villages.register_villager(product_name, def)
-  working_villages.registered_villagers[product_name] = def
+  local name = cmnp(product_name)
+  working_villages.registered_villagers[name] = def
 
   -- initialize manufacturing number of a new villager.
-  if working_villages.manufacturing_data[product_name] == nil then
-    working_villages.manufacturing_data[product_name] = 0
+  if working_villages.manufacturing_data[name] == nil then
+    working_villages.manufacturing_data[name] = 0
   end
 
   -- create_inventory creates a new inventory, and returns it.
@@ -822,9 +828,9 @@ function working_villages.register_villager(product_name, def)
   local function on_activate(self, staticdata)
     -- parse the staticdata, and compose a inventory.
     if staticdata == "" then
-      self.product_name = product_name
-      self.manufacturing_number = working_villages.manufacturing_data[product_name]
-      working_villages.manufacturing_data[product_name] = working_villages.manufacturing_data[product_name] + 1
+      self.product_name = name
+      self.manufacturing_number = working_villages.manufacturing_data[name]
+      working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
       create_inventory(self)
 
       -- attach dummy item to new villager.
@@ -988,14 +994,15 @@ function working_villages.register_villager(product_name, def)
   -- home methods
   villager_def.get_home                    = working_villages.get_home
   villager_def.has_home                    = working_villages.is_valid_home
+  villager_def.set_home                    = working_villages.set_home
 
 
-  minetest.register_entity(product_name, villager_def)
+  minetest.register_entity(name, villager_def)
 
   -- register villager egg.
-  working_villages.register_egg(product_name .. "_egg", {
-    description     = product_name .. " egg",
+  working_villages.register_egg(name .. "_egg", {
+    description     = name .. " egg",
     inventory_image = def.egg_image,
-    product_name    = product_name,
+    product_name    = name,
   })
 end

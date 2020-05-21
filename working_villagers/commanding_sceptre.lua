@@ -22,7 +22,8 @@ minetest.register_tool("working_villages:commanding_sceptre", {
 					luaentity:set_displayed_action("active")
 					luaentity:set_state_info("I'm continuing my job.")
 				else
-					luaentity:set_paused()
+					luaentity:set_pause(true)
+					luaentity:set_displayed_action("waiting")
 					luaentity:set_state_info("I was asked to wait here.")
 					if type(job.on_pause)=="function" then
 						job.on_pause(luaentity)

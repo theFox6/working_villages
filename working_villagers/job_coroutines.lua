@@ -35,7 +35,8 @@ function job_coroutines.resume(self,dtime)
     local ret = {coroutine.resume(self.job_thread, self, dtime)}
     if ret[1] then
       if ret[2] == commands.pause then
-       self:set_paused(ret[3])
+       self:set_pause(true)
+       self:set_displayed_action(ret[3])
       end
     else
       error("error in job_thread " .. ret[2])
