@@ -61,7 +61,10 @@ minetest.register_node("building_sign:building_marker", {
 		local meta = minetest.get_meta(pos)
 		local building = building_sign.areas.check_existing(pos)
 		if building then
-			--TODO: load from area
+			--TODO: load everything from area
+			if building.build_pos then
+				meta:set_string("build_pos",minetest.pos_to_string(building.build_pos))
+			end
 		else
 			meta:set_string("configured","false")
 			meta:set_string("state","unplanned")

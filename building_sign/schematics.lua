@@ -1,5 +1,7 @@
 --TODO: cleanup
 
+local DEFAULT_NODE = building_sign.DEFAULT_NODE
+
 function building_sign.get_registered_nodename(name)
 	if name:find("doors:") then
 		name = name:gsub("_[b]_[12]", "")

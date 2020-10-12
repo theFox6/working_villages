@@ -52,6 +52,49 @@ for developing jobs, villagers, etc. read [api.md](api.MD)
 ![Screenshot 3](screenshot.3.png)
 ![Screenshot 4](screenshot.4.png)
 
+## Submodules
+Currently working_villages only has the modutil portable submodule.
+It is needed to be able to run without the modutil mod.  
+This means you can either download the modutil mod and enable it or get the submodule:
+
+When cloning add "--recursive" option to clone including all submodules:
+```
+git clone --recursive https://github.com/theFox6/working_villages.git
+```
+
+If one of the submodule folders is empty use:
+```
+git submodule update --init
+```
+This will clone all missing submodules.
+
+## Dependencies
+working_villages needs modutil to load utilities it can also use modutil portable though  
+doors can be used by the villagers that's why there is a dependency
+
+## missing modutil
+If you clone the mod you either need to **install and activate the modutil mod** or you need to **[clone it recursively](#cloning)**.  
+If modutil is not present you will get the following error:
+`.minetest/mods/working_villages/modutil/portable.lua: No such file or directory`
+
+## cloning
+When cloning first add "--recursive" option to clone including all submodules:
+```
+git clone --recursive https://github.com/theFox6/working_villages.git
+```
+else the submodule folders will be empty.
+
+If one of the submodule folders is empty use:
+```
+git submodule update --init
+```
+This will clone all missing submodules.
+
+To pull all changes in the repo including changes in the submodules use:
+```
+git pull --recurse-submodules
+```
+
 ## License
 * working_villages by theFox6 is avalible under the MIT License
 

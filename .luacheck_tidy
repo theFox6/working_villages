@@ -1,15 +1,28 @@
-allow_defined_top = true
+max_line_length = 240
 
 read_globals = {
+	-- minetest
+	"AreaStore",
 	"dump",
 	"minetest",
 	"vector",
 	"VoxelManip",
 	"VoxelArea",
 	"ItemStack",
+	-- mods
 	"default", "doors",
 }
 
+globals = {
+	-- modpack mods
+	"building_sign",
+	"working_villages",
+	-- submodule mods
+	"modutil",
+	"LuaVenusCompiler"
+}
+
 exclude_files = {
-	"working_villagers/modutil/VenusParser/testout"
+	-- bad syntax is tested here
+	"working_villagers/modutil/LuaVenusCompiler/testout"
 }
