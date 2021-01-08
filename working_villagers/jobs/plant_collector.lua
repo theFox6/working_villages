@@ -50,17 +50,8 @@ working_villages.register_job("working_villages:job_herbcollector", {
 		self:count_timer("herbcollector:change_dir")
 		self:handle_obstacles()
 		if self:timer_exceeded("herbcollector:search",20) then
-			local sapling = self:get_nearest_item_by_condition(herbs.is_herb, searching_range)
-			if sapling ~= nil then
-				local pos = sapling:getpos()
-				--print("found a sapling at:".. minetest.pos_to_string(pos))
-				local inv=self:get_inventory()
-				if inv:room_for_item("main", ItemStack(sapling:get_luaentity().itemstring)) then
-					self:go_to(pos)
-					self:pickup_item()
-				end
-			end
-			local target = func.search_surrounding(self.object:getpos(), find_herb, searching_range)
+			self:collect_nearest_item_by_condition(herbs.is_herb, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_herb, searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then
@@ -71,7 +62,7 @@ working_villages.register_job("working_villages:job_herbcollector", {
 					destination = target
 				end
 				self:go_to(destination)
-				self:dig(target)
+				self:dig(target,true)
 			end
 		elseif self:timer_exceeded("herbcollector:change_dir",50) then
 			self:change_direction_randomly()

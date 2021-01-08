@@ -13,7 +13,7 @@ working_villages.register_job("working_villages:job_guard", {
 		if guard_mode == "stationary" or self.pause then
 			local guard_pos = self:get_job_data("guard_target")
 			if guard_pos == nil then
-				guard_pos = self.object:getpos()
+				guard_pos = self.object:get_pos()
 				self:set_job_data("guard_target",guard_pos)
 			end
 			self:go_to(guard_pos)
@@ -31,8 +31,8 @@ working_villages.register_job("working_villages:job_guard", {
 				return co_command.pause, "escort target not on server" 
 			end
 
-			local target_position = escort_target:getpos()
-			local distance = vector.subtract(target_position, self.object:getpos())
+			local target_position = escort_target:get_pos()
+			local distance = vector.subtract(target_position, self.object:get_pos())
 
 			local velocity = self.object:getvelocity()
 			if vector.length(distance) < 3 then

@@ -3,12 +3,13 @@ local log = working_villages.require("log")
 local func = working_villages.require("jobs/util")
 local pathfinder = working_villages.require("pathfinder")
 
+--TODO: add variable precision
 function working_villages.villager:go_to(pos)
 	self.destination=vector.round(pos)
 	if func.walkable_pos(self.destination) then
 		self.destination=pathfinder.get_ground_level(vector.round(self.destination))
 	end
-	local val_pos = func.validate_pos(self.object:getpos())
+	local val_pos = func.validate_pos(self.object:get_pos())
 	self.path = pathfinder.find_path(val_pos, self.destination, self)
 	self:set_timer("go_to:find_path",0) -- find path interval
 	self:set_timer("go_to:change_dir",0)
@@ -27,7 +28,7 @@ function working_villages.villager:go_to(pos)
 		self:count_timer("go_to:find_path")
 		self:count_timer("go_to:change_dir")
 		if self:timer_exceeded("go_to:find_path",100) then
-			val_pos = func.validate_pos(self.object:getpos())
+			val_pos = func.validate_pos(self.object:get_pos())
 			if func.walkable_pos(self.destination) then
         self.destination=pathfinder.get_ground_level(vector.round(self.destination))
       end
@@ -48,10 +49,12 @@ function working_villages.villager:go_to(pos)
 		end
 
 		-- follow path
-		if self:is_near({x=self.path[1].x,y=self.object:getpos().y,z=self.path[1].z}, 1) then
+		if self:is_near({x=self.path[1].x,y=self.object:get_pos().y,z=self.path[1].z}, 1) then
 			table.remove(self.path, 1)
 
 			if #self.path == 0 then -- end of path
+			   --keep walking another step for good measure
+        coroutine.yield()
 				break
 			else -- else next step, follow next path.
 				self:set_timer("go_to:find_path",0)
@@ -63,15 +66,32 @@ function working_villages.villager:go_to(pos)
 		-- end step
 		coroutine.yield()
 	end
+	-- stop
 	self.object:setvelocity{x = 0, y = 0, z = 0}
 	self.path = nil
 	self:set_animation(working_villages.animation_frames.STAND)
 	return true
 end
 
-function working_villages.villager:dig(pos)
+function working_villages.villager:collect_nearest_item_by_condition(cond, searching_range)
+  local item = self:get_nearest_item_by_condition(cond, searching_range)
+  if item == nil then
+    return false
+  end
+  local pos = item:get_pos()
+  --print("collecting item at:".. minetest.pos_to_string(pos))
+  local inv=self:get_inventory()
+  if inv:room_for_item("main", ItemStack(item:get_luaentity().itemstring)) then
+    self:go_to(pos)
+    self:pickup_item()
+  end
+end
+
+local drop_range = {x = 2, y = 10, z = 2}
+
+function working_villages.villager:dig(pos,collect_drops)
 	self.object:setvelocity{x = 0, y = 0, z = 0}
-	local dist = vector.subtract(pos, self.object:getpos())
+	local dist = vector.subtract(pos, self.object:get_pos())
 	if vector.length(dist) > 5 then
 		self:set_animation(working_villages.animation_frames.STAND)
 		return false, fail.too_far
@@ -80,17 +100,10 @@ function working_villages.villager:dig(pos)
 	self:set_yaw_by_direction(dist)
 	for _=0,30 do coroutine.yield() end --wait 30 steps
 	local destnode = minetest.get_node(pos)
-	--[[if not minetest.dig_node(pos) then --somehow this drops the items
+	if not minetest.dig_node(pos) then --somehow this drops the items
 	 return false, fail.dig_fail
-	end]]
-	minetest.remove_node(pos)
-	local stacks = minetest.get_node_drops(destnode.name)
-	for _, stack in ipairs(stacks) do
-		local leftover = self:add_item_to_main(stack)
-		if not leftover:is_empty() then
-  		minetest.add_item(pos, leftover)
-		end
 	end
+	--minetest.remove_node(pos)
 	local sounds = minetest.registered_nodes[destnode.name]
 	if sounds then
 		if sounds.sounds then
@@ -101,6 +114,30 @@ function working_villages.villager:dig(pos)
 		end
 	end
 	self:set_animation(working_villages.animation_frames.STAND)
+	if collect_drops then
+    local stacks = minetest.get_node_drops(destnode.name)
+    --perhaps simplify by just checking if the found item is one of the drops
+    for _, stack in ipairs(stacks) do
+      local function is_drop(n)
+        local name
+        if type(n) == "table" then
+          name = n.name
+        else
+          name = n
+        end
+        if name == stack then
+          return true
+        end
+        return false
+      end
+      self:collect_nearest_item_by_condition(is_drop,drop_range)
+      -- add to inventory, when using remove_node
+      --[[local leftover = self:add_item_to_main(stack)
+      if not leftover:is_empty() then
+        minetest.add_item(pos, leftover)
+      end]]
+    end
+  end
 	return true
 end
 
@@ -108,7 +145,7 @@ function working_villages.villager:place(item,pos)
 	if type(pos)~="table" then
 		error("no target position given")
 	end
-	local dist = vector.subtract(pos, self.object:getpos())
+	local dist = vector.subtract(pos, self.object:get_pos())
 	if vector.length(dist) > 5 then
 		return false, fail.too_far
 	end
@@ -214,7 +251,7 @@ function working_villages.villager:sleep()
 
 	self.wait_until_dawn()
 
-	local pos=self.object:getpos()
+	local pos=self.object:get_pos()
 	self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
 	log.action("villager %s gets up", self.invenory_name)
 	self:set_animation(working_villages.animation_frames.STAND)

@@ -40,7 +40,7 @@ function torcher.place_torch_at(v,pos)
       elseif v.owner_name then
         minetest.chat_send_player(v.owner_name,msg)
       else
-        print(("torcher at %s doesn't have torches"):format(minetest.pos_to_string(v.object:getpos())))
+        print(("torcher at %s doesn't have torches"):format(minetest.pos_to_string(v.object:get_pos())))
       end
       return co_command.pause,"in need of torches"
     else
@@ -57,7 +57,7 @@ working_villages.register_job("working_villages:job_torcher", {
 		while (self.pause) do
 			coroutine.yield()
 		end
-		local position = self.object:getpos()
+		local position = self.object:get_pos()
 		if torcher.is_dark(position) then
 			local front = self:get_front() -- if it is dark, set torch.
 			if torcher.is_dark(front) then

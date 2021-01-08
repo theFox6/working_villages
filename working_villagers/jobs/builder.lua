@@ -32,7 +32,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 		
 		self:count_timer("builder:search")
 		if self:timer_exceeded("builder:search",20) then
-			local marker = func.search_surrounding(self.object:getpos(), find_building, searching_range)
+			local marker = func.search_surrounding(self.object:get_pos(), find_building, searching_range)
 			if marker == nil then
 			 self:set_state_info("I am currently looking for a building site nearby.\nHowever there wasn't one the last time I checked.")
 			else
@@ -75,7 +75,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 					if inv:room_for_item("main", ItemStack(nname)) then
 						inv:add_item("main", ItemStack(nname))
 					else
-						local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) ..
+						local msg = "builder at " .. minetest.pos_to_string(self.object:get_pos()) ..
 							" doesn't have enough inventory space"
 						if self.owner_name then
 							minetest.chat_send_player(self.owner_name,msg)
@@ -93,7 +93,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 					  if inv:room_for_item("main", ItemStack(nname)) then
 						  self:replace_item_from_main(ItemStack("default:torch"),ItemStack(nname))
 					  else
-              local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) ..
+              local msg = "builder at " .. minetest.pos_to_string(self.object:get_pos()) ..
                 " doesn't have enough inventory space"
               if self.owner_name then
                 minetest.chat_send_player(self.owner_name,msg)
@@ -121,7 +121,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 						meta:set_int("index",meta:get_int("index")+1)
 					end
 				else
-					local msg = "builder at " .. minetest.pos_to_string(self.object:getpos()) .. " doesn't have " .. nname
+					local msg = "builder at " .. minetest.pos_to_string(self.object:get_pos()) .. " doesn't have " .. nname
 					if self.owner_name then
 						minetest.chat_send_player(self.owner_name,msg)
 					else

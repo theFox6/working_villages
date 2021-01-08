@@ -16,7 +16,7 @@ I'm doing anyway, clearing the snow away.",
 		self:count_timer("snowclearer:change_dir")
 		self:handle_obstacles()
 		if self:timer_exceeded("snowclearer:search",20) then
-			local target = func.search_surrounding(self.object:getpos(), find_snow, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_snow, searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination==false then
@@ -25,7 +25,7 @@ I'm doing anyway, clearing the snow away.",
 				end
 				self:set_displayed_action("clearing snow away")
 				self:go_to(destination)
-				self:dig(target)
+				self:dig(target,true)
 			end
 			self:set_displayed_action("looking for work")
 		elseif self:timer_exceeded("snowclearer:change_dir",50) then

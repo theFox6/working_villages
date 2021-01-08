@@ -7,7 +7,7 @@ function func.find_path_toward(pos,villager)
   if func.walkable_pos(dest) then
     dest = pathfinder.get_ground_level(dest)
   end
-  local val_pos = func.validate_pos(villager.object:getpos())
+  local val_pos = func.validate_pos(villager.object:get_pos())
   --FIXME: this also reverses jump height and fear height
   local path,rev = pathfinder.find_path(dest, val_pos, villager)
   return rev

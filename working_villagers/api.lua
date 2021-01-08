@@ -78,12 +78,12 @@ end
 function working_villages.villager:get_nearest_player(range_distance,pos)
   local min_distance = range_distance
   local player,ppos
-  local position = pos or self.object:getpos()
+  local position = pos or self.object:get_pos()
 
   local all_objects = minetest.get_objects_inside_radius(position, range_distance)
   for _, object in pairs(all_objects) do
     if object:is_player() then
-      local player_position = object:getpos()
+      local player_position = object:get_pos()
       local distance = vector.distance(position, player_position)
 
       if distance < min_distance then
@@ -100,12 +100,12 @@ end
 function working_villages.villager:get_nearest_enemy(range_distance)
   local enemy
   local min_distance = range_distance
-  local position = self.object:getpos()
+  local position = self.object:get_pos()
 
   local all_objects = minetest.get_objects_inside_radius(position, range_distance)
   for _, object in pairs(all_objects) do
     if self:is_enemy(object) then
-      local object_position = object:getpos()
+      local object_position = object:get_pos()
       local distance = vector.distance(position, object_position)
 
       if distance < min_distance then
@@ -116,7 +116,7 @@ function working_villages.villager:get_nearest_enemy(range_distance)
   end
   return enemy
 end
--- woriking_villages.villager.get_nearest_item_by_condition returns the position of
+-- working_villages.villager.get_nearest_item_by_condition returns the position of
 -- an item that returns true for the condition
 function working_villages.villager:get_nearest_item_by_condition(cond, range_distance)
   local max_distance=range_distance
@@ -125,7 +125,7 @@ function working_villages.villager:get_nearest_item_by_condition(cond, range_dis
   end
   local item = nil
   local min_distance = max_distance
-  local position = self.object:getpos()
+  local position = self.object:get_pos()
 
   local all_objects = minetest.get_objects_inside_radius(position, max_distance)
   for _, object in pairs(all_objects) do
@@ -133,7 +133,7 @@ function working_villages.villager:get_nearest_item_by_condition(cond, range_dis
       local found_item = ItemStack(object:get_luaentity().itemstring):to_table()
       if found_item then
         if cond(found_item) then
-          local item_position = object:getpos()
+          local item_position = object:get_pos()
           local distance = vector.distance(position, item_position)
 
           if distance < min_distance then
@@ -164,7 +164,7 @@ function working_villages.villager:get_front()
 
   --direction.y = direction.y - 1
 
-  return vector.add(vector.round(self.object:getpos()), direction)
+  return vector.add(vector.round(self.object:get_pos()), direction)
 end
 
 -- working_villages.villager.get_front_node returns a node that exists in front of the villager.
@@ -192,7 +192,7 @@ function working_villages.villager:get_back()
 
   --direction.y = direction.y - 1
 
-  return vector.add(vector.round(self.object:getpos()), direction)
+  return vector.add(vector.round(self.object:get_pos()), direction)
 end
 
 -- working_villages.villager.get_back_node returns a node that exists behind the villager.
@@ -291,7 +291,7 @@ end
 
 -- working_villages.villager.change_direction change direction to destination and velocity vector.
 function working_villages.villager:change_direction(destination)
-  local position = self.object:getpos()
+  local position = self.object:get_pos()
   local direction = vector.subtract(destination, position)
   direction.y = 0
   local velocity = vector.multiply(vector.normalize(direction), 1.5)
@@ -379,14 +379,14 @@ end
 
 -- working_villages.villager.is_near checks if the villager is within the radius of a position
 function working_villages.villager:is_near(pos, distance)
-  local p = self.object:getpos()
+  local p = self.object:get_pos()
   p.y = p.y + 0.5
   return vector.distance(p, pos) < distance
 end
 
 function working_villages.villager:handle_liquids()
   local ctrl = self.object
-  local inside_node = minetest.get_node(self.object:getpos())
+  local inside_node = minetest.get_node(self.object:get_pos())
   -- perhaps only when changed
   if minetest.get_item_group(inside_node.name,"liquid") > 0 then
     -- swim
@@ -403,7 +403,7 @@ end
 
 function working_villages.villager:jump()
   local ctrl = self.object
-  local below_node = minetest.get_node(vector.subtract(ctrl:getpos(),{x=0,y=1,z=0}))
+  local below_node = minetest.get_node(vector.subtract(ctrl:get_pos(),{x=0,y=1,z=0}))
   local velocity = ctrl:getvelocity()
   if below_node.name == "air" then return false end
   local jump_force = math.sqrt(self.initial_properties.weight) * 1.5
@@ -424,8 +424,8 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
   for i,v in pairs(front_diff) do
     local front_pos = vector.new(0,0,0)
     front_pos[i] = v
-    front_pos = vector.add(front_pos, vector.round(self.object:getpos()))
-    front_pos.y = math.floor(self.object:getpos().y)+0.5
+    front_pos = vector.add(front_pos, vector.round(self.object:get_pos()))
+    front_pos.y = math.floor(self.object:get_pos().y)+0.5
     local above_node = vector.new(front_pos)
     local front_node = minetest.get_node(front_pos)
     above_node = vector.add(above_node,{x=0,y=1,z=0})
@@ -453,7 +453,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
         end
         for _,box in pairs(nBox) do --TODO: check rotation of the nodebox
           local nHeight = (box[5] - box[2]) + front_pos.y
-          if nHeight > self.object:getpos().y + .5 then
+          if nHeight > self.object:get_pos().y + .5 then
             self:jump()
           end
         end
@@ -471,7 +471,7 @@ end
 
 -- working_villages.villager.pickup_item pickup items placed and put it to main slot.
 function working_villages.villager:pickup_item()
-  local pos = self.object:getpos()
+  local pos = self.object:get_pos()
   local radius = 1.0
   local all_objects = minetest.get_objects_inside_radius(pos, radius)
 
@@ -486,7 +486,7 @@ function working_villages.villager:pickup_item()
           local inv = self:get_inventory()
           local leftover = inv:add_item("main", stack)
 
-          minetest.add_item(obj:getpos(), leftover)
+          minetest.add_item(obj:get_pos(), leftover)
           obj:get_luaentity().itemstring = ""
           obj:remove()
         end
@@ -554,8 +554,8 @@ function working_villages.villager:set_state(id)
   elseif id == "job" then
     print("the job state is not nessecary anymore")
   elseif id == "dig_target" then
-    print("use self:dig(pos) instead of self:set_state(\"dig_target\")")
-    self:dig(self.target)
+    print("use self:dig(pos,collect_drops) instead of self:set_state(\"dig_target\")")
+    self:dig(self.target,true)
   elseif id == "place_wield" then
     print("use self:place(itemname,pos) instead of self:set_state(\"place_wield\")")
     local wield_stack = self:get_wield_item_stack()
@@ -597,7 +597,7 @@ do
 
   local function on_activate(self)
     -- attach to the nearest villager.
-    local all_objects = minetest.get_objects_inside_radius(self.object:getpos(), 0.1)
+    local all_objects = minetest.get_objects_inside_radius(self.object:get_pos(), 0.1)
     for _, obj in ipairs(all_objects) do
       local luaentity = obj:get_luaentity()
 
@@ -610,7 +610,7 @@ do
   end
 
   local function on_step(self)
-    local all_objects = minetest.get_objects_inside_radius(self.object:getpos(), 0.1)
+    local all_objects = minetest.get_objects_inside_radius(self.object:get_pos(), 0.1)
     for _, obj in ipairs(all_objects) do
       local luaentity = obj:get_luaentity()
 
@@ -693,7 +693,7 @@ function working_villages.register_egg(egg_name, def)
         -- set villager's direction.
         local new_villager = minetest.add_entity(pointed_thing.above, def.product_name)
         new_villager:get_luaentity():set_yaw_by_direction(
-          vector.subtract(user:getpos(), new_villager:getpos())
+          vector.subtract(user:get_pos(), new_villager:get_pos())
         )
         new_villager:get_luaentity().owner_name = user:get_player_name()
         new_villager:get_luaentity():update_infotext()
@@ -834,7 +834,7 @@ function working_villages.register_villager(product_name, def)
       create_inventory(self)
 
       -- attach dummy item to new villager.
-      minetest.add_entity(self.object:getpos(), "working_villages:dummy_item")
+      minetest.add_entity(self.object:get_pos(), "working_villages:dummy_item")
     else
       -- if static data is not empty string, this object has beed already created.
       local data = minetest.deserialize(staticdata)
