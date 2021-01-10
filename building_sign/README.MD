@@ -7,7 +7,7 @@ also it remembers the blueprint of house using shematics
 ## features
 * building shematics are remembered by the building sign
   * schematics can be chosen with the building sign
-* saves a lua table and not everything serialized as meta (ensure savety)
+* doesn't keep building data in blockmeta (removal safety)
 
 ## planned features
 * allow mods and users to add schematics

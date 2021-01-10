@@ -27,6 +27,7 @@ end
 --content
 working_villages.require("forms")
 working_villages.require("talking")
+--TODO: instead use the building sign mod when it is ready
 working_villages.require("building")
 
 --base

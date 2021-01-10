@@ -65,6 +65,10 @@ minetest.register_node("building_sign:building_marker", {
 			if building.build_pos then
 				meta:set_string("build_pos",minetest.pos_to_string(building.build_pos))
 			end
+			if not building.nodedata then
+        meta:set_string("configured","false")
+        meta:set_string("state","unplanned")
+			end
 		else
 			meta:set_string("configured","false")
 			meta:set_string("state","unplanned")
