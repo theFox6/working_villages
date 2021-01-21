@@ -100,10 +100,30 @@ function working_villages.villager:dig(pos,collect_drops)
 	self:set_yaw_by_direction(dist)
 	for _=0,30 do coroutine.yield() end --wait 30 steps
 	local destnode = minetest.get_node(pos)
-	if not minetest.dig_node(pos) then --somehow this drops the items
-	 return false, fail.dig_fail
+	--if not minetest.dig_node(pos) then --somehow this drops the items
+	-- return false, fail.dig_fail
+	--end
+  local def_node = minetest.registered_items[destnode.name];
+  local old_meta = nil;
+  if (def_node~=nil) and (def_node.after_dig_node~=nil) then
+    old_meta = minetest.get_meta(pos):to_table();
+  end
+	minetest.remove_node(pos)
+	local stacks = minetest.get_node_drops(destnode.name)
+	for _, stack in ipairs(stacks) do
+		local leftover = self:add_item_to_main(stack)
+		if not leftover:is_empty() then
+  		minetest.add_item(pos, leftover)
+		end
 	end
-	--minetest.remove_node(pos)
+  if (old_meta) then
+    def_node.after_dig_node(pos, destnode, old_meta, self)
+  end
+  for _, callback in ipairs(minetest.registered_on_dignodes) do
+    local pos_copy = {x=pos.x, y=pos.y, z=pos.z}
+    local node_copy = {name=destnode.name, param1=destnode.param1, param2=destnode.param2}
+    callback(pos_copy, node_copy, self)
+  end
 	local sounds = minetest.registered_nodes[destnode.name]
 	if sounds then
 		if sounds.sounds then
