@@ -117,12 +117,12 @@ function working_villages.villager:dig(pos,collect_drops)
 		end
 	end
   if (old_meta) then
-    def_node.after_dig_node(pos, destnode, old_meta, self)
+    def_node.after_dig_node(pos, destnode, old_meta, nil)
   end
   for _, callback in ipairs(minetest.registered_on_dignodes) do
     local pos_copy = {x=pos.x, y=pos.y, z=pos.z}
     local node_copy = {name=destnode.name, param1=destnode.param1, param2=destnode.param2}
-    callback(pos_copy, node_copy, self)
+    callback(pos_copy, node_copy, nil)
   end
 	local sounds = minetest.registered_nodes[destnode.name]
 	if sounds then
