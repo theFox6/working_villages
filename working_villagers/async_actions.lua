@@ -239,13 +239,17 @@ function working_villages.villager:sleep()
 		function(p) return string.find(minetest.get_node(p).name,"_top") end)
 	local bed_bottom = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_bottom") end)
+  local lay_pos = table.copy(bed_pos);
 	if bed_top and bed_bottom then
-		self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
+    local bed_vector = vector.subtract(bed_bottom, bed_top);
+		self:set_yaw_by_direction(bed_vector)
+    lay_pos.x = bed_pos.x + bed_vector.x/2;
+    lay_pos.z = bed_pos.z + bed_vector.z/2;
 	else
 		log.info("villager %s found no bed", self.inventory_name)
 	end
 	self:set_animation(working_villages.animation_frames.LAY)
-	self.object:setpos(bed_pos)
+	self.object:setpos(lay_pos)
 	self:set_state_info("Zzzzzzz...")
 	self:set_displayed_action("sleeping")
 
