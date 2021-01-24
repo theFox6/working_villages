@@ -227,11 +227,23 @@ forms.register_page("working_villages:job_change",{
 
 forms.register_page("working_villages:inv_gui", {
 	constructor = function(_, villager) --self, villager, playername
+    -- home position
 		local home_pos = {x = 0, y = 0, z = 0}
 		if villager:has_home() then
 			home_pos = villager:get_home():get_marker()
 		end
 		home_pos = minetest.pos_to_string(home_pos)
+    -- job positon
+		local job_pos = villager.object:get_pos();
+    if (villager:get_job_pos()) then
+      job_pos = villager:get_job_pos();
+    else
+      job_pos.x = math.floor(job_pos.x);
+      job_pos.y = math.floor(job_pos.y);
+      job_pos.z = math.floor(job_pos.z);
+    end
+		job_pos = minetest.pos_to_string(job_pos)
+    -- job name
 		local jobname = villager:get_job()
 		if jobname then
 			jobname = jobname.description
@@ -239,6 +251,7 @@ forms.register_page("working_villages:inv_gui", {
 			jobname = "no job"
 		end
 		local wp = { x = 4.25, y = 0}
+		local jp = { x = 4.3, y = 2}
 		local hp = { x = 4.3, y = 3}
 		return "size[8,9]"
 			.. default.gui_bg
@@ -253,6 +266,7 @@ forms.register_page("working_villages:inv_gui", {
 			.. "list[detached:"..villager.inventory_name..";wield_item;" .. wp.x .. "," .. wp.y + 0.5 ..";1,1;]"
 			.. "button[5.5,0.7;2,1;job;change job]"
 			.. "label[4,1.5;current job:\n"..jobname.."]"
+			.. "field[" .. jp.x .. "," .. jp.y + 0.4 ..";2.5,1;job_pos;job position;" .. job_pos .. "]"
 			.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;home position;" .. home_pos .. "]"
 			.. "button_exit[" .. hp.x + 2 .. "," .. hp.y + 0.09 .. ";1,1;ok;set]"
 	end,
@@ -262,6 +276,23 @@ forms.register_page("working_villages:inv_gui", {
 			forms.show_formspec(villager, "working_villages:job_change", sender_name)
 			return
 		end
+		if fields.job_pos then
+      local coords = minetest.string_to_pos(fields.job_pos)
+      if not (coords.x and coords.y and coords.z) then
+        -- fail on illegal input of coordinates
+        minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the job position. '..
+          'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
+          'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+        return
+      end
+      if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
+        minetest.chat_send_player(sender_name, "The coordinates of your job position "..
+          "do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.")
+        return
+      end
+      villager:set_job_pos(table.copy(coords))
+      minetest.chat_send_player(sender_name, 'Job positon set!')
+    end
 		if fields.home_pos == nil then
 			return
 		end

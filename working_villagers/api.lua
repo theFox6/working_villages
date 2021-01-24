@@ -66,6 +66,17 @@ function working_villages.villager:get_job()
   return nil
 end
 
+-- working_villages.villager.get_job_pos return a villager's current job positon.
+function working_villages.villager:get_job_pos()
+  return self.job_pos;
+end
+
+-- working_villages.villager.set_job_pos set a villager's job positon.
+function working_villages.villager:set_job_pos(pos)
+  -- TODO: maybe add some check of pos, if it si valid
+  self.job_pos = pos;
+end
+
 -- working_villages.villager.is_enemy returns if an object is an enemy.
 function working_villages.villager:is_enemy(obj)
   log.verbose("villager %s checks if %s is hostile",self.inventory_name,obj)
