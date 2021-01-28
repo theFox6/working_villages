@@ -223,6 +223,44 @@ function working_villages.villager:place(item,pos)
 	return true
 end
 
+function working_villages.villager:manipulate_chest(chest_pos, take_func, put_func)
+  if func.is_chest(chest_pos) then
+    -- try to put items
+    local vil_inv = self:get_inventory();
+    
+    -- from villager to chest
+    if put_func then
+      local size = vil_inv:get_size("main");
+      for index = 1,size do
+        local stack = vil_inv:get_stack("main", index);
+        if (not stack:is_empty()) and (put_func(stack)) then
+          local chest_meta = minetest.get_meta(chest_pos);
+          local chest_inv = chest_meta:get_inventory();
+          local leftover = chest_inv:add_item("main", stack);
+          vil_inv:set_stack("main", index, leftover);
+          for _=0,10 do coroutine.yield() end --wait 10 steps
+        end
+      end
+    end
+    -- from chest to villager
+    if take_func then
+      local chest_meta = minetest.get_meta(chest_pos);
+      local chest_inv = chest_meta:get_inventory();
+      local size = chest_inv:get_size("main");
+      for index = 1,size do
+        local chest_meta = minetest.get_meta(chest_pos);
+        local chest_inv = chest_meta:get_inventory();
+        local stack = chest_inv:get_stack("main", index);
+        if (not stack:is_empty()) and (take_func(stack)) then
+          local leftover = vil_inv:add_item("main", stack);
+          chest_inv:set_stack("main", index, leftover);
+          for _=0,10 do coroutine.yield() end --wait 10 steps
+        end
+      end
+    end
+  end
+end
+
 function working_villages.villager.wait_until_dawn()
 	local daytime = minetest.get_timeofday()
 	while (daytime < 0.2 or daytime > 0.805) do
@@ -314,5 +352,6 @@ function working_villages.villager:handle_night()
   local tod = minetest.get_timeofday() 
   if  tod < 0.2 or tod > 0.76 then
     self:goto_bed()
+    self.manipulated_chest = false;
   end
 end
