@@ -454,6 +454,6 @@ function working_villages.home:get_bed()
 end
 
 -- set the home of a villager
-function working_villages.set_home(inv_name,marker_pos)
-	working_villages.homes[inv_name] = working_villages.home:new{marker = marker_pos}
+function working_villages.set_home(self, marker_pos)
+	working_villages.homes[self.inventory_name] = working_villages.home:new{marker = marker_pos}
 end
