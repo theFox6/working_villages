@@ -28,6 +28,7 @@ end
 working_villages.require("forms")
 working_villages.require("talking")
 working_villages.require("building")
+working_villages.require("storage")
 
 --base
 working_villages.require("api")

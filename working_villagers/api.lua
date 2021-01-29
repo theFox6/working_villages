@@ -68,13 +68,16 @@ end
 
 -- working_villages.villager.get_job_pos return a villager's current job positon.
 function working_villages.villager:get_job_pos()
-  return self.job_pos;
+  local data = self:get_stored_table();
+  return data.job_pos;
 end
 
 -- working_villages.villager.set_job_pos set a villager's job positon.
 function working_villages.villager:set_job_pos(pos)
   -- TODO: maybe add some check of pos, if it si valid
-  self.job_pos = pos;
+  local data = self:get_stored_table();
+  data.job_pos = pos;
+  self:set_stored_table(data);
 end
 
 -- working_villages.villager.is_enemy returns if an object is an enemy.
@@ -1001,6 +1004,10 @@ function working_villages.register_villager(product_name, def)
   villager_def.on_rightclick               = on_rightclick
   villager_def.on_punch                    = on_punch
   villager_def.get_staticdata              = get_staticdata
+  
+  -- storage methods
+  villager_def.get_stored_table            = working_villages.get_stored_villager_table
+  villager_def.set_stored_table            = working_villages.set_stored_villager_table
 
   -- home methods
   villager_def.get_home                    = working_villages.get_home
