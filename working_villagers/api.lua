@@ -1008,6 +1008,7 @@ function working_villages.register_villager(product_name, def)
   -- storage methods
   villager_def.get_stored_table            = working_villages.get_stored_villager_table
   villager_def.set_stored_table            = working_villages.set_stored_villager_table
+  villager_def.clear_cached_table          = working_villages.clear_cached_villager_table
 
   -- home methods
   villager_def.get_home                    = working_villages.get_home
