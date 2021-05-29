@@ -1,0 +1,28 @@
+---
+--@type building
+--@field #table area two positions marking the size of the building
+--@field #table anchor the anchor point of the schematic
+--@field #number id the unique identifier of the building
+local building = {}
+
+---
+--#number the last given unique id
+--warning: right now all buildings have to be loaded before new ones are created
+local nid = 0
+
+fn building.new(o) {
+	local n = setmetatable(o or {}, {__index = building})
+	if n.id then
+		if n.id > nid then
+			nid = n.id
+		end
+	else
+		nid = nid + 1
+		n.id = nid
+	end
+	return n
+}
+
+building_sign.building = building
+
+return building

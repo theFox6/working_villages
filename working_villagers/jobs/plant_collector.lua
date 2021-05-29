@@ -1,41 +1,63 @@
 local func = working_villages.require("jobs/util")
 
 local herbs = {
-	groups = {
-		"flora",
-	},
+  -- more priority definitions
 	names = {
-		"default:apple",
-		"default:cactus",
-		"default:papyrus",
-		"default:dry_shrub",
-		"flowers:mushroom_brown",
-		"flowers:mushroom_red",
-	}
+		["default:apple"]={},
+		["default:cactus"]={collect_only_top=true},
+		["default:papyrus"]={collect_only_top=true},
+		["default:dry_shrub"]={},
+		["farming:wheat_8"]={replant={"farming:seed_wheat"}},
+		["flowers:mushroom_brown"]={},
+		["flowers:mushroom_red"]={},
+	},
+  -- less priority definitions
+	groups = {
+		["flora"]={},
+	},
 }
 
-function herbs.is_herb(node)
-	local nname=node
-	if type(nname)=="table" then
-		nname=nname.name
-	end
-	for _, i in ipairs(herbs.groups) do
-		if minetest.get_item_group(nname, i) > 0 then
-			--print("found some "..i)
-			return true
+function herbs.get_herb(item_name)
+  -- check more priority definitions
+	for key, value in pairs(herbs.names) do
+		if item_name==key then
+			return value
 		end
 	end
-	for _, i in ipairs(herbs.names) do
-		if nname==i then
-			--print("found a "..nname)
-			return true
+  -- check less priority definitions
+	for key, value in pairs(herbs.groups) do
+		if minetest.get_item_group(item_name, key) > 0 then
+			return value;
 		end
 	end
-	return false
+	return nil
 end
 
-local function find_herb(p)
-	return herbs.is_herb(minetest.get_node(p).name)
+function herbs.is_herb(item_name)
+  local data = herbs.get_herb(item_name);
+  if (not data) then
+    return false;
+  end
+  return true;
+end
+
+local function find_herb_node(pos)
+	local node = minetest.get_node(pos);
+  local data = herbs.get_herb(node.name);
+  if (not data) then
+    return false;
+  end
+  
+  if data.collect_only_top then
+    -- prevent to collect plat part, which can continue to grow
+    local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
+    local node_below = minetest.get_node(pos_below);
+    if (node_below.name~=node.name) then
+      return false;
+    end
+  end
+    
+  return true;
 end
 
 local searching_range = {x = 10, y = 3, z = 10}
@@ -51,7 +73,7 @@ working_villages.register_job("working_villages:job_herbcollector", {
 		self:handle_obstacles()
 		if self:timer_exceeded("herbcollector:search",20) then
 			self:collect_nearest_item_by_condition(herbs.is_herb, searching_range)
-			local target = func.search_surrounding(self.object:get_pos(), find_herb, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_herb_node, searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then
@@ -62,7 +84,13 @@ working_villages.register_job("working_villages:job_herbcollector", {
 					destination = target
 				end
 				self:go_to(destination)
+        local herb_data = herbs.get_herb(minetest.get_node(target).name);
 				self:dig(target,true)
+        if herb_data.replant then
+          for index, value in ipairs(herb_data.replant) do
+				    self:place(value, target)
+          end
+        end
 			end
 		elseif self:timer_exceeded("herbcollector:change_dir",50) then
 			self:change_direction_randomly()

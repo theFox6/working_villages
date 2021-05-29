@@ -1,12 +1,4 @@
----
---@type building
---@field #table area two positions marking the size of the building
---@field #table anchor the anchor point of the schematic
-local building = {}
-
-fn building.new(o) {
-	return setmetatable(o or {}, {__index = building})
-}
+local building = building_sign.require("building","venus")
 
 -- #table all buildings that ever were in the world
 local building_store
@@ -40,7 +32,6 @@ fn building_sign.get(pos, create) {
 	return building_sign.building_store[poshash]
 }
 
-building_sign.building = building
 building_sign.building_store = building_store
 
 return building_store
