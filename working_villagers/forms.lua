@@ -225,24 +225,122 @@ forms.register_page("working_villages:job_change",{
 	end
 })
 
+local function floor_pos(pos)
+	pos.x = math.floor(pos.x)
+	pos.y = math.floor(pos.y)
+	pos.z = math.floor(pos.z)
+	return pos
+end
+local function load_pos(pos, villager, nodes)
+  if (pos=="near") then
+    pos = minetest.find_node_near(villager.object:get_pos(), 5, nodes, true) or nil
+	elseif (pos~="") then
+		pos = minetest.string_to_pos(pos)	
+    pos = minetest.find_node_near(pos, 0.2, nodes, true) or nil
+	else
+		pos = nil
+  end
+  return pos
+end 
+
+local change_index = 0
+
+forms.register_page("working_villages:data_change",{
+	constructor = function(_, villager, player_name) --self, villager, playername
+		-- villager data
+		local data = villager:get_data()
+    -- references
+		local villager_pos = minetest.pos_to_string(floor_pos(villager.object:get_pos()))
+		local player = minetest.get_player_by_name(player_name)
+		local player_pos = villager_pos
+		if player then
+			player_pos = minetest.pos_to_string(floor_pos(player:get_pos()))
+		end
+		-- villager positions
+		local home_pos = ""
+		if (data.home_pos~=nil) then
+			home_pos = minetest.pos_to_string(data.home_pos)
+		end
+		local bed_pos = ""
+		if (data.bed_pos~=nil) then
+			bed_pos = minetest.pos_to_string(data.bed_pos)
+		end
+		local chest_pos = ""
+		if (data.chest_pos~=nil) then
+			chest_pos = minetest.pos_to_string(data.chest_pos)
+		end
+		-- village positions
+		local food_pos = ""
+		if (data.food_pos~=nil) then
+			food_pos = minetest.pos_to_string(data.food_pos)
+		end
+		local tools_pos = ""
+		if (data.tools_pos~=nil) then
+			tools_pos = minetest.pos_to_string(data.tools_pos)
+		end
+		local storage_pos = ""
+		if (data.storage_pos~=nil) then
+			storage_pos = minetest.pos_to_string(data.storage_pos)
+		end
+    -- job positon
+		local job_pos = ""
+		if (data.job_pos~=nil) then
+			job_pos = minetest.pos_to_string(data.job_pos)
+		end
+		
+		local cp = { x = 3.5, y = 0 }
+		local hp = { x = 0.5, y = 1.5 }
+		local wp = { x = 0.5, y = 2.5 }
+		local jp = { x = 0.5, y = 3.5 }
+		local bp = { x = 3.5, y = 5 }
+		change_index = change_index + 1
+		return "size[8,6]"
+			.. default.gui_bg
+			.. default.gui_bg_img
+			.. default.gui_slots
+			.. "label[".. cp.x - 0.25 ..",".. cp.y-0.1 ..";current villager data]"
+			.. "label[".. cp.x - 3 ..",".. cp.y-0.1 ..";"..change_index.."]"
+			.. "field[" .. cp.x-3 .. "," .. cp.y + 0.9 ..";2.5,1;villager_pos;villager position;" .. player_pos .. "]"
+			.. "field[" .. cp.x+2 .. "," .. cp.y + 0.9 ..";2.5,1;player_pos;player position;" .. villager_pos .. "]"
+			.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;house door position;" .. home_pos .. "]"
+			.. "field[" .. hp.x+2.5 .. "," .. hp.y + 0.4 ..";2.5,1;bed_pos;bed position;" .. bed_pos .. "]"
+			.. "field[" .. hp.x+5 .. "," .. hp.y + 0.4 ..";2.5,1;chest_pos;chest position;" .. chest_pos .. "]"
+			.. "field[" .. wp.x .. "," .. wp.y + 0.4 ..";2.5,1;food_pos;food position;" .. food_pos .. "]"
+			.. "field[" .. wp.x+2.5 .. "," .. wp.y + 0.4 ..";2.5,1;tools_pos;tools position;" .. tools_pos .. "]"
+			.. "field[" .. wp.x+5 .. "," .. wp.y + 0.4 ..";2.5,1;storage_pos;storage position;" .. storage_pos .. "]"
+			.. "field[" .. jp.x .. "," .. jp.y + 0.4 ..";2.5,1;job_pos;job position;" .. job_pos .. "]"
+			.. "button[3,".. bp.y + 0.5 ..";1,1;set_data;set]"
+			.. "button[6,".. bp.y + 0.5 ..";1,1;back;back]"
+	end,
+	receiver = function(page, villager, sender, fields)
+		local sender_name = sender:get_player_name()
+    if fields.set_data then
+			local data = {}
+      --data.home_pos = load_pos(fields.home_pos, villager, "group:villager_door")
+      data.home_pos = load_pos(fields.home_pos, villager, "group:door")
+      data.bed_pos = load_pos(fields.bed_pos, villager, "group:villager_bed_bottom")
+			if (data.bed_pos~=nil) then
+				local bed = minetest.get_node(data.bed_pos)
+				local dir = minetest.facedir_to_dir(bed.param2)
+				data.bed_pos = vector.add(data.bed_pos, vector.multiply(dir, 0.5))
+			end
+      data.chest_pos = load_pos(fields.chest_pos, villager, "group:villager_chest")
+      data.food_pos = load_pos(fields.food_pos, villager, "group:villager_chest")
+      data.tools_pos = load_pos(fields.tools_pos, villager, "group:villager_chest")
+      data.storage_pos = load_pos(fields.storage_pos, villager, "group:villager_chest")
+			
+			villager:update_data(data)
+			forms.show_formspec(villager, "working_villages:data_change", sender_name)
+    end
+		if fields.back then
+			forms.show_formspec(villager, "working_villages:inv_gui", sender_name)
+			return
+		end
+	end
+})
+
 forms.register_page("working_villages:inv_gui", {
 	constructor = function(_, villager) --self, villager, playername
-    -- home position
-		local home_pos = {x = 0, y = 0, z = 0}
-		if villager:has_home() then
-			home_pos = villager:get_home():get_marker()
-		end
-		home_pos = minetest.pos_to_string(home_pos)
-    -- job positon
-		local job_pos = villager.object:get_pos();
-    if (villager:get_job_pos()) then
-      job_pos = villager:get_job_pos();
-    else
-      job_pos.x = math.floor(job_pos.x);
-      job_pos.y = math.floor(job_pos.y);
-      job_pos.z = math.floor(job_pos.z);
-    end
-		job_pos = minetest.pos_to_string(job_pos)
     -- job name
 		local jobname = villager:get_job()
 		if jobname then
@@ -251,8 +349,7 @@ forms.register_page("working_villages:inv_gui", {
 			jobname = "no job"
 		end
 		local wp = { x = 4.25, y = 0}
-		local jp = { x = 4.3, y = 2}
-		local hp = { x = 4.3, y = 3}
+		local hp = { x = 4.0, y = 3}
 		return "size[8,9]"
 			.. default.gui_bg
 			.. default.gui_bg_img
@@ -266,14 +363,19 @@ forms.register_page("working_villages:inv_gui", {
 			.. "list[detached:"..villager.inventory_name..";wield_item;" .. wp.x .. "," .. wp.y + 0.5 ..";1,1;]"
 			.. "button[5.5,0.7;2,1;job;change job]"
 			.. "label[4,1.5;current job:\n"..jobname.."]"
-			.. "field[" .. jp.x .. "," .. jp.y + 0.4 ..";2.5,1;job_pos;job position;" .. job_pos .. "]"
-			.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;home position;" .. home_pos .. "]"
+			.. "button[5.5,2.3;2,1;data;change data]"
+			--.. "field[" .. jp.x .. "," .. jp.y + 0.4 ..";2.5,1;job_pos;job position;" .. job_pos .. "]"
+			--.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;home position;" .. home_pos .. "]"
 			.. "button_exit[" .. hp.x + 2 .. "," .. hp.y + 0.09 .. ";1,1;ok;set]"
 	end,
 	receiver = function(_, villager, sender, fields)
 		local sender_name = sender:get_player_name()
 		if fields.job then
 			forms.show_formspec(villager, "working_villages:job_change", sender_name)
+			return
+		end
+		if fields.data then
+			forms.show_formspec(villager, "working_villages:data_change", sender_name)
 			return
 		end
 		if fields.job_pos then

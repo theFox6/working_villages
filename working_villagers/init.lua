@@ -23,6 +23,7 @@ function working_villages.setting_enabled(name, default)
   return b
 end
 
+working_villages.require("groups")
 --TODO: check for which preloading is needed
 --content
 working_villages.require("forms")
