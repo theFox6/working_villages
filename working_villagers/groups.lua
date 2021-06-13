@@ -1,8 +1,18 @@
 -- add groups for some nodes to be managed by working_villagers
 
 local list_of_doors = {
-	"doors:door_wood_a"
+	"doors:door_wood_a",
+	"doors:door_wood_c"
 }
+
+for _,name in pairs(list_of_doors) do
+	local item_def = minetest.registered_items[name]
+	if (item_def~=nil) then
+		local groups = table.copy(item_def.groups)
+		groups.villager_door = 1
+		minetest.override_item(name, {groups=groups})
+	end
+end
 
 local list_of_chests = {
 	"default:chest"

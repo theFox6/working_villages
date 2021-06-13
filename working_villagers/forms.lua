@@ -317,7 +317,7 @@ forms.register_page("working_villages:data_change",{
     if fields.set_data then
 			local data = {}
       --data.home_pos = load_pos(fields.home_pos, villager, "group:villager_door")
-      data.home_pos = load_pos(fields.home_pos, villager, "group:door")
+      data.home_pos = load_pos(fields.home_pos, villager, "group:villager_door")
       data.bed_pos = load_pos(fields.bed_pos, villager, "group:villager_bed_bottom")
 			if (data.bed_pos~=nil) then
 				local bed = minetest.get_node(data.bed_pos)
