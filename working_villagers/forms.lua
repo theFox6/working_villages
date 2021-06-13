@@ -248,7 +248,7 @@ local change_index = 0
 forms.register_page("working_villages:data_change",{
 	constructor = function(_, villager, player_name) --self, villager, playername
 		-- villager data
-		local data = villager:get_data()
+		local data = villager.pos_data
     -- references
 		local villager_pos = minetest.pos_to_string(floor_pos(villager.object:get_pos()))
 		local player = minetest.get_player_by_name(player_name)
@@ -328,8 +328,11 @@ forms.register_page("working_villages:data_change",{
       data.food_pos = load_pos(fields.food_pos, villager, "group:villager_chest")
       data.tools_pos = load_pos(fields.tools_pos, villager, "group:villager_chest")
       data.storage_pos = load_pos(fields.storage_pos, villager, "group:villager_chest")
+			if fields.job_pos then
+				data.job_pos = minetest.string_to_pos(fields.job_pos)
+			end
 			
-			villager:update_data(data)
+			villager.pos_data = data
 			forms.show_formspec(villager, "working_villages:data_change", sender_name)
     end
 		if fields.back then

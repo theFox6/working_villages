@@ -66,40 +66,6 @@ function working_villages.villager:get_job()
   return nil
 end
 
--- working_villages.villager.get_job_pos return a villager's current job positon.
-function working_villages.villager:get_job_pos()
-  local data = self:get_stored_table();
-  return data.job_pos;
-end
-
--- working_villages.villager.set_job_pos set a villager's job positon.
-function working_villages.villager:set_job_pos(pos)
-  -- TODO: maybe add some check of pos, if it si valid
-  local data = self:get_stored_table();
-  data.job_pos = pos;
-  self:set_stored_table(data);
-end
-
--- working_villages.villager.get_data return a villager's current data.
-function working_villages.villager:get_data()
-  local data = self:get_stored_table();
-  return data;
-end
-
--- working_villages.villager.set_data set a villager's current data.
-function working_villages.villager:set_data()
-  self:set_stored_table(data);
-end
-
--- working_villages.villager.update_data update a villager's data.
-function working_villages.villager:update_data(data)
-  local store_data = self:get_stored_table();
-	for key, value in pairs(data) do
-  	store_data[key] = value;
-	end
-  self:set_stored_table(store_data);
-end
-
 -- working_villages.villager.is_enemy returns if an object is an enemy.
 function working_villages.villager:is_enemy(obj)
   log.verbose("villager %s checks if %s is hostile",self.inventory_name,obj)
@@ -880,6 +846,7 @@ function working_villages.register_villager(product_name, def)
       self.pause = data["pause"]
       self.job_data = data["job_data"]
       self.state_info = data["state_info"]
+      self.pos_data = data["pos_data"]
 
       local inventory = create_inventory(self)
       for list_name, list in pairs(data["inventory"]) do
@@ -929,7 +896,8 @@ function working_villages.register_villager(product_name, def)
       ["inventory"] = {},
       ["pause"] = self.pause,
       ["job_data"] = self.job_data,
-      ["state_info"] = self.state_info
+      ["state_info"] = self.state_info,
+      ["pos_data"] = self.pos_data,
     }
 
     -- set lists.
@@ -1016,7 +984,8 @@ function working_villages.register_villager(product_name, def)
   villager_def.owner_name                  = ""
   villager_def.time_counters               = {}
   villager_def.destination                 = vector.new(0,0,0)
-  villager_def.data                        = {}
+  villager_def.job_data                    = {}
+  villager_def.pos_data                    = {}
 
   -- callback methods
   villager_def.on_activate                 = on_activate
