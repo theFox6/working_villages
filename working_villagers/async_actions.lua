@@ -334,6 +334,37 @@ end
 function working_villages.villager:handle_night()
   local tod = minetest.get_timeofday() 
   if  tod < 0.2 or tod > 0.76 then
+    local data = self:get_stored_table();
+    if (data.in_work == true) then
+      data.in_work = false;
+      self:set_stored_table(data);
+    end
     self:goto_bed()
   end
 end
+
+function working_villages.villager:goto_job()
+  log.action("villager %s is going home", self.inventory_name)
+  local job_pos = self:get_job_pos()
+  local data = self:get_stored_table();
+  if not job_pos then
+    log.warning("villager %s couldn't find his job position",self.inventory_name)
+    self:set_state_info("I am going to my job position.")
+    data.in_work = true;
+  else
+    self:set_state_info("I am going to my job position.")
+    self:set_displayed_action("going to job")
+    self:go_to(job_pos)
+    data.in_work = true;
+  end
+  self:set_stored_table(data);
+	return true
+end
+
+function working_villages.villager:handle_job_pos()
+  local data = self:get_stored_table();
+  if (not data.in_work) then
+    self:goto_job()
+  end
+end
+
