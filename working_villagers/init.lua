@@ -51,6 +51,8 @@ working_villages.require("jobs/woodcutter")
 working_villages.require("jobs/torcher")
 working_villages.require("jobs/snowclearer")
 
+working_villages.require("spawn")
+
 if working_villages.setting_enabled("debug_tools",false) then
   working_villages.require("util_test")
 end
