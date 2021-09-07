@@ -59,7 +59,7 @@ minetest.register_node("building_sign:building_marker", {
 	end,
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
-		local building = building_sign.areas.check_existing(pos)
+		local building = building_sign.areas.get_building(pos)
 		if building then
 			--TODO: load everything from area
 			if building.build_pos then
