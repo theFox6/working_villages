@@ -9,15 +9,12 @@ for name,_ in pairs(working_villages.herbs.groups) do
 end
 
 local function spawn(pos, node, active_object_count, active_object_count_wider)
-    minetest.log("action", "Active objects "..active_object_count_wider)
     if active_object_count_wider > 2 then return end
         local pos1 = {x=pos.x-4,y=pos.y-8,z=pos.z-4}
         local pos2 = {x=pos.x+4,y=pos.y+1,z=pos.z+4}
     local spawn_pos
-    minetest.log("action", "Search from "..minetest.pos_to_string(pos1,0).." to "..minetest.pos_to_string(pos2,0))
     for _,pos in ipairs(minetest.find_nodes_in_area_under_air(
             pos1,pos2,"group:soil")) do
-        minetest.log("action", "Considering "..minetest.pos_to_string(pos,0))
         local above = minetest.get_node({x=pos.x,y=pos.y+2,z=pos.z})
         local above_def = minetest.registered_nodes[above.name] 
         if above_def and not above_def.groups.walkable then
@@ -28,7 +25,6 @@ local function spawn(pos, node, active_object_count, active_object_count_wider)
             local self = minetest.add_entity(
                 {x=pos.x,y=pos.y+1,z=pos.z},gender[math.random(2)], ""
             )
-            minetest.log("action", "working_villages spawned at "..minetest.pos_to_string(pos,0))
             return
         end
     end
