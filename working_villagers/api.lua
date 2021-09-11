@@ -847,7 +847,7 @@ function working_villages.register_villager(product_name, def)
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
       local inventory = create_inventory(self)
 
-      if self.object:get_luaentity().owner_name == "" then
+      if self.object:get_luaentity().owner_name == "working_villages:self_employed" then
         -- Spawned in with no owner, assign job
         local job_stack = ItemStack("working_villages:job_herbcollector")
         inventory:set_stack("job", 1, job_stack)
@@ -953,7 +953,8 @@ function working_villages.register_villager(product_name, def)
   local function on_rightclick(self, clicker)
     local wielded_stack = clicker:get_wielded_item()
     if wielded_stack:get_name() == "working_villages:commanding_sceptre"
-      and clicker:get_player_name() == self.owner_name then
+      and (self.owner_name == "working_villages:self_employed"
+        or clicker:get_player_name() == self.owner_name) then
 
       forms.show_formspec(self, "working_villages:inv_gui", clicker:get_player_name())
     else

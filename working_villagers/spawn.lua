@@ -22,9 +22,11 @@ local function spawn(pos, node, active_object_count, active_object_count_wider)
                 "working_villages:villager_male",
                 "working_villages:villager_female",
             }
-            local self = minetest.add_entity(
+            local new_villager = minetest.add_entity(
                 {x=pos.x,y=pos.y+1,z=pos.z},gender[math.random(2)], ""
             )
+            new_villager:get_luaentity().owner_name = "working_villages:self_employed"
+            new_villager:get_luaentity():update_infotext()
             return
         end
     end

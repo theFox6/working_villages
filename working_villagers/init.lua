@@ -51,7 +51,9 @@ working_villages.require("jobs/woodcutter")
 working_villages.require("jobs/torcher")
 working_villages.require("jobs/snowclearer")
 
-working_villages.require("spawn")
+if working_villages.setting_enabled("spawn",false) then
+  working_villages.require("spawn")
+end
 
 if working_villages.setting_enabled("debug_tools",false) then
   working_villages.require("util_test")
@@ -60,3 +62,4 @@ end
 --ready
 local time_to_load= os.clock() - init
 log.action("loaded init in %.4f s", time_to_load)
+
