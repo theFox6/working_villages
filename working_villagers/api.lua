@@ -851,8 +851,9 @@ function working_villages.register_villager(product_name, def)
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
       local inventory = create_inventory(self)
 
-      if not self:get_luaentity().owner_name then
+      if self.object:get_luaentity().owner_name == "" then
         -- Spawned in with no owner, assign job
+        minetest.log("action", "Setting initial job.")
         local job_stack = ItemStack("working_villages:job_herbcollector")
         inventory:set_stack("job", 1, job_stack)
       end
@@ -894,6 +895,7 @@ function working_villages.register_villager(product_name, def)
 
     local job = self:get_job()
     if job ~= nil then
+      minetest.log("action", "Found job "..dump(job))
       if type(job.on_start)=="function" then
         job.on_start(self)
         self.job_thread = coroutine.create(job.on_step)

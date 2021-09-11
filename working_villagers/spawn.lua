@@ -38,8 +38,8 @@ minetest.register_abm({
     label = "Spawn herb collector",
     nodenames = herb_names,
     neighbors = "air",
-    interval = 18,
-    chance = 100,
+    interval = 180,
+    chance = 1000,
     catch_up = false,
     action = spawn,
 })
