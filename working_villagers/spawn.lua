@@ -9,7 +9,7 @@ for name,_ in pairs(working_villages.herbs.groups) do
 end
 
 local function spawn(pos, node, active_object_count, active_object_count_wider)
-    if active_object_count_wider > 2 then return end
+    if active_object_count_wider > 1 then return end
         local pos1 = {x=pos.x-4,y=pos.y-8,z=pos.z-4}
         local pos2 = {x=pos.x+4,y=pos.y+1,z=pos.z+4}
     local spawn_pos
@@ -37,7 +37,7 @@ minetest.register_abm({
     nodenames = herb_names,
     neighbors = "air",
     interval = 180,
-    chance = 1000,
+    chance = 1024,
     catch_up = false,
     action = spawn,
 })
