@@ -28,13 +28,6 @@ local function spawn(pos, node, active_object_count, active_object_count_wider)
             local self = minetest.add_entity(
                 {x=pos.x,y=pos.y+1,z=pos.z},gender[math.random(2)], ""
             )
-            local inv = self:get_inventory()
-            minetest.log("action", "Making "..dump(self).." with inventory "..dump(inv))
-            if not inv then return end
-            local job = working_villages.job_inv:remove_item(
-                "main","working_villages:job_herbcollector"
-            ) 
-            inv:set_stack("job", 1, job)
             minetest.log("action", "working_villages spawned at "..minetest.pos_to_string(pos,0))
             return
         end

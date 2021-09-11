@@ -389,6 +389,7 @@ function working_villages.villager:update_infotext()
     infotext = infotext .. ", [paused]"
   end
   self.object:set_properties{infotext = infotext}
+  minetest.log("action", "Updated infotext "..infotext)
 end
 
 -- working_villages.villager.is_near checks if the villager is within the radius of a position
@@ -530,6 +531,7 @@ end
 
 -- working_villages.villager:new returns a new villager object.
 function working_villages.villager:new(o)
+  minetest.log("action", "new("..dump(o)..")")
   return setmetatable(o or {}, {__index = self})
 end
 
@@ -560,6 +562,7 @@ working_villages.require("async_actions")
 
 --deprecated
 function working_villages.villager:set_state(id)
+  minetest.log("action", "set_state("..dump(id)..")")
   if id == "idle" then
     print("the idle state is deprecated")
   elseif id == "goto_dest" then
@@ -842,14 +845,22 @@ function working_villages.register_villager(product_name, def)
   local function on_activate(self, staticdata)
     -- parse the staticdata, and compose a inventory.
     if staticdata == "" then
+      minetest.log("action", "on_activate()"..(working_villages.manufacturing_data[name] + 1))
       self.product_name = name
       self.manufacturing_number = working_villages.manufacturing_data[name]
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
-      create_inventory(self)
+      local inventory = create_inventory(self)
+
+      if not self:get_luaentity().owner_name then
+        -- Spawned in with no owner, assign job
+        local job_stack = ItemStack("working_villages:job_herbcollector")
+        inventory:set_stack("job", 1, job_stack)
+      end
 
       -- attach dummy item to new villager.
       minetest.add_entity(self.object:get_pos(), "working_villages:dummy_item")
     else
+      minetest.log("action", "on_activate("..staticdata..")")
       -- if static data is not empty string, this object has beed already created.
       local data = minetest.deserialize(staticdata)
 
