@@ -254,13 +254,14 @@ end
 function working_villages.villager:sleep()
 	log.action("villager %s is laying down",self.inventory_name)
 	self.object:setvelocity{x = 0, y = 0, z = 0}
-	local bed_pos = self.pos_data.bed_pos
+	local bed_pos = vector.new(self.pos_data.bed_pos)
 	local bed_top = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_top") end)
 	local bed_bottom = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_bottom") end)
 	if bed_top and bed_bottom then
 		self:set_yaw_by_direction(vector.subtract(bed_bottom, bed_top))
+		bed_pos = vector.divide(vector.add(bed_top,bed_bottom),2)
 	else
 		log.info("villager %s found no bed", self.inventory_name)
 	end
@@ -273,7 +274,7 @@ function working_villages.villager:sleep()
 
 	local pos=self.object:get_pos()
 	self.object:setpos({x=pos.x,y=pos.y+0.5,z=pos.z})
-	log.action("villager %s gets up", self.invenory_name)
+	log.action("villager %s gets up", self.inventory_name)
 	self:set_animation(working_villages.animation_frames.STAND)
 	self:set_state_info("I'm starting into the new day.")
 	self:set_displayed_action("active")

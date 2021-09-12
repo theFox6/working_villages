@@ -419,7 +419,7 @@ forms.register_page("working_villages:inv_gui", {
 			return
 		end
 
-		villager.set_home(villager.inventory_name,coords)
+		villager:set_home(coords)
 		minetest.chat_send_player(sender_name, 'Home set!')
 		if minetest.get_meta(coords):get_string("valid") == "false" then
 			minetest.chat_send_player(sender_name, 'Home marker not configured, '..

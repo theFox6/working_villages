@@ -45,7 +45,7 @@ function forms.make_formspec(meta)
 	elseif state == "built" then
 		local formspec = "size[5,5]"..
 			"field[0.5,1;4,1;name;house label;${house_label}]"..
-			"field[0.5,2;4,1;bed_pos;bed position;${bed}]"..
+			"field[0.5,2;4,1;bed_pos;bed position (bottom);${bed}]"..
 			"field[0.5,3;4,1;door_pos;position outside the house;${door}]"..
 			"button_exit[1,4;2,1;assign_home;Write]"
 		return formspec
