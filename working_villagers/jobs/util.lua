@@ -164,4 +164,45 @@ function func.find_adjacent_pos(pos,pred)
 	return false
 end
 
+-- Activating owner griefing settings departs from the documented behavior
+-- of the protection system, and may break some protection mods.
+local owner_griefing = minetest.settings:get(
+    "working_villages_owner_protection")
+local owner_griefing_lc = owner_griefing and string.lower(owner_griefing)
+
+if not owner_griefing or owner_griefing_lc == "false" then
+    -- Villagers may not grief in protected areas.
+    func.is_protected = function(self, pos)
+        return minetest.is_protected(self, "")
+    end
+
+else if owner_griefing_lc == "true" then
+    -- Villagers may grief in areas protected by the owner.
+    func.is_protected = function(self, pos)
+        local owner = self.owner_name or ""
+        if owner == "working_villages:self_employed" then
+            owner = ""
+        end
+        return minetest.is_protected(self, owner)
+    end
+
+else if owner_griefing_lc == "ignore" then
+    -- Villagers ignore protected areas.
+    func.is_protected = function() return false end
+
+else
+    -- Villagers may grief in areas where "[owner_protection]:[owner_name]" is allowed.
+    -- This makes sense with protection mods that grant permission to
+    -- arbitrary "player names."
+    func.is_protected = function(self, pos)
+        local owner = self.owner_name or ""
+        if owner == "working_villages:self_employed" then
+            owner = ""
+        else
+            owner = owner_griefing..":"..owner
+        end
+        return minetest.is_protected(self, owner)
+    end
+end end -- else and if
+
 return func
