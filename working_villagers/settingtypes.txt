@@ -15,7 +15,3 @@ working_villages_enable_debug_checks (debug checks) bool true
 #    Enables spawning self-employed working villagers. The villagers that
 #    spawn in will interact with any player who has a command sceptre.
 working_villages_enable_spawn (spawn working villagers) bool false
-
-#    Enables spawning self-employed working villagers within 100 blocks of
-#    nodes owned by a player.
-working_villages_spawn_near_civilization (spawn working villagers near civilization) bool false

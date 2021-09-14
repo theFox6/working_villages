@@ -1,9 +1,5 @@
 local log = working_villages.require("log")
 
-local spawn_check = not working_villages.setting_enabled(
-    "spawn_near_civilization",
-    false)
-
 local function spawner(initial_job)
     return function(pos, node, active_object_count, active_object_count_wider)
         if active_object_count_wider > 1 then return end
