@@ -7,17 +7,7 @@ local spawn_check = not working_villages.setting_enabled(
 local function spawner(initial_job)
     return function(pos, node, active_object_count, active_object_count_wider)
         if active_object_count_wider > 1 then return end
-
-        if spawn_check then
-            for _,p in ipairs(minetest.find_nodes_with_meta(
-                    {x=pos.x-50,y=pos.y-50,z=pos.z-50},
-                    {x=pos.x+50,y=pos.y+50,z=pos.z+50})) do
-                if minetest.get_meta(p):contains("owner") then
-                    log.action("Avoiding messing with someone's stuff.")
-                    return
-                end
-            end
-        end
+        if minetest.is_protected(pos, "") then return end
 
         local pos1 = {x=pos.x-4,y=pos.y-8,z=pos.z-4}
         local pos2 = {x=pos.x+4,y=pos.y+1,z=pos.z+4}
