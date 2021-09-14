@@ -58,7 +58,6 @@ function working_villages.villager:get_job_name()
   local new_job = self.object:get_luaentity().new_job
   if new_job ~= "" then
     self.object:get_luaentity().new_job = ""
-    log.action("New villager has job %s", new_job)
     local job_stack = ItemStack(new_job)
     inv:set_stack("job", 1, job_stack)
     return new_job
@@ -852,7 +851,6 @@ function working_villages.register_villager(product_name, def)
   local function on_activate(self, staticdata)
     -- parse the staticdata, and compose a inventory.
     if staticdata == "" then
-      log.action("Got owner %s", self.object:get_luaentity().owner_name)
       self.product_name = name
       self.manufacturing_number = working_villages.manufacturing_data[name]
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
