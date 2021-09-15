@@ -203,6 +203,6 @@ else
         end
         return minetest.is_protected(self, owner)
     end
-end end -- else and if
+end end end -- else else else
 
 return func
