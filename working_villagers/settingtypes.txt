@@ -10,6 +10,18 @@ working_villages_enable_debug_tools (debug tools) bool false
 #    It helps finding bugs within working villages and within mods using working villages.
 working_villages_enable_debug_checks (debug checks) bool true
 
+[protection]
+#    Controls activity in protected areas.
+#    false: Activity is not allowed in protected areas.
+#    true: Activity is allowed in protected areas if the owner would be allowed.
+#    ignore: Activity is allowed in protected areas.
+#    prefix: Protection is tested using a fake player name of "[prefix]:[owner]"
+#            For example, if the owner is "user1" and the prefix is "owner"
+#            the test will use the player name "owner:user1". This is
+#            useful with protection mods that allow protection to be
+#            configured using arbitrary player names.
+working_villages_owner_protection (owner protection) string false
+
 [spawning]
 
 #    Enables spawning self-employed working villagers. The villagers that
