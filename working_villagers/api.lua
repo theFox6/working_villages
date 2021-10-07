@@ -54,6 +54,15 @@ end
 -- working_villages.villager.get_job_name returns a name of a villager's current job.
 function working_villages.villager:get_job_name()
   local inv = self:get_inventory()
+
+  local new_job = self.object:get_luaentity().new_job
+  if new_job ~= "" then
+    self.object:get_luaentity().new_job = ""
+    local job_stack = ItemStack(new_job)
+    inv:set_stack("job", 1, job_stack)
+    return new_job
+  end
+
   return inv:get_stack("job", 1):get_name()
 end
 
@@ -845,7 +854,7 @@ function working_villages.register_villager(product_name, def)
       self.product_name = name
       self.manufacturing_number = working_villages.manufacturing_data[name]
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
-      create_inventory(self)
+      local inventory = create_inventory(self)
 
       -- attach dummy item to new villager.
       minetest.add_entity(self.object:get_pos(), "working_villages:dummy_item")
@@ -947,7 +956,8 @@ function working_villages.register_villager(product_name, def)
   local function on_rightclick(self, clicker)
     local wielded_stack = clicker:get_wielded_item()
     if wielded_stack:get_name() == "working_villages:commanding_sceptre"
-      and clicker:get_player_name() == self.owner_name then
+      and (self.owner_name == "working_villages:self_employed"
+        or clicker:get_player_name() == self.owner_name) then
 
       forms.show_formspec(self, "working_villages:inv_gui", clicker:get_player_name())
     else
@@ -997,6 +1007,7 @@ function working_villages.register_villager(product_name, def)
   villager_def.time_counters               = {}
   villager_def.destination                 = vector.new(0,0,0)
   villager_def.job_data                    = {}
+  villager_def.new_job                     = ""
 
   -- callback methods
   villager_def.on_activate                 = on_activate

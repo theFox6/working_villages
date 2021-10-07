@@ -9,3 +9,9 @@ working_villages_enable_debug_tools (debug tools) bool false
 #    This may have a small effect on the performance.
 #    It helps finding bugs within working villages and within mods using working villages.
 working_villages_enable_debug_checks (debug checks) bool true
+
+[spawning]
+
+#    Enables spawning self-employed working villagers. The villagers that
+#    spawn in will interact with any player who has a command sceptre.
+working_villages_enable_spawn (spawn working villagers) bool false

@@ -86,7 +86,7 @@ working_villages.register_job("working_villages:job_herbcollector", {
 				self:go_to(destination)
         local herb_data = herbs.get_herb(minetest.get_node(target).name);
 				self:dig(target,true)
-        if herb_data.replant then
+        if herb_data and herb_data.replant then
           for index, value in ipairs(herb_data.replant) do
 				    self:place(value, target)
           end
