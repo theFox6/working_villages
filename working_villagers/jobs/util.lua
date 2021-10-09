@@ -215,16 +215,18 @@ else
     end
     minetest.register_on_prejoinplayer(on_prejoinplayer)
 
-    -- Modify areas to support this extension
-    local areas_player_exists = areas.player_exists
-    function areas.player_exists(area, name)
-        local myname = name
-        if string.sub(name,prefixlen+1,prefixlen+1) == ":"
-                and string.sub(name,prefixlen+2)
-                and string.sub(name,1,prefixlen) == owner_griefing then
-            myname = string.sub(name,prefixlen+2)
+    -- Patch areas to support this extension
+    if minetest.get_modpath("areas") then
+        local areas_player_exists = areas.player_exists
+        function areas.player_exists(area, name)
+            local myname = name
+            if string.sub(name,prefixlen+1,prefixlen+1) == ":"
+                    and string.sub(name,prefixlen+2)
+                    and string.sub(name,1,prefixlen) == owner_griefing then
+                myname = string.sub(name,prefixlen+2)
+            end
+            return areas_player_exists(area, myname)
         end
-        return areas_player_exists(area, myname)
     end
 end end end -- else else else
 
