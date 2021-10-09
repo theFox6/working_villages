@@ -39,7 +39,7 @@ function job_coroutines.resume(self,dtime)
        self:set_displayed_action(ret[3])
       end
     else
-      error("error in job_thread " .. ret[2])
+      error("error in job_thread " .. ret[2]..": "..debug.traceback(self.job_thread))
     end
   end
 end

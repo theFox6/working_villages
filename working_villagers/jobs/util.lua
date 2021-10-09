@@ -196,24 +196,36 @@ else
     -- arbitrary "player names."
     func.is_protected = function(self, pos)
         local owner = self.owner_name or ""
-        if owner == "working_villages:self_employed" then
+        if owner == "working_villages:self_employed" or owner == "" then
             owner = ""
         else
             owner = owner_griefing..":"..owner
         end
-        return minetest.is_protected(self, owner)
+        return minetest.is_protected(pos, owner)
     end
 
     -- Prevent player names like "[owner_protection]:[owner_name]"
     local prefixlen = #owner_griefing
-    local function on_prejoin(name, ip)
+    local function on_prejoinplayer(name, ip)
         if name[prefixlen + 1] == ":"
                 and name[prefixlen + 2]
                 and strsub(name,1,prefixlen) == owner_griefing then
             return "Your player name is reserved."
         end
     end
-    minetest.register_on_prejoin(on_prejoin)
+    minetest.register_on_prejoinplayer(on_prejoinplayer)
+
+    -- Modify areas to support this extension
+    local areas_player_exists = areas.player_exists
+    function areas.player_exists(area, name)
+        local myname = name
+        if string.sub(name,prefixlen+1,prefixlen+1) == ":"
+                and string.sub(name,prefixlen+2)
+                and string.sub(name,1,prefixlen) == owner_griefing then
+            myname = string.sub(name,prefixlen+2)
+        end
+        return areas_player_exists(area, myname)
+    end
 end end end -- else else else
 
 return func
