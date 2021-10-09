@@ -196,7 +196,7 @@ else
     -- arbitrary "player names."
     func.is_protected = function(self, pos)
         local owner = self.owner_name or ""
-        if owner == "working_villages:self_employed" or owner == "" then
+        if owner == "" then
             owner = ""
         else
             owner = owner_griefing..":"..owner
