@@ -203,6 +203,17 @@ else
         end
         return minetest.is_protected(self, owner)
     end
+
+    -- Prevent player names like "[owner_protection]:[owner_name]"
+    local prefixlen = #owner_griefing
+    local function on_prejoin(name, ip)
+        if name[prefixlen + 1] == ":"
+                and name[prefixlen + 2]
+                and strsub(name,1,prefixlen) == owner_griefing then
+            return "Your player name is reserved."
+        end
+    end
+    minetest.register_on_prejoin(on_prejoin)
 end end end -- else else else
 
 return func
