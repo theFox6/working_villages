@@ -173,7 +173,7 @@ local owner_griefing_lc = owner_griefing and string.lower(owner_griefing)
 if not owner_griefing or owner_griefing_lc == "false" then
     -- Villagers may not grief in protected areas.
     func.is_protected = function(self, pos)
-        return minetest.is_protected(self, "")
+        return minetest.is_protected(pos, "")
     end
 
 else if owner_griefing_lc == "true" then
@@ -183,7 +183,7 @@ else if owner_griefing_lc == "true" then
         if owner == "working_villages:self_employed" then
             owner = ""
         end
-        return minetest.is_protected(self, owner)
+        return minetest.is_protected(pos, owner)
     end
 
 else if owner_griefing_lc == "ignore" then
