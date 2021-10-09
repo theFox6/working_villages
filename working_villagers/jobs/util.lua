@@ -224,6 +224,9 @@ else
                     and string.sub(name,prefixlen+2)
                     and string.sub(name,1,prefixlen) == owner_griefing then
                 myname = string.sub(name,prefixlen+2)
+                if myname == "working_villages:self_employed" then
+                    return true
+                end
             end
             return areas_player_exists(area, myname)
         end
