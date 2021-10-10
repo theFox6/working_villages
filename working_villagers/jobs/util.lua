@@ -172,36 +172,36 @@ local owner_griefing_lc = owner_griefing and string.lower(owner_griefing)
 
 if not owner_griefing or owner_griefing_lc == "false" then
     -- Villagers may not grief in protected areas.
-    func.is_protected = function(self, pos)
+    func.is_protected_owner = function(owner, pos)
         return minetest.is_protected(pos, "")
     end
 
 else if owner_griefing_lc == "true" then
     -- Villagers may grief in areas protected by the owner.
-    func.is_protected = function(self, pos)
-        local owner = self.owner_name or ""
-        if owner == "working_villages:self_employed" then
-            owner = ""
+    func.is_protected_owner = function(owner, pos)
+        local myowner = owner or ""
+        if myowner == "working_villages:self_employed" then
+            myowner = ""
         end
-        return minetest.is_protected(pos, owner)
+        return minetest.is_protected(pos, myowner)
     end
 
 else if owner_griefing_lc == "ignore" then
     -- Villagers ignore protected areas.
-    func.is_protected = function() return false end
+    func.is_protected_owner = function() return false end
 
 else
     -- Villagers may grief in areas where "[owner_protection]:[owner_name]" is allowed.
     -- This makes sense with protection mods that grant permission to
     -- arbitrary "player names."
-    func.is_protected = function(self, pos)
-        local owner = self.owner_name or ""
-        if owner == "" then
-            owner = ""
+    func.is_protected_owner = function(owner, pos)
+        local myowner = owner or ""
+        if myowner == "" then
+            myowner = ""
         else
-            owner = owner_griefing..":"..owner
+            myowner = owner_griefing..":"..myowner
         end
-        return minetest.is_protected(pos, owner)
+        return minetest.is_protected(pos, myowner)
     end
 
     -- Prevent player names like "[owner_protection]:[owner_name]"
@@ -232,5 +232,9 @@ else
         end
     end
 end end end -- else else else
+
+function func.is_protected(self, pos)
+    return func.is_protected_owner(self.owner_name, pos)
+end
 
 return func
