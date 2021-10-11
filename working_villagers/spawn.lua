@@ -11,18 +11,18 @@ local function spawner(initial_job)
         local pos1 = {x=pos.x-4,y=pos.y-8,z=pos.z-4}
         local pos2 = {x=pos.x+4,y=pos.y+1,z=pos.z+4}
         local spawn_pos
-        for _,pos in ipairs(minetest.find_nodes_in_area_under_air(
+        for _,p in ipairs(minetest.find_nodes_in_area_under_air(
                 pos1,pos2,"group:soil")) do
-            local above = minetest.get_node({x=pos.x,y=pos.y+2,z=pos.z})
+            local above = minetest.get_node({x=p.x,y=p.y+2,z=p.z})
             local above_def = minetest.registered_nodes[above.name] 
             if above_def and not above_def.groups.walkable then
-                log.action("Spawning a %s at %s", initial_job, minetest.pos_to_string(pos,0))
+                log.action("Spawning a %s at %s", initial_job, minetest.pos_to_string(p,0))
                 local gender = {
                     "working_villages:villager_male",
                     "working_villages:villager_female",
                 }
                 local new_villager = minetest.add_entity(
-                    {x=pos.x,y=pos.y+1,z=pos.z},gender[math.random(2)], ""
+                    {x=p.x,y=p.y+1,z=p.z},gender[math.random(2)], ""
                 )
                 local entity = new_villager:get_luaentity()
                 entity.new_job = initial_job
