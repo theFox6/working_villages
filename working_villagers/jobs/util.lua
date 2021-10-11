@@ -209,14 +209,14 @@ else
     local function on_prejoinplayer(name, ip)
         if name[prefixlen + 1] == ":"
                 and name[prefixlen + 2]
-                and strsub(name,1,prefixlen) == owner_griefing then
+                and string.sub(name,1,prefixlen) == owner_griefing then
             return "Your player name is reserved."
         end
     end
     minetest.register_on_prejoinplayer(on_prejoinplayer)
 
     -- Patch areas to support this extension
-    if minetest.get_modpath("areas") then
+    if minetest.global_exists("areas") then
         local areas_player_exists = areas.player_exists
         function areas.player_exists(area, name)
             local myname = name

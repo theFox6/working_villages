@@ -290,7 +290,7 @@ forms.register_page("working_villages:inv_gui", {
           "do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.")
         return
       end
-      villager:set_job_pos(table.copy(coords))
+      villager:set_job_pos(vector.new(coords))
       minetest.chat_send_player(sender_name, 'Job positon set!')
     end
 		if fields.home_pos == nil then
