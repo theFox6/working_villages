@@ -5,7 +5,7 @@ working_villages={
 	modpath = minetest.get_modpath("working_villages"),
 }
 
-if not rawget(_G, "modutil") then
+if not minetest.get_modpath("modutil") then
     dofile(working_villages.modpath.."/modutil/portable.lua")
 end
 

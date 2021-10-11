@@ -1,9 +1,12 @@
+local func = working_villages.require("jobs/util")
 local log = working_villages.require("log")
 
 local function spawner(initial_job)
     return function(pos, node, active_object_count, active_object_count_wider)
         if active_object_count_wider > 1 then return end
-        if minetest.is_protected(pos, "") then return end
+        if func.is_protected_owner("working_villages:self_employed",pos) then
+            return
+        end
 
         local pos1 = {x=pos.x-4,y=pos.y-8,z=pos.z-4}
         local pos2 = {x=pos.x+4,y=pos.y+1,z=pos.z+4}

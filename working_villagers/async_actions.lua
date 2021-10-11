@@ -90,6 +90,7 @@ end
 local drop_range = {x = 2, y = 10, z = 2}
 
 function working_villages.villager:dig(pos,collect_drops)
+	if func.is_protected(self, pos) then return end
 	self.object:setvelocity{x = 0, y = 0, z = 0}
 	local dist = vector.subtract(pos, self.object:get_pos())
 	if vector.length(dist) > 5 then
@@ -165,6 +166,7 @@ function working_villages.villager:place(item,pos)
 	if type(pos)~="table" then
 		error("no target position given")
 	end
+	if func.is_protected(self,pos) then return end
 	local dist = vector.subtract(pos, self.object:get_pos())
 	if vector.length(dist) > 5 then
 		return false, fail.too_far

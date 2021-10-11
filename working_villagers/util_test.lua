@@ -7,7 +7,10 @@ minetest.register_tool("working_villages:neighbor_test_tool", {
     local pos = vector.round(pointed_thing.above)
     pos.y = pos.y + 5
     for _,n in pairs(u.get_eneigbor_offsets(3)) do
-      minetest.place_node(vector.add(pos,n),{name = "default:wood"})
+      local p = vector.add(pos,n)
+      if not minetest.is_protected(p, user) then
+        minetest.place_node(p,{name = "default:wood"})
+      end
     end
   end,
 })
