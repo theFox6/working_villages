@@ -1,5 +1,5 @@
 local init = os.clock()
-minetest.log("action", "["..minetest.get_current_modname().."] loading init") 
+minetest.log("action", "["..minetest.get_current_modname().."] loading init")
 
 working_villages={
 	modpath = minetest.get_modpath("working_villages"),

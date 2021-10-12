@@ -2,7 +2,8 @@ local func = working_villages.require("jobs/util")
 local log = working_villages.require("log")
 
 local function spawner(initial_job)
-    return function(pos, node, active_object_count, active_object_count_wider)
+    return function(pos, _, _, active_object_count_wider)
+               --  (pos, node, active_object_count, active_object_count_wider)
         if active_object_count_wider > 1 then return end
         if func.is_protected_owner("working_villages:self_employed",pos) then
             return
@@ -10,11 +11,10 @@ local function spawner(initial_job)
 
         local pos1 = {x=pos.x-4,y=pos.y-8,z=pos.z-4}
         local pos2 = {x=pos.x+4,y=pos.y+1,z=pos.z+4}
-        local spawn_pos
         for _,p in ipairs(minetest.find_nodes_in_area_under_air(
                 pos1,pos2,"group:soil")) do
             local above = minetest.get_node({x=p.x,y=p.y+2,z=p.z})
-            local above_def = minetest.registered_nodes[above.name] 
+            local above_def = minetest.registered_nodes[above.name]
             if above_def and not above_def.groups.walkable then
                 log.action("Spawning a %s at %s", initial_job, minetest.pos_to_string(p,0))
                 local gender = {

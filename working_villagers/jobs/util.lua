@@ -9,7 +9,7 @@ function func.find_path_toward(pos,villager)
   end
   local val_pos = func.validate_pos(villager.object:get_pos())
   --FIXME: this also reverses jump height and fear height
-  local path,rev = pathfinder.find_path(dest, val_pos, villager)
+  local _,rev = pathfinder.find_path(dest, val_pos, villager)
   return rev
 end
 
@@ -172,7 +172,7 @@ local owner_griefing_lc = owner_griefing and string.lower(owner_griefing)
 
 if not owner_griefing or owner_griefing_lc == "false" then
     -- Villagers may not grief in protected areas.
-    func.is_protected_owner = function(owner, pos)
+    func.is_protected_owner = function(_, pos) -- (owner, pos)
         return minetest.is_protected(pos, "")
     end
 
@@ -206,7 +206,8 @@ else
 
     -- Patch areas to support this extension
     local prefixlen = #owner_griefing
-    if minetest.global_exists("areas") then
+    local areas = rawget(_G, "areas")
+    if areas then
         local areas_player_exists = areas.player_exists
         function areas.player_exists(area, name)
             local myname = name

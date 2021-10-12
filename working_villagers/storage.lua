@@ -5,7 +5,7 @@ local cache = {};
 
 -- use key with _ prefix, for non villager data
 function working_villages.get_stored_table(key)
-  local data = cache[key]; 
+  local data = cache[key];
   if data then
     return data;
   end
@@ -28,7 +28,7 @@ end
 
 
 function working_villages.get_stored_villager_table(self)
-  local data = cache[self.inventory_name]; 
+  local data = cache[self.inventory_name];
   if data then
     return data;
   end

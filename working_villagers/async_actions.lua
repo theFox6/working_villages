@@ -109,14 +109,14 @@ function working_villages.villager:dig(pos,collect_drops)
   if (def_node~=nil) and (def_node.after_dig_node~=nil) then
     old_meta = minetest.get_meta(pos):to_table();
   end
-	minetest.remove_node(pos)
-	local stacks = minetest.get_node_drops(destnode.name)
-	for _, stack in ipairs(stacks) do
-		local leftover = self:add_item_to_main(stack)
-		if not leftover:is_empty() then
-  		minetest.add_item(pos, leftover)
-		end
-	end
+  minetest.remove_node(pos)
+  local stacks = minetest.get_node_drops(destnode.name)
+  for _, stack in ipairs(stacks) do
+    local leftover = self:add_item_to_main(stack)
+    if not leftover:is_empty() then
+      minetest.add_item(pos, leftover)
+    end
+  end
   if (old_meta) then
     def_node.after_dig_node(pos, destnode, old_meta, nil)
   end
@@ -136,9 +136,9 @@ function working_villages.villager:dig(pos,collect_drops)
 	end
 	self:set_animation(working_villages.animation_frames.STAND)
 	if collect_drops then
-    local stacks = minetest.get_node_drops(destnode.name)
+    local mystacks = minetest.get_node_drops(destnode.name)
     --perhaps simplify by just checking if the found item is one of the drops
-    for _, stack in ipairs(stacks) do
+    for _, stack in ipairs(mystacks) do
       local function is_drop(n)
         local name
         if type(n) == "table" then
@@ -241,7 +241,7 @@ function working_villages.villager:place(item,pos)
 	else
 		self:set_animation(working_villages.animation_frames.WALK)
 	end
-	
+
 	return true
 end
 
@@ -334,7 +334,7 @@ function working_villages.villager:goto_bed()
 end
 
 function working_villages.villager:handle_night()
-  local tod = minetest.get_timeofday() 
+  local tod = minetest.get_timeofday()
   if  tod < 0.2 or tod > 0.76 then
     local data = self:get_stored_table();
     if (data.in_work == true) then
