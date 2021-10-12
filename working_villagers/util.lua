@@ -43,7 +43,7 @@ function wv_util.get_eneigbor_offsets(radius,adjacent)
   local list = {vector.new()}
   local lb = {list[1]}
   local hs = {}
-  for d = 1,r do
+  for _ = 1,r do
     local nb = {}
     for _,b in ipairs(lb) do
       for _,n in ipairs(a) do

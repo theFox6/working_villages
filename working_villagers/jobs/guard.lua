@@ -28,7 +28,7 @@ working_villages.register_job("working_villages:job_guard", {
 
 			if escort_target == nil then
 				--perhaps only wait until the target returns
-				return co_command.pause, "escort target not on server" 
+				return co_command.pause, "escort target not on server"
 			end
 
 			local target_position = escort_target:get_pos()

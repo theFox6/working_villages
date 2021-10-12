@@ -854,7 +854,7 @@ function working_villages.register_villager(product_name, def)
       self.product_name = name
       self.manufacturing_number = working_villages.manufacturing_data[name]
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
-      local inventory = create_inventory(self)
+      create_inventory(self)
 
       -- attach dummy item to new villager.
       minetest.add_entity(self.object:get_pos(), "working_villages:dummy_item")
@@ -884,7 +884,7 @@ function working_villages.register_villager(product_name, def)
 
     self.object:setvelocity{x = 0, y = 0, z = 0}
     self.object:setacceleration{x = 0, y = -self.initial_properties.weight, z = 0}
-    
+
     --legacy
     if type(self.pause) == "string" then
       self.pause = (self.pause == "resting")
@@ -1015,7 +1015,7 @@ function working_villages.register_villager(product_name, def)
   villager_def.on_rightclick               = on_rightclick
   villager_def.on_punch                    = on_punch
   villager_def.get_staticdata              = get_staticdata
-  
+
   -- storage methods
   villager_def.get_stored_table            = working_villages.get_stored_villager_table
   villager_def.set_stored_table            = working_villages.set_stored_villager_table
