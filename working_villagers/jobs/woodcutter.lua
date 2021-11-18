@@ -43,7 +43,7 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_job_pos()
-		
+
 		self:count_timer("woodcutter:search")
 		self:count_timer("woodcutter:change_dir")
 		self:handle_obstacles()

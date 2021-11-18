@@ -1,11 +1,11 @@
 local init = os.clock()
-minetest.log("action", "["..minetest.get_current_modname().."] loading init") 
+minetest.log("action", "["..minetest.get_current_modname().."] loading init")
 
 working_villages={
 	modpath = minetest.get_modpath("working_villages"),
 }
 
-if not modutil then
+if not minetest.get_modpath("modutil") then
     dofile(working_villages.modpath.."/modutil/portable.lua")
 end
 
@@ -52,6 +52,10 @@ working_villages.require("jobs/woodcutter")
 working_villages.require("jobs/torcher")
 working_villages.require("jobs/snowclearer")
 
+if working_villages.setting_enabled("spawn",false) then
+  working_villages.require("spawn")
+end
+
 if working_villages.setting_enabled("debug_tools",false) then
   working_villages.require("util_test")
 end
@@ -59,3 +63,4 @@ end
 --ready
 local time_to_load= os.clock() - init
 log.action("loaded init in %.4f s", time_to_load)
+

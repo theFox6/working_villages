@@ -6,7 +6,7 @@ function follower.walk_in_direction(v,dir)
   if dir.y > 1 and minetest.get_item_group(minetest.get_node(position).name,"liquid") > 0 then
     v:jump()
   end
-  
+
   local velocity = v.object:getvelocity()
   if velocity.x==0 and velocity.y==0 then
     v:set_animation(working_villages.animation_frames.WALK)
@@ -34,13 +34,13 @@ function follower.step(v)
   if player~=nil then
     direction = vector.subtract(player_position, position)
   end
-  
+
   if vector.length(direction) < 3 then
     --swim upward
     if direction.y > 1 and minetest.get_item_group(minetest.get_node(position).name,"liquid") > 0 then
       v:jump()
     end
-    
+
     follower.stop(v)
   else
     follower.walk_in_direction(v,direction)

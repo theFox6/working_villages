@@ -47,7 +47,7 @@ local function find_herb_node(pos)
   if (not data) then
     return false;
   end
-  
+
   if data.collect_only_top then
     -- prevent to collect plat part, which can continue to grow
     local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
@@ -56,7 +56,7 @@ local function find_herb_node(pos)
       return false;
     end
   end
-    
+
   return true;
 end
 
@@ -86,8 +86,8 @@ working_villages.register_job("working_villages:job_herbcollector", {
 				self:go_to(destination)
         local herb_data = herbs.get_herb(minetest.get_node(target).name);
 				self:dig(target,true)
-        if herb_data.replant then
-          for index, value in ipairs(herb_data.replant) do
+        if herb_data and herb_data.replant then
+          for _, value in ipairs(herb_data.replant) do
 				    self:place(value, target)
           end
         end

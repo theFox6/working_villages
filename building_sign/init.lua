@@ -85,7 +85,7 @@ minetest.register_node("building_sign:building_marker", {
 		return true
 	end,
 	--on_destruct
-	after_destruct = function(pos, oldnode)
+	after_destruct = function() --(pos, oldnode)
 		--TODO: record sign removal
 	end,
 })

@@ -9,7 +9,7 @@ function func.find_path_toward(pos,villager)
   end
   local val_pos = func.validate_pos(villager.object:get_pos())
   --FIXME: this also reverses jump height and fear height
-  local path,rev = pathfinder.find_path(dest, val_pos, villager)
+  local _,rev = pathfinder.find_path(dest, val_pos, villager)
   return rev
 end
 
@@ -162,6 +162,70 @@ function func.find_adjacent_pos(pos,pred)
 		return dest_pos
 	end
 	return false
+end
+
+-- Activating owner griefing settings departs from the documented behavior
+-- of the protection system, and may break some protection mods.
+local owner_griefing = minetest.settings:get(
+    "working_villages_owner_protection")
+local owner_griefing_lc = owner_griefing and string.lower(owner_griefing)
+
+if not owner_griefing or owner_griefing_lc == "false" then
+    -- Villagers may not grief in protected areas.
+    func.is_protected_owner = function(_, pos) -- (owner, pos)
+        return minetest.is_protected(pos, "")
+    end
+
+else if owner_griefing_lc == "true" then
+    -- Villagers may grief in areas protected by the owner.
+    func.is_protected_owner = function(owner, pos)
+        local myowner = owner or ""
+        if myowner == "working_villages:self_employed" then
+            myowner = ""
+        end
+        return minetest.is_protected(pos, myowner)
+    end
+
+else if owner_griefing_lc == "ignore" then
+    -- Villagers ignore protected areas.
+    func.is_protected_owner = function() return false end
+
+else
+    -- Villagers may grief in areas where "[owner_protection]:[owner_name]" is allowed.
+    -- This makes sense with protection mods that grant permission to
+    -- arbitrary "player names."
+    func.is_protected_owner = function(owner, pos)
+        local myowner = owner or ""
+        if myowner == "" then
+            myowner = ""
+        else
+            myowner = owner_griefing..":"..myowner
+        end
+        return minetest.is_protected(pos, myowner)
+    end
+
+    -- Patch areas to support this extension
+    local prefixlen = #owner_griefing
+    local areas = rawget(_G, "areas")
+    if areas then
+        local areas_player_exists = areas.player_exists
+        function areas.player_exists(area, name)
+            local myname = name
+            if string.sub(name,prefixlen+1,prefixlen+1) == ":"
+                    and string.sub(name,prefixlen+2)
+                    and string.sub(name,1,prefixlen) == owner_griefing then
+                myname = string.sub(name,prefixlen+2)
+                if myname == "working_villages:self_employed" then
+                    return true
+                end
+            end
+            return areas_player_exists(area, myname)
+        end
+    end
+end end end -- else else else
+
+function func.is_protected(self, pos)
+    return func.is_protected_owner(self.owner_name, pos)
 end
 
 return func
