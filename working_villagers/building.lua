@@ -35,7 +35,9 @@ working_villages.home = {
 }
 
 function working_villages.home:new(o)
-	return setmetatable(o or {}, {__index = self})
+	local new = setmetatable(o or {}, {__index = self})
+	new.update = table.copy(self.update)
+	return new
 end
 
 -- working_villages.homes represents a table that contains the villagers homes.
@@ -311,6 +313,9 @@ local on_receive_fields = function(pos, _, fields, sender)
 				for k, v in pairs(working_villages.home.update) do
 					home.update[k] = v
 				end
+				-- hard update of home object
+				home:get_bed()
+				home:get_door()
 			end
 		end
 	end
@@ -425,7 +430,15 @@ function working_villages.home:get_door()
 		end
 		return false
 	end
-	self.door = minetest.string_to_pos(door_pos)
+	-- do a update without changing door table pointer if possible
+	local door = minetest.string_to_pos(door_pos)
+	if not self.door then
+		self.door = door
+	else
+		self.door.x = door.x
+		self.door.y = door.y
+		self.door.z = door.z
+	end
 	self.update.door = false
 	return self.door
 end
@@ -448,12 +461,30 @@ function working_villages.home:get_bed()
 		end
 		return false
 	end
-	self.bed = minetest.string_to_pos(bed_pos)
+	-- do a update without changing bed table pointer if possible
+	local bed = minetest.string_to_pos(bed_pos)
+	if not self.bed then
+		self.bed = bed
+	else
+		self.bed.x = bed.x
+		self.bed.y = bed.y
+		self.bed.z = bed.z
+	end
 	self.update.bed = false
 	return self.bed
 end
 
 -- set the home of a villager
 function working_villages.set_home(self, marker_pos)
-	working_villages.homes[self.inventory_name] = working_villages.home:new{marker = marker_pos}
+	local home = working_villages.home:new{marker = marker_pos}
+	working_villages.homes[self.inventory_name] = home
+	-- connect to home
+	self.pos_data.bed_pos = home:get_bed()
+	self.pos_data.door_pos = home:get_door()
 end
+
+-- remove the home of villager
+function working_villages.remove_home(self)
+	working_villages.homes[self.inventory_name] = nil
+end
+

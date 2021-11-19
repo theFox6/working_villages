@@ -232,16 +232,53 @@ local function floor_pos(pos)
 	return pos
 end
 local function load_pos(pos, villager, nodes)
-  if (pos=="near") then
-    pos = minetest.find_node_near(villager.object:get_pos(), 5, nodes, true) or nil
+	if (pos=="near") then
+		pos = minetest.find_node_near(villager.object:get_pos(), 5, nodes, true) or nil
 	elseif (pos~="") then
 		pos = minetest.string_to_pos(pos)	
-    pos = minetest.find_node_near(pos, 0.2, nodes, true) or nil
+		if pos then
+			pos = minetest.find_node_near(pos, 0.2, nodes, true) or nil
+		end
 	else
 		pos = nil
-  end
-  return pos
-end 
+	end
+	return pos
+end
+local function soft_table_update(table_old, table_new)
+	for k,v in pairs(table_new) do
+		if type(v)=="table" then
+			soft_table_update(table_old[k], table_new[k])
+		else
+			table_old[k] = v
+		end
+	end
+end
+
+local function set_villager_home(sender_name, villager, marker_pos)
+	if not (marker_pos.x and marker_pos.y and marker_pos.z) then
+		-- fail on illegal input of coordinates
+		minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the home position. '..
+			'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
+			'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
+		return
+	end
+	if(marker_pos.x>30927 or marker_pos.x<-30912 or marker_pos.y>30927 or marker_pos.y<-30912 or marker_pos.z>30927 or marker_pos.z<-30912) then
+		minetest.chat_send_player(sender_name, "The coordinates of your home position "..
+			"do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.")
+		return
+	end
+	if minetest.get_node(marker_pos).name ~= "working_villages:building_marker" then
+		minetest.chat_send_player(sender_name, 'No home marker could be found at the entered position.')
+		return
+	end
+
+	villager:set_home(marker_pos)
+	minetest.chat_send_player(sender_name, 'Home marker set!')
+	if minetest.get_meta(marker_pos):get_string("valid") == "false" then
+		minetest.chat_send_player(sender_name, 'Home marker not configured, '..
+			'please right-click the home marker to configure it.')
+	end
+end
 
 local change_index = 0
 
@@ -249,12 +286,22 @@ forms.register_page("working_villages:data_change",{
 	constructor = function(_, villager, player_name) --self, villager, playername
 		-- villager data
 		local data = villager.pos_data
-    -- references
+		-- references
 		local villager_pos = minetest.pos_to_string(floor_pos(villager.object:get_pos()))
 		local player = minetest.get_player_by_name(player_name)
 		local player_pos = villager_pos
 		if player then
 			player_pos = minetest.pos_to_string(floor_pos(player:get_pos()))
+		end
+		-- type set
+		local marker_pos = ""
+		if villager:has_home() then
+			local home = villager:get_home()
+			marker_pos = minetest.pos_to_string(floor_pos(home:get_marker()))
+		end
+		local village_name = ""
+		if villager.village_name then
+			village_name = villager.village_name
 		end
 		-- villager positions
 		local home_pos = ""
@@ -282,19 +329,19 @@ forms.register_page("working_villages:data_change",{
 		if (data.storage_pos~=nil) then
 			storage_pos = minetest.pos_to_string(data.storage_pos)
 		end
-    -- job positon
+		-- job positon
 		local job_pos = ""
 		if (data.job_pos~=nil) then
 			job_pos = minetest.pos_to_string(data.job_pos)
 		end
 		
 		local cp = { x = 3.5, y = 0 }
-		local hp = { x = 0.5, y = 1.5 }
-		local wp = { x = 0.5, y = 2.5 }
-		local jp = { x = 0.5, y = 3.5 }
-		local bp = { x = 3.5, y = 5 }
+		local hp = { x = 0.5, y = 2.5 }
+		local wp = { x = 0.5, y = 3.5 }
+		local jp = { x = 0.5, y = 4.5 }
+		local bp = { x = 3.5, y = 6 }
 		change_index = change_index + 1
-		return "size[8,6]"
+		return "size[8,7]"
 			.. default.gui_bg
 			.. default.gui_bg_img
 			.. default.gui_slots
@@ -302,6 +349,8 @@ forms.register_page("working_villages:data_change",{
 			.. "label[".. cp.x - 3 ..",".. cp.y-0.1 ..";"..change_index.."]"
 			.. "field[" .. cp.x-3 .. "," .. cp.y + 0.9 ..";2.5,1;villager_pos;villager position;" .. player_pos .. "]"
 			.. "field[" .. cp.x+2 .. "," .. cp.y + 0.9 ..";2.5,1;player_pos;player position;" .. villager_pos .. "]"
+			.. "field[" .. cp.x-3 .. "," .. cp.y + 1.9 ..";2.5,1;marker_pos;building marker pos;" .. marker_pos .. "]"
+			.. "field[" .. cp.x+2 .. "," .. cp.y + 1.9 ..";2.5,1;village_name;village name;" .. village_name .. "]"
 			.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;house door position;" .. home_pos .. "]"
 			.. "field[" .. hp.x+2.5 .. "," .. hp.y + 0.4 ..";2.5,1;bed_pos;bed position;" .. bed_pos .. "]"
 			.. "field[" .. hp.x+5 .. "," .. hp.y + 0.4 ..";2.5,1;chest_pos;chest position;" .. chest_pos .. "]"
@@ -314,27 +363,39 @@ forms.register_page("working_villages:data_change",{
 	end,
 	receiver = function(page, villager, sender, fields)
 		local sender_name = sender:get_player_name()
-    if fields.set_data then
+		if fields.set_data then
 			local data = {}
-      --data.home_pos = load_pos(fields.home_pos, villager, "group:villager_door")
-      data.home_pos = load_pos(fields.home_pos, villager, "group:villager_door")
-      data.bed_pos = load_pos(fields.bed_pos, villager, "group:villager_bed_bottom")
+			local marker_pos = load_pos(fields.marker_pos, villager, "working_villages:building_marker")
+			--data.home_pos = load_pos(fields.home_pos, villager, "group:door")
+			data.home_pos = load_pos(fields.home_pos, villager, "group:villager_door")
+			data.bed_pos = load_pos(fields.bed_pos, villager, "group:villager_bed_bottom")
 			if (data.bed_pos~=nil) then
 				local bed = minetest.get_node(data.bed_pos)
 				local dir = minetest.facedir_to_dir(bed.param2)
 				data.bed_pos = vector.add(data.bed_pos, vector.multiply(dir, 0.5))
 			end
-      data.chest_pos = load_pos(fields.chest_pos, villager, "group:villager_chest")
-      data.food_pos = load_pos(fields.food_pos, villager, "group:villager_chest")
-      data.tools_pos = load_pos(fields.tools_pos, villager, "group:villager_chest")
-      data.storage_pos = load_pos(fields.storage_pos, villager, "group:villager_chest")
+			data.chest_pos = load_pos(fields.chest_pos, villager, "group:villager_chest")
+			data.food_pos = load_pos(fields.food_pos, villager, "group:villager_chest")
+			data.tools_pos = load_pos(fields.tools_pos, villager, "group:villager_chest")
+			data.storage_pos = load_pos(fields.storage_pos, villager, "group:villager_chest")
 			if fields.job_pos then
 				data.job_pos = minetest.string_to_pos(fields.job_pos)
 			end
 			
-			villager.pos_data = data
+			-- soft update have to be done here, do not break pointers
+			soft_table_update(villager.pos_data, data)
+			if marker_pos then
+				local home = villager:get_home()
+				if (not home) or (not vector.equals(home:get_marker(), marker_pos)) then
+					set_villager_home(sender_name, villager, marker_pos)
+				end
+			else
+				if villager:has_home() then
+					villager:remove_home()
+				end
+			end
 			forms.show_formspec(villager, "working_villages:data_change", sender_name)
-    end
+		end
 		if fields.back then
 			forms.show_formspec(villager, "working_villages:inv_gui", sender_name)
 			return
@@ -344,7 +405,7 @@ forms.register_page("working_villages:data_change",{
 
 forms.register_page("working_villages:inv_gui", {
 	constructor = function(_, villager) --self, villager, playername
-    -- job name
+		-- job name
 		local jobname = villager:get_job()
 		if jobname then
 			jobname = jobname.description
@@ -380,50 +441,6 @@ forms.register_page("working_villages:inv_gui", {
 		if fields.data then
 			forms.show_formspec(villager, "working_villages:data_change", sender_name)
 			return
-		end
-		if fields.job_pos then
-      local coords = minetest.string_to_pos(fields.job_pos)
-      if not (coords.x and coords.y and coords.z) then
-        -- fail on illegal input of coordinates
-        minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the job position. '..
-          'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
-          'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
-        return
-      end
-      if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-        minetest.chat_send_player(sender_name, "The coordinates of your job position "..
-          "do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.")
-        return
-      end
-      villager:set_job_pos(vector.new(coords))
-      minetest.chat_send_player(sender_name, 'Job positon set!')
-    end
-		if fields.home_pos == nil then
-			return
-		end
-		local coords = minetest.string_to_pos(fields.home_pos)
-		if not (coords.x and coords.y and coords.z) then
-			-- fail on illegal input of coordinates
-			minetest.chat_send_player(sender_name, 'You failed to provide correct coordinates for the home position. '..
-				'Please enter the X, Y, and Z coordinates of the desired destination in a comma seperated list. '..
-				'Example: The input "10,20,30" means the destination at the coordinates X=10, Y=20 and Z=30.')
-			return
-		end
-		if(coords.x>30927 or coords.x<-30912 or coords.y>30927 or coords.y<-30912 or coords.z>30927 or coords.z<-30912) then
-			minetest.chat_send_player(sender_name, "The coordinates of your home position "..
-				"do not exist in our coordinate system. Correct coordinates range from -30912 to 30927 in all axes.")
-			return
-		end
-		if minetest.get_node(coords).name ~= "working_villages:building_marker" then
-			minetest.chat_send_player(sender_name, 'No home marker could be found at the entered position.')
-			return
-		end
-
-		villager:set_home(coords)
-		minetest.chat_send_player(sender_name, 'Home set!')
-		if minetest.get_meta(coords):get_string("valid") == "false" then
-			minetest.chat_send_player(sender_name, 'Home marker not configured, '..
-				'please right-click the home marker to configure it.')
 		end
 	end,
 })
