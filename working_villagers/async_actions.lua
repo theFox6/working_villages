@@ -208,10 +208,8 @@ function working_villages.villager:place(item,pos)
 	--TODO: support given pointed thing via function parameter
 	local pointed_thing = {
 		type = "node",
-		--above = pos,
-		--under = vector.add(pos, {x = 0, y = -1, z = 0}),
-		under = pos,
-		above = vector.add(pos, {x = 0, y = 1, z = 0}),
+		above = pos,
+		under = vector.add(pos, {x = 0, y = -1, z = 0}),
 	}
 	--TODO: try making a placer
 	local itemname = stack:get_name()
@@ -222,12 +220,12 @@ function working_villages.villager:place(item,pos)
 		stack:take_item(1)
 	else
 		local itemdef = stack:get_definition()
-		if itemdef.type=="node" then
-			stack = minetest.item_place(stack, self.object, pointed_thing)
+		if itemdef.on_place then
+			stack = itemdef.on_place(stack, self.object, pointed_thing)
+		elseif itemdef.type=="node" then
+			stack = minetest.item_place_node(stack, self.object, pointed_thing)
 			--minetest.set_node(pointed_thing.above, {name = itemname})
 			--minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
-		else
-			stack = itemdef.on_place(stack, self.object, pointed_thing)
 		end
 	end
 	--take item

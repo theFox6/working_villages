@@ -1,6 +1,7 @@
 
 local func = working_villages.require("jobs/util")
 
+-- limited support to two replant definitions
 local farming_plants = {
 	names = {
 		["farming:artichoke_5"]={replant={"farming:artichoke"}},
@@ -100,8 +101,8 @@ working_villages.register_job("working_villages:job_farmer", {
 				local plant_data = farming_plants.get_plant(minetest.get_node(target).name);
 				self:dig(target,true)
 				if plant_data and plant_data.replant then
-					for _, value in ipairs(plant_data.replant) do
-						self:place(value, target)
+					for index, value in ipairs(plant_data.replant) do
+						self:place(value, vector.add(target, vector.new(0,index-1,0)))
 					end
 				end
 			end
