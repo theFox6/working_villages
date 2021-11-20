@@ -46,6 +46,7 @@ working_villages.require("jobs/builder")
 working_villages.require("jobs/follow_player")
 working_villages.require("jobs/guard")
 working_villages.require("jobs/plant_collector")
+working_villages.require("jobs/farmer")
 working_villages.require("jobs/woodcutter")
 --testing jobs
 working_villages.require("jobs/torcher")

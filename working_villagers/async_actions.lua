@@ -30,8 +30,8 @@ function working_villages.villager:go_to(pos)
 		if self:timer_exceeded("go_to:find_path",100) then
 			val_pos = func.validate_pos(self.object:get_pos())
 			if func.walkable_pos(self.destination) then
-        self.destination=pathfinder.get_ground_level(vector.round(self.destination))
-      end
+				self.destination=pathfinder.get_ground_level(vector.round(self.destination))
+			end
 			local path = pathfinder.find_path(val_pos,self.destination,self)
 			if path == nil then
 				self:count_timer("go_to:give_up")
@@ -53,8 +53,8 @@ function working_villages.villager:go_to(pos)
 			table.remove(self.path, 1)
 
 			if #self.path == 0 then -- end of path
-			   --keep walking another step for good measure
-        coroutine.yield()
+				 --keep walking another step for good measure
+				coroutine.yield()
 				break
 			else -- else next step, follow next path.
 				self:set_timer("go_to:find_path",0)
@@ -74,17 +74,17 @@ function working_villages.villager:go_to(pos)
 end
 
 function working_villages.villager:collect_nearest_item_by_condition(cond, searching_range)
-  local item = self:get_nearest_item_by_condition(cond, searching_range)
-  if item == nil then
-    return false
-  end
-  local pos = item:get_pos()
-  --print("collecting item at:".. minetest.pos_to_string(pos))
-  local inv=self:get_inventory()
-  if inv:room_for_item("main", ItemStack(item:get_luaentity().itemstring)) then
-    self:go_to(pos)
-    self:pickup_item()
-  end
+	local item = self:get_nearest_item_by_condition(cond, searching_range)
+	if item == nil then
+		return false
+	end
+	local pos = item:get_pos()
+	--print("collecting item at:".. minetest.pos_to_string(pos))
+	local inv=self:get_inventory()
+	if inv:room_for_item("main", ItemStack(item:get_luaentity().itemstring)) then
+		self:go_to(pos)
+		self:pickup_item()
+	end
 end
 
 local drop_range = {x = 2, y = 10, z = 2}
@@ -104,27 +104,27 @@ function working_villages.villager:dig(pos,collect_drops)
 	--if not minetest.dig_node(pos) then --somehow this drops the items
 	-- return false, fail.dig_fail
 	--end
-  local def_node = minetest.registered_items[destnode.name];
-  local old_meta = nil;
-  if (def_node~=nil) and (def_node.after_dig_node~=nil) then
-    old_meta = minetest.get_meta(pos):to_table();
-  end
-  minetest.remove_node(pos)
-  local stacks = minetest.get_node_drops(destnode.name)
-  for _, stack in ipairs(stacks) do
-    local leftover = self:add_item_to_main(stack)
-    if not leftover:is_empty() then
-      minetest.add_item(pos, leftover)
-    end
-  end
-  if (old_meta) then
-    def_node.after_dig_node(pos, destnode, old_meta, nil)
-  end
-  for _, callback in ipairs(minetest.registered_on_dignodes) do
-    local pos_copy = {x=pos.x, y=pos.y, z=pos.z}
-    local node_copy = {name=destnode.name, param1=destnode.param1, param2=destnode.param2}
-    callback(pos_copy, node_copy, nil)
-  end
+	local def_node = minetest.registered_items[destnode.name];
+	local old_meta = nil;
+	if (def_node~=nil) and (def_node.after_dig_node~=nil) then
+		old_meta = minetest.get_meta(pos):to_table();
+	end
+	minetest.remove_node(pos)
+	local stacks = minetest.get_node_drops(destnode.name)
+	for _, stack in ipairs(stacks) do
+		local leftover = self:add_item_to_main(stack)
+		if not leftover:is_empty() then
+			minetest.add_item(pos, leftover)
+		end
+	end
+	if (old_meta) then
+		def_node.after_dig_node(pos, destnode, old_meta, nil)
+	end
+	for _, callback in ipairs(minetest.registered_on_dignodes) do
+		local pos_copy = {x=pos.x, y=pos.y, z=pos.z}
+		local node_copy = {name=destnode.name, param1=destnode.param1, param2=destnode.param2}
+		callback(pos_copy, node_copy, nil)
+	end
 	local sounds = minetest.registered_nodes[destnode.name]
 	if sounds then
 		if sounds.sounds then
@@ -136,29 +136,29 @@ function working_villages.villager:dig(pos,collect_drops)
 	end
 	self:set_animation(working_villages.animation_frames.STAND)
 	if collect_drops then
-    local mystacks = minetest.get_node_drops(destnode.name)
-    --perhaps simplify by just checking if the found item is one of the drops
-    for _, stack in ipairs(mystacks) do
-      local function is_drop(n)
-        local name
-        if type(n) == "table" then
-          name = n.name
-        else
-          name = n
-        end
-        if name == stack then
-          return true
-        end
-        return false
-      end
-      self:collect_nearest_item_by_condition(is_drop,drop_range)
-      -- add to inventory, when using remove_node
-      --[[local leftover = self:add_item_to_main(stack)
-      if not leftover:is_empty() then
-        minetest.add_item(pos, leftover)
-      end]]
-    end
-  end
+		local mystacks = minetest.get_node_drops(destnode.name)
+		--perhaps simplify by just checking if the found item is one of the drops
+		for _, stack in ipairs(mystacks) do
+			local function is_drop(n)
+				local name
+				if type(n) == "table" then
+					name = n.name
+				else
+					name = n
+				end
+				if name == stack then
+					return true
+				end
+				return false
+			end
+			self:collect_nearest_item_by_condition(is_drop,drop_range)
+			-- add to inventory, when using remove_node
+			--[[local leftover = self:add_item_to_main(stack)
+			if not leftover:is_empty() then
+				minetest.add_item(pos, leftover)
+			end]]
+		end
+	end
 	return true
 end
 
@@ -208,8 +208,10 @@ function working_villages.villager:place(item,pos)
 	--TODO: support given pointed thing via function parameter
 	local pointed_thing = {
 		type = "node",
-		above = pos,
-		under = vector.add(pos, {x = 0, y = -1, z = 0}),
+		--above = pos,
+		--under = vector.add(pos, {x = 0, y = -1, z = 0}),
+		under = pos,
+		above = vector.add(pos, {x = 0, y = 1, z = 0}),
 	}
 	--TODO: try making a placer
 	local itemname = stack:get_name()
@@ -217,13 +219,18 @@ function working_villages.villager:place(item,pos)
 	if type(item)=="table" then
 		minetest.set_node(pointed_thing.above, item)
 		--minetest.place_node(pos, item) --loses param2
+		stack:take_item(1)
 	else
-		--minetest.item_place(stack, minetest.get_player_by_name(self.owner_name), pointed_thing)
-		--minetest.set_node(pointed_thing.above, {name = itemname})
-		minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
+		local itemdef = stack:get_definition()
+		if itemdef.type=="node" then
+			stack = minetest.item_place(stack, self.object, pointed_thing)
+			--minetest.set_node(pointed_thing.above, {name = itemname})
+			--minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
+		else
+			stack = itemdef.on_place(stack, self.object, pointed_thing)
+		end
 	end
 	--take item
-	stack:take_item(1)
 	self:set_wield_item_stack(stack)
 	--handle sounds
 	local sounds = minetest.registered_nodes[itemname]
@@ -288,7 +295,7 @@ function working_villages.villager:goto_bed()
 		self:set_state_info("I'm waiting for dawn to come.")
 		self:set_displayed_action("waiting until dawn")
 		self:set_animation(working_villages.animation_frames.SIT)
-    local tod = minetest.get_timeofday()
+		local tod = minetest.get_timeofday()
 		while (tod > 0.2 and tod < 0.805) do
 			coroutine.yield()
 			tod = minetest.get_timeofday()
@@ -312,7 +319,7 @@ function working_villages.villager:goto_bed()
 			end
 			self:set_state_info("I'm waiting for dawn to come.")
 			self:set_displayed_action("waiting until dawn")
-      self:set_animation(working_villages.animation_frames.SIT)
+			self:set_animation(working_villages.animation_frames.SIT)
 			self.wait_until_dawn()
 		else
 			log.info("villager %s bed is at: %s", self.inventory_name, minetest.pos_to_string(bed_pos))
@@ -334,39 +341,39 @@ function working_villages.villager:goto_bed()
 end
 
 function working_villages.villager:handle_night()
-  local tod = minetest.get_timeofday()
-  if  tod < 0.2 or tod > 0.76 then
-    local data = self:get_stored_table();
-    if (data.in_work == true) then
-      data.in_work = false;
-      self:set_stored_table(data);
-    end
-    self:goto_bed()
-  end
+	local tod = minetest.get_timeofday()
+	if	tod < 0.2 or tod > 0.76 then
+		local data = self:get_stored_table();
+		if (data.in_work == true) then
+			data.in_work = false;
+			self:set_stored_table(data);
+		end
+		self:goto_bed()
+	end
 end
 
 function working_villages.villager:goto_job()
-  log.action("villager %s is going home", self.inventory_name)
-  local job_pos = self:get_job_pos()
-  local data = self:get_stored_table();
-  if not job_pos then
-    log.warning("villager %s couldn't find his job position",self.inventory_name)
-    self:set_state_info("I am going to my job position.")
-    data.in_work = true;
-  else
-    self:set_state_info("I am going to my job position.")
-    self:set_displayed_action("going to job")
-    self:go_to(job_pos)
-    data.in_work = true;
-  end
-  self:set_stored_table(data);
+	log.action("villager %s is going home", self.inventory_name)
+	local job_pos = self:get_job_pos()
+	local data = self:get_stored_table();
+	if not job_pos then
+		log.warning("villager %s couldn't find his job position",self.inventory_name)
+		self:set_state_info("I am going to my job position.")
+		data.in_work = true;
+	else
+		self:set_state_info("I am going to my job position.")
+		self:set_displayed_action("going to job")
+		self:go_to(job_pos)
+		data.in_work = true;
+	end
+	self:set_stored_table(data);
 	return true
 end
 
 function working_villages.villager:handle_job_pos()
-  local data = self:get_stored_table();
-  if (not data.in_work) then
-    self:goto_job()
-  end
+	local data = self:get_stored_table();
+	if (not data.in_work) then
+		self:goto_job()
+	end
 end
 
