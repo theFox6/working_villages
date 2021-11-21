@@ -88,7 +88,7 @@ function forms.form_base(width,height,villager)
 		jobname = "no job"
 	end
 	local villager_name = ""
-	if villager.nametag~="" then
+	if villager.nametag and villager.nametag~="" then
 		villager_name = villager.nametag.." - "
 	end
 
@@ -211,7 +211,7 @@ forms.register_page("working_villages:job_change",{
 	constructor = function(_, villager) --self, villager, playername
 		local cp = { x = 3.5, y = 0 }
 		local villager_name = ""
-		if villager.nametag~="" then
+		if villager.nametag and villager.nametag~="" then
 			villager_name = "label[0,0;"..villager.nametag.."]"
 		end
 		return "size[8,6]"
@@ -319,7 +319,7 @@ forms.register_page("working_villages:data_change",{
 		end
 		local villager_name = ""
 		local villager_name_label = ""
-		if villager.nametag~="" then
+		if villager.nametag and villager.nametag~="" then
 			villager_name = villager.nametag
 			villager_name_label = "label[0,0;"..villager.nametag.."]"
 		end
@@ -454,7 +454,7 @@ forms.register_page("working_villages:inv_gui", {
 		local wp = { x = 4.25, y = 0.5}
 		local hp = { x = 4.0, y = 3.5}
 		local villager_name = ""
-		if villager.nametag~="" then
+		if villager.nametag and villager.nametag~="" then
 			villager_name = "label[0,0;"..villager.nametag.."]"
 		end
 		return "size[8,9]"
