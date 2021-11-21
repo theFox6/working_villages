@@ -308,6 +308,10 @@ forms.register_page("working_villages:data_change",{
 			local home = villager:get_home()
 			marker_pos = minetest.pos_to_string(floor_pos(home:get_marker()))
 		end
+		local villager_name = ""
+		if villager.nametag then
+			villager_name = villager.nametag
+		end
 		local village_name = ""
 		if villager.village_name then
 			village_name = villager.village_name
@@ -359,6 +363,7 @@ forms.register_page("working_villages:data_change",{
 			.. "field[" .. cp.x-3 .. "," .. cp.y + 0.9 ..";2.5,1;villager_pos;villager position;" .. player_pos .. "]"
 			.. "field[" .. cp.x+2 .. "," .. cp.y + 0.9 ..";2.5,1;player_pos;player position;" .. villager_pos .. "]"
 			.. "field[" .. cp.x-3 .. "," .. cp.y + 1.9 ..";2.5,1;marker_pos;building marker pos;" .. marker_pos .. "]"
+			.. "field[" .. cp.x-0.5 .. "," .. cp.y + 1.9 ..";2.5,1;villager_name;villager name;" .. villager_name .. "]"
 			.. "field[" .. cp.x+2 .. "," .. cp.y + 1.9 ..";2.5,1;village_name;village name;" .. village_name .. "]"
 			.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;house door position;" .. home_pos .. "]"
 			.. "field[" .. hp.x+2.5 .. "," .. hp.y + 0.4 ..";2.5,1;bed_pos;bed position;" .. bed_pos .. "]"
@@ -393,6 +398,7 @@ forms.register_page("working_villages:data_change",{
 			
 			-- soft update have to be done here, do not break pointers
 			soft_table_update(villager.pos_data, data)
+			-- marked pos update
 			if marker_pos then
 				local home = villager:get_home()
 				if (not home) or (not vector.equals(home:get_marker(), marker_pos)) then
@@ -402,6 +408,18 @@ forms.register_page("working_villages:data_change",{
 				if villager:has_home() then
 					villager:remove_home()
 				end
+			end
+			-- villager name update
+			if fields.villager_name ~= villager.nametag then
+				villager.nametag = fields.villager_name
+				villager.object:set_nametag_attributes({
+						text = villager.nametag
+					})
+			end
+			-- village connect update
+			if fields.village_name ~= villager.village_name then
+				villager.village_name = fields.village_name
+				-- TODO: Add some connection data update function here?
 			end
 			forms.show_formspec(villager, "working_villages:data_change", sender_name)
 		end
