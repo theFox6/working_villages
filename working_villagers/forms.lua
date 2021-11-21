@@ -87,12 +87,16 @@ function forms.form_base(width,height,villager)
 	else
 		jobname = "no job"
 	end
+	local villager_name = ""
+	if villager.nametag~="" then
+		villager_name = villager.nametag.." - "
+	end
 
 	return "size["..width..","..height.."]"
 		.. default.gui_bg
 		.. default.gui_bg_img
 		.. default.gui_slots
-		.. "label[0,0;"..jobname.."]"
+		.. "label[0,0;"..villager_name..jobname.."]"
 end
 
 function forms.register_menu_page(pageid, title)
@@ -206,10 +210,15 @@ end
 forms.register_page("working_villages:job_change",{
 	constructor = function(_, villager) --self, villager, playername
 		local cp = { x = 3.5, y = 0 }
+		local villager_name = ""
+		if villager.nametag~="" then
+			villager_name = "label[0,0;"..villager.nametag.."]"
+		end
 		return "size[8,6]"
 			.. default.gui_bg
 			.. default.gui_bg_img
 			.. default.gui_slots
+			.. villager_name
 			.. "label[".. cp.x - 0.25 ..",".. cp.y ..";current job]"
 			.. "list[detached:".. villager.inventory_name ..";job;".. cp.x ..",".. cp.y + 0.5 ..";1,1;]"
 			.. "list[detached:working_villages:job_inv;main;0,2;8,4;]"
@@ -309,8 +318,10 @@ forms.register_page("working_villages:data_change",{
 			marker_pos = minetest.pos_to_string(floor_pos(home:get_marker()))
 		end
 		local villager_name = ""
-		if villager.nametag then
+		local villager_name_label = ""
+		if villager.nametag~="" then
 			villager_name = villager.nametag
+			villager_name_label = "label[0,0;"..villager.nametag.."]"
 		end
 		local village_name = ""
 		if villager.village_name then
@@ -358,8 +369,9 @@ forms.register_page("working_villages:data_change",{
 			.. default.gui_bg
 			.. default.gui_bg_img
 			.. default.gui_slots
-			.. "label[".. cp.x - 0.25 ..",".. cp.y-0.1 ..";current villager data]"
-			.. "label[".. cp.x - 3 ..",".. cp.y-0.1 ..";"..change_index.."]"
+			.. villager_name_label
+			.. "label[".. cp.x - 0.5 ..",".. cp.y-0.1 ..";current villager data]"
+			.. "label[-1,-1;"..change_index.."]"
 			.. "field[" .. cp.x-3 .. "," .. cp.y + 0.9 ..";2.5,1;villager_pos;villager position;" .. player_pos .. "]"
 			.. "field[" .. cp.x+2 .. "," .. cp.y + 0.9 ..";2.5,1;player_pos;player position;" .. villager_pos .. "]"
 			.. "field[" .. cp.x-3 .. "," .. cp.y + 1.9 ..";2.5,1;marker_pos;building marker pos;" .. marker_pos .. "]"
@@ -439,25 +451,30 @@ forms.register_page("working_villages:inv_gui", {
 		else
 			jobname = "no job"
 		end
-		local wp = { x = 4.25, y = 0}
-		local hp = { x = 4.0, y = 3}
+		local wp = { x = 4.25, y = 0.5}
+		local hp = { x = 4.0, y = 3.5}
+		local villager_name = ""
+		if villager.nametag~="" then
+			villager_name = "label[0,0;"..villager.nametag.."]"
+		end
 		return "size[8,9]"
 			.. default.gui_bg
 			.. default.gui_bg_img
 			.. default.gui_slots
-			.. "list[detached:"..villager.inventory_name..";main;0,0;4,4;]"
+			.. villager_name
+			.. "list[detached:"..villager.inventory_name..";main;0,0.5;4,4;]"
 			.. "list[current_player;main;0,5;8,1;]"
 			.. "list[current_player;main;0,6.2;8,3;8]"
 			.. "listring[detached:"..villager.inventory_name..";main]"
 			.. "listring[current_player;main]"
 			.. "label[" .. wp.x + 0.1 .."," .. wp.y .. ";wield]"
 			.. "list[detached:"..villager.inventory_name..";wield_item;" .. wp.x .. "," .. wp.y + 0.5 ..";1,1;]"
-			.. "button[5.5,0.7;2,1;job;change job]"
-			.. "label[4,1.5;current job:\n"..jobname.."]"
-			.. "button[5.5,2.3;2,1;data;change data]"
+			.. "button[5.5,1.2;2,1;job;change job]"
+			.. "label[4,2;current job:\n"..jobname.."]"
+			.. "button[5.5,2.8;2,1;data;change data]"
 			--.. "field[" .. jp.x .. "," .. jp.y + 0.4 ..";2.5,1;job_pos;job position;" .. job_pos .. "]"
 			--.. "field[" .. hp.x .. "," .. hp.y + 0.4 ..";2.5,1;home_pos;home position;" .. home_pos .. "]"
-			.. "button_exit[" .. hp.x + 2 .. "," .. hp.y + 0.09 .. ";1,1;ok;set]"
+			.. "button_exit[" .. hp.x + 2 .. "," .. hp.y + 0.09 .. ";1,1;ok;close]"
 	end,
 	receiver = function(_, villager, sender, fields)
 		local sender_name = sender:get_player_name()
