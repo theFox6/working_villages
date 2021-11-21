@@ -247,9 +247,18 @@ end
 local function soft_table_update(table_old, table_new)
 	for k,v in pairs(table_new) do
 		if type(v)=="table" then
-			soft_table_update(table_old[k], table_new[k])
+			if table_old[k] then
+				soft_table_update(table_old[k], table_new[k])
+			else
+				table_old[k] = v
+			end
 		else
 			table_old[k] = v
+		end
+	end
+	for k,_ in pairs(table_old) do
+		if not table_new[k] then
+			table_old[k] = nil
 		end
 	end
 end
