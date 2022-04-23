@@ -273,7 +273,8 @@ function working_villages.villager:move_main_to_wield(pred)
     if pred(stack:get_name()) then
       local wield_stack = inv:get_stack("wield_item", 1)
       inv:set_stack("wield_item", 1, stack)
-      inv:set_stack("main", i, wield_stack)
+      inv:take_stack("main", stack)
+      inv:add_stack("main", wield_stack)
       return true
     end
   end
