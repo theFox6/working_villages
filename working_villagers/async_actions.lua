@@ -36,7 +36,7 @@ function working_villages.villager:go_to(pos)
 			if path == nil then
 				self:count_timer("go_to:give_up")
 				if self:timer_exceeded("go_to:give_up",3) then
-					print("villager can't find path")
+					print("villager can't find path to "..minetest.pos_to_string(val_pos))
 					return false, fail.no_path
 				end
 			else
@@ -299,6 +299,9 @@ function working_villages.villager:goto_bed()
 		self:set_displayed_action("active")
 	else
 		log.action("villager %s is going home", self.inventory_name)
+		self:set_state_info("I'm going home, it's late.")
+		self:set_displayed_action("going home")
+		self:go_to(self.pos_data.home_pos)
 		if (self.pos_data.bed_pos==nil) then
 			log.warning("villager %s couldn't find his bed",self.inventory_name)
 			--TODO: go home anyway
@@ -315,8 +318,8 @@ function working_villages.villager:goto_bed()
 			self.wait_until_dawn()
 		else
 			log.info("villager %s bed is at: %s", self.inventory_name, minetest.pos_to_string(self.pos_data.bed_pos))
-			self:set_state_info("I'm going home, it's late.")
-			self:set_displayed_action("going home")
+			self:set_state_info("I'm going to bed, it's late.")
+			self:set_displayed_action("going to bed")
 			self:go_to(self.pos_data.bed_pos)
 			self:set_state_info("I am going to sleep soon.")
 			self:set_displayed_action("waiting for dusk")

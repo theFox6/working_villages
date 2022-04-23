@@ -447,7 +447,11 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
       local door_dir = vector.apply(minetest.facedir_to_dir(front_node.param2),math.abs)
       local villager_dir = vector.round(vector.apply(front_diff,math.abs))
       if vector.equals(door_dir,villager_dir) then
-        door:toggle()
+        if door:state() then
+          door:close()
+        else
+          door:open()
+        end
       end
     elseif minetest.registered_nodes[front_node.name].walkable
       and not(minetest.registered_nodes[above_node.name].walkable) then
