@@ -401,11 +401,6 @@ forms.register_page("working_villages:data_change",{
 			--data.home_pos = load_pos(fields.home_pos, villager, "group:door")
 			data.home_pos = load_pos(fields.home_pos, villager, "group:villager_door")
 			data.bed_pos = load_pos(fields.bed_pos, villager, "group:villager_bed_bottom")
-			if (data.bed_pos~=nil) then
-				local bed = minetest.get_node(data.bed_pos)
-				local dir = minetest.facedir_to_dir(bed.param2)
-				data.bed_pos = vector.add(data.bed_pos, vector.multiply(dir, 0.5))
-			end
 			data.chest_pos = load_pos(fields.chest_pos, villager, "group:villager_chest")
 			data.food_pos = load_pos(fields.food_pos, villager, "group:villager_chest")
 			data.tools_pos = load_pos(fields.tools_pos, villager, "group:villager_chest")
