@@ -11,6 +11,7 @@ I'm doing anyway, clearing the snow away.",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
 	jobfunc = function(self)
 		self:handle_night()
+		self:handle_job_pos()
 
 		self:count_timer("snowclearer:search")
 		self:count_timer("snowclearer:change_dir")

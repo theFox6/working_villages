@@ -29,6 +29,7 @@ If I have the materials of course. Also I'll look for building markers within a 
 	inventory_image  = "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()
+		self:handle_job_pos()
 
 		self:count_timer("builder:search")
 		if self:timer_exceeded("builder:search",20) then
