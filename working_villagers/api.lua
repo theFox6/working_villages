@@ -75,20 +75,6 @@ function working_villages.villager:get_job()
   return nil
 end
 
--- working_villages.villager.get_job_pos return a villager's current job positon.
-function working_villages.villager:get_job_pos()
-  local data = self:get_stored_table();
-  return data.job_pos;
-end
-
--- working_villages.villager.set_job_pos set a villager's job positon.
-function working_villages.villager:set_job_pos(pos)
-  -- TODO: maybe add some check of pos, if it si valid
-  local data = self:get_stored_table();
-  data.job_pos = pos;
-  self:set_stored_table(data);
-end
-
 -- working_villages.villager.is_enemy returns if an object is an enemy.
 function working_villages.villager:is_enemy(obj)
   log.verbose("villager %s checks if %s is hostile",self.inventory_name,obj)
@@ -287,7 +273,8 @@ function working_villages.villager:move_main_to_wield(pred)
     if pred(stack:get_name()) then
       local wield_stack = inv:get_stack("wield_item", 1)
       inv:set_stack("wield_item", 1, stack)
-      inv:set_stack("main", i, wield_stack)
+      inv:remove_item("main", stack)
+      inv:add_item("main", wield_stack)
       return true
     end
   end
@@ -460,7 +447,11 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
       local door_dir = vector.apply(minetest.facedir_to_dir(front_node.param2),math.abs)
       local villager_dir = vector.round(vector.apply(front_diff,math.abs))
       if vector.equals(door_dir,villager_dir) then
-        door:toggle()
+        if door:state() then
+          door:close()
+        else
+          door:open()
+        end
       end
     elseif minetest.registered_nodes[front_node.name].walkable
       and not(minetest.registered_nodes[above_node.name].walkable) then
@@ -846,7 +837,23 @@ function working_villages.register_villager(product_name, def)
 
     return inventory
   end
-
+  
+  local function fix_pos_data(self)
+    if self:has_home() then
+      -- share some data from building sign
+      local sign = self:get_home()
+      self.pos_data.home_pos = sign:get_door()
+      self.pos_data.bed_pos = sign:get_bed()
+    end
+    if self.village_name then
+      -- TODO: share pos data from central village data
+      --local village = working_villages.get_village(self.village_name)
+      --if village then
+        --self.pos_data = village:get_villager_pos_data(self.inventory_name)
+      --end
+    end
+  end
+  
   -- on_activate is a callback function that is called when the object is created or recreated.
   local function on_activate(self, staticdata)
     -- parse the staticdata, and compose a inventory.
@@ -869,11 +876,14 @@ function working_villages.register_villager(product_name, def)
       self.pause = data["pause"]
       self.job_data = data["job_data"]
       self.state_info = data["state_info"]
+      self.pos_data = data["pos_data"]
 
       local inventory = create_inventory(self)
       for list_name, list in pairs(data["inventory"]) do
         inventory:set_list(list_name, list)
       end
+      
+      fix_pos_data(self)
     end
 
     self:set_displayed_action("active")
@@ -918,7 +928,8 @@ function working_villages.register_villager(product_name, def)
       ["inventory"] = {},
       ["pause"] = self.pause,
       ["job_data"] = self.job_data,
-      ["state_info"] = self.state_info
+      ["state_info"] = self.state_info,
+      ["pos_data"] = self.pos_data,
     }
 
     -- set lists.
@@ -1007,6 +1018,7 @@ function working_villages.register_villager(product_name, def)
   villager_def.time_counters               = {}
   villager_def.destination                 = vector.new(0,0,0)
   villager_def.job_data                    = {}
+  villager_def.pos_data                    = {}
   villager_def.new_job                     = ""
 
   -- callback methods
@@ -1025,6 +1037,7 @@ function working_villages.register_villager(product_name, def)
   villager_def.get_home                    = working_villages.get_home
   villager_def.has_home                    = working_villages.is_valid_home
   villager_def.set_home                    = working_villages.set_home
+  villager_def.remove_home                 = working_villages.remove_home
 
 
   minetest.register_entity(name, villager_def)

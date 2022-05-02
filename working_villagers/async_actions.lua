@@ -36,7 +36,7 @@ function working_villages.villager:go_to(pos)
 			if path == nil then
 				self:count_timer("go_to:give_up")
 				if self:timer_exceeded("go_to:give_up",3) then
-					print("villager can't find path")
+					print("villager can't find path to "..minetest.pos_to_string(val_pos))
 					return false, fail.no_path
 				end
 			else
@@ -256,7 +256,7 @@ end
 function working_villages.villager:sleep()
 	log.action("villager %s is laying down",self.inventory_name)
 	self.object:setvelocity{x = 0, y = 0, z = 0}
-	local bed_pos = vector.new(self:get_home():get_bed())
+	local bed_pos = vector.new(self.pos_data.bed_pos)
 	local bed_top = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_top") end)
 	local bed_bottom = func.find_adjacent_pos(bed_pos,
@@ -283,7 +283,7 @@ function working_villages.villager:sleep()
 end
 
 function working_villages.villager:goto_bed()
-	if not self:has_home() then
+	if self.pos_data.home_pos==nil then
 		log.action("villager %s is waiting until dawn", self.inventory_name)
 		self:set_state_info("I'm waiting for dawn to come.")
 		self:set_displayed_action("waiting until dawn")
@@ -299,8 +299,10 @@ function working_villages.villager:goto_bed()
 		self:set_displayed_action("active")
 	else
 		log.action("villager %s is going home", self.inventory_name)
-		local bed_pos = self:get_home():get_bed()
-		if not bed_pos then
+		self:set_state_info("I'm going home, it's late.")
+		self:set_displayed_action("going home")
+		self:go_to(self.pos_data.home_pos)
+		if (self.pos_data.bed_pos==nil) then
 			log.warning("villager %s couldn't find his bed",self.inventory_name)
 			--TODO: go home anyway
 			self:set_state_info("I am going to rest soon.\nI would love to have a bed in my home though.")
@@ -315,10 +317,10 @@ function working_villages.villager:goto_bed()
       self:set_animation(working_villages.animation_frames.SIT)
 			self.wait_until_dawn()
 		else
-			log.info("villager %s bed is at: %s", self.inventory_name, minetest.pos_to_string(bed_pos))
-			self:set_state_info("I'm going home, it's late.")
-			self:set_displayed_action("going home")
-			self:go_to(bed_pos)
+			log.info("villager %s bed is at: %s", self.inventory_name, minetest.pos_to_string(self.pos_data.bed_pos))
+			self:set_state_info("I'm going to bed, it's late.")
+			self:set_displayed_action("going to bed")
+			self:go_to(self.pos_data.bed_pos)
 			self:set_state_info("I am going to sleep soon.")
 			self:set_displayed_action("waiting for dusk")
 			local tod = minetest.get_timeofday()
@@ -327,7 +329,7 @@ function working_villages.villager:goto_bed()
 				tod = minetest.get_timeofday()
 			end
 			self:sleep()
-			self:go_to(self:get_home():get_door())
+			self:go_to(self.pos_data.home_pos)
 		end
 	end
 	return true
@@ -336,10 +338,8 @@ end
 function working_villages.villager:handle_night()
   local tod = minetest.get_timeofday()
   if  tod < 0.2 or tod > 0.76 then
-    local data = self:get_stored_table();
-    if (data.in_work == true) then
-      data.in_work = false;
-      self:set_stored_table(data);
+    if (self.job_data.in_work == true) then
+      self.job_data.in_work = false;
     end
     self:goto_bed()
   end
@@ -347,25 +347,21 @@ end
 
 function working_villages.villager:goto_job()
   log.action("villager %s is going home", self.inventory_name)
-  local job_pos = self:get_job_pos()
-  local data = self:get_stored_table();
-  if not job_pos then
+  if self.pos_data.job_pos==nil then
     log.warning("villager %s couldn't find his job position",self.inventory_name)
     self:set_state_info("I am going to my job position.")
-    data.in_work = true;
+    self.job_data.in_work = true;
   else
     self:set_state_info("I am going to my job position.")
     self:set_displayed_action("going to job")
-    self:go_to(job_pos)
-    data.in_work = true;
+    self:go_to(self.pos_data.job_pos)
+    self.job_data.in_work = true;
   end
-  self:set_stored_table(data);
 	return true
 end
 
 function working_villages.villager:handle_job_pos()
-  local data = self:get_stored_table();
-  if (not data.in_work) then
+  if (not self.job_data.in_work) then
     self:goto_job()
   end
 end
