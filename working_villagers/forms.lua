@@ -235,7 +235,7 @@ local function load_pos(pos, villager, nodes)
 	if (pos=="near") then
 		pos = minetest.find_node_near(villager.object:get_pos(), 5, nodes, true) or nil
 	elseif (pos~="") then
-		pos = minetest.string_to_pos(pos)	
+		pos = minetest.string_to_pos(pos)
 		if pos then
 			pos = minetest.find_node_near(pos, 0.2, nodes, true) or nil
 		end
@@ -334,7 +334,7 @@ forms.register_page("working_villages:data_change",{
 		if (data.job_pos~=nil) then
 			job_pos = minetest.pos_to_string(data.job_pos)
 		end
-		
+
 		local cp = { x = 3.5, y = 0 }
 		local hp = { x = 0.5, y = 2.5 }
 		local wp = { x = 0.5, y = 3.5 }
@@ -361,7 +361,8 @@ forms.register_page("working_villages:data_change",{
 			.. "button[3,".. bp.y + 0.5 ..";1,1;set_data;set]"
 			.. "button[6,".. bp.y + 0.5 ..";1,1;back;back]"
 	end,
-	receiver = function(page, villager, sender, fields)
+	--receiver = function(page, villager, sender, fields)
+	receiver = function(_, villager, sender, fields)
 		local sender_name = sender:get_player_name()
 		if fields.set_data then
 			local data = {}
@@ -381,7 +382,7 @@ forms.register_page("working_villages:data_change",{
 			if fields.job_pos then
 				data.job_pos = minetest.string_to_pos(fields.job_pos)
 			end
-			
+
 			-- soft update have to be done here, do not break pointers
 			soft_table_update(villager.pos_data, data)
 			if marker_pos then

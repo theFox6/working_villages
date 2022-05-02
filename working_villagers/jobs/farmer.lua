@@ -68,7 +68,6 @@ local function find_plant_node(pos)
 	if (not data) then
 		return false;
 	end
-
 	return true;
 end
 
@@ -81,7 +80,7 @@ working_villages.register_job("working_villages:job_farmer", {
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_job_pos()
-		
+
 		self:count_timer("farmer:search")
 		self:count_timer("farmer:change_dir")
 		self:handle_obstacles()

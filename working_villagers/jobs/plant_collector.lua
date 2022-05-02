@@ -68,7 +68,7 @@ working_villages.register_job("working_villages:job_herbcollector", {
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_job_pos()
-    
+
 		self:count_timer("herbcollector:search")
 		self:count_timer("herbcollector:change_dir")
 		self:handle_obstacles()
@@ -85,7 +85,8 @@ working_villages.register_job("working_villages:job_herbcollector", {
 					destination = target
 				end
 				self:go_to(destination)
-        local herb_data = herbs.get_herb(minetest.get_node(target).name);
+        --local herb_data = herbs.get_herb(minetest.get_node(target).name);
+        herbs.get_herb(minetest.get_node(target).name);
 				self:dig(target,true)
 			end
 		elseif self:timer_exceeded("herbcollector:change_dir",50) then

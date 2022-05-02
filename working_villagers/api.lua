@@ -832,7 +832,7 @@ function working_villages.register_villager(product_name, def)
 
     return inventory
   end
-  
+
   local function fix_pos_data(self)
     if self:has_home() then
       -- share some data from building sign
@@ -850,7 +850,7 @@ function working_villages.register_villager(product_name, def)
       return -- do semething for luacheck
     end
   end
-  
+
   -- on_activate is a callback function that is called when the object is created or recreated.
   local function on_activate(self, staticdata)
     -- parse the staticdata, and compose a inventory.
@@ -879,7 +879,7 @@ function working_villages.register_villager(product_name, def)
       for list_name, list in pairs(data["inventory"]) do
         inventory:set_list(list_name, list)
       end
-      
+
       fix_pos_data(self)
     end
 
