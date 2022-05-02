@@ -29,6 +29,8 @@ read_globals = {
 	"ItemStack",
 	-- mods
 	"default", "doors",
+	-- special minetest functions
+	"table.copy",
 }
 
 globals = {

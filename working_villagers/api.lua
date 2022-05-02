@@ -846,6 +846,8 @@ function working_villages.register_villager(product_name, def)
       --if village then
         --self.pos_data = village:get_villager_pos_data(self.inventory_name)
       --end
+      -- remove this later
+      return -- do semething for luacheck
     end
   end
   
