@@ -54,12 +54,21 @@ local function find_herb_node(pos)
     if (node_below.name~=node.name) then
       return false;
     end
+    local pos_above = {x=pos.x, y=pos.y+1, z=pos.z}
+    local node_above = minetest.get_node(pos_above);
+    if (node_above.name==node.name) then
+      return false;
+    end
   end
 
   return true;
 end
 
-local searching_range = {x = 10, y = 3, z = 10}
+local searching_range = {x = 10, y = 5, z = 10}
+
+local function put_func()
+  return true;
+end
 
 working_villages.register_job("working_villages:job_herbcollector", {
 	description      = "herb collector (working_villages)",
@@ -67,6 +76,7 @@ working_villages.register_job("working_villages:job_herbcollector", {
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
 		self:handle_night()
+		self:handle_chest(nil, put_func)
 		self:handle_job_pos()
 
 		self:count_timer("herbcollector:search")

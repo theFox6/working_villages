@@ -32,6 +32,19 @@ local function is_sapling_spot(pos)
 	return true
 end
 
+local function put_func(_,stack)
+  local name = stack:get_name();
+  if (minetest.get_item_group(name, "axe")~=0)
+      or (minetest.get_item_group(name, "food")~=0) then
+    return false;
+  end
+  return true;
+end
+local function take_func(_,stack)
+  return not put_func(stack);
+end
+
+local chest_range = {x = 5, y = 5, z = 5, h = 3}
 local searching_range = {x = 10, y = 10, z = 10, h = 5}
 
 working_villages.register_job("working_villages:job_woodcutter", {
@@ -42,8 +55,9 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 	inventory_image  = "default_paper.png^working_villages_woodcutter.png",
 	jobfunc = function(self)
 		self:handle_night()
+		self:handle_chest(take_func, put_func)
 		self:handle_job_pos()
-
+	
 		self:count_timer("woodcutter:search")
 		self:count_timer("woodcutter:change_dir")
 		self:handle_obstacles()
