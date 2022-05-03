@@ -82,13 +82,15 @@ local function put_func(_,stack)
 	if farming_demands[stack:get_name()] then
 		return false
 	end
-  return true;
+	return true;
 end
 local function take_func(villager,stack)
 	local item_name = stack:get_name()
 	if farming_demands[item_name] then
 		local inv = villager:get_inventory()
-		if (not inv:contains_item("main", ItemStack(item_name):set_count(farmng_demands[item_name]))) then
+		local itemstack = ItemStack(item_name)
+		itemstack:set_count(farming_demands[item_name])
+		if (not inv:contains_item("main", itemstack)) then
 			return true
 		end
 	end

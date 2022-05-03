@@ -558,6 +558,15 @@ end
 
 working_villages.require("async_actions")
 
+-- compatibility with like player object
+function working_villages.villager:get_player_name()
+  return self.object:get_player_name()
+end
+
+function working_villages.villager:get_wield_index()
+  return 1
+end
+
 --deprecated
 function working_villages.villager:set_state(id)
   if id == "idle" then
@@ -1051,3 +1060,4 @@ function working_villages.register_villager(product_name, def)
     product_name    = name,
   })
 end
+

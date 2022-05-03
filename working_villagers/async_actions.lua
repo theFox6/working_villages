@@ -221,9 +221,9 @@ function working_villages.villager:place(item,pos)
 	else
 		local itemdef = stack:get_definition()
 		if itemdef.on_place then
-			stack = itemdef.on_place(stack, self.object, pointed_thing)
+			stack = itemdef.on_place(stack, self, pointed_thing)
 		elseif itemdef.type=="node" then
-			stack = minetest.item_place_node(stack, self.object, pointed_thing)
+			stack = minetest.item_place_node(stack, self, pointed_thing)
 			--minetest.set_node(pointed_thing.above, {name = itemname})
 			--minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
 		end
