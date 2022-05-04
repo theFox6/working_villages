@@ -40,8 +40,8 @@ local function put_func(_,stack)
   end
   return true;
 end
-local function take_func(_,stack)
-  return not put_func(stack);
+local function take_func(self,stack,data)
+  return not put_func(self,stack,data);
 end
 
 local searching_range = {x = 10, y = 10, z = 10, h = 5}

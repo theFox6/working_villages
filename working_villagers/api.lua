@@ -563,6 +563,10 @@ function working_villages.villager:get_player_name()
   return self.object:get_player_name()
 end
 
+function working_villages.villager:is_player()
+  return false
+end
+
 function working_villages.villager:get_wield_index()
   return 1
 end
