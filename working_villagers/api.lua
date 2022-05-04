@@ -983,7 +983,8 @@ function working_villages.register_villager(product_name, def)
     local wielded_stack = clicker:get_wielded_item()
     if wielded_stack:get_name() == "working_villages:commanding_sceptre"
       and (self.owner_name == "working_villages:self_employed"
-        or clicker:get_player_name() == self.owner_name) then
+        or clicker:get_player_name() == self.owner_name or
+        minetest.check_player_privs(clicker, "debug")) then
 
       forms.show_formspec(self, "working_villages:inv_gui", clicker:get_player_name())
     else
