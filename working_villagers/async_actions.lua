@@ -219,13 +219,22 @@ function working_villages.villager:place(item,pos)
 		--minetest.place_node(pos, item) --loses param2
 		stack:take_item(1)
 	else
+		local before_node = minetest.get_node(pos)
+		local before_count = stack:get_count()
 		local itemdef = stack:get_definition()
 		if itemdef.on_place then
 			stack = itemdef.on_place(stack, self, pointed_thing)
 		elseif itemdef.type=="node" then
 			stack = minetest.item_place_node(stack, self, pointed_thing)
-			--minetest.set_node(pointed_thing.above, {name = itemname})
-			--minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
+		end
+		local after_node = minetest.get_node(pos)
+		-- if the node didn't change, then the callback failed
+		if before_node.name == after_node.name then
+			return false, fail.protected
+		end
+		-- if in creative mode, the callback may not reduce the stack
+		if before_count == stack:get_count() then
+			stack:take_item(1)
 		end
 	end
 	--take item
