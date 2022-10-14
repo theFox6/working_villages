@@ -221,15 +221,16 @@ function working_villages.villager:place(item,pos)
 	else
 		local itemdef = stack:get_definition()
 		if itemdef.on_place then
-			stack = itemdef.on_place(stack, self.object, pointed_thing)
+			stack = itemdef.on_place(stack, self, pointed_thing)
 		elseif itemdef.type=="node" then
-			stack = minetest.item_place_node(stack, self.object, pointed_thing)
+			stack = minetest.item_place_node(stack, self, pointed_thing)
 			--minetest.set_node(pointed_thing.above, {name = itemname})
 			--minetest.place_node(pos, {name = itemname}) --Place node with the same effects that a player would cause
 		end
 	end
 	--take item
 	self:set_wield_item_stack(stack)
+	coroutine.yield()
 	--handle sounds
 	local sounds = minetest.registered_nodes[itemname]
 	if sounds then
@@ -248,6 +249,46 @@ function working_villages.villager:place(item,pos)
 	end
 
 	return true
+end
+
+function working_villages.villager:manipulate_chest(chest_pos, take_func, put_func, data)
+	if func.is_chest(chest_pos) then
+		-- try to put items
+		local vil_inv = self:get_inventory();
+
+		-- from villager to chest
+		if put_func then
+			local size = vil_inv:get_size("main");
+			for index = 1,size do
+				local stack = vil_inv:get_stack("main", index);
+				if (not stack:is_empty()) and (put_func(self, stack, data)) then
+					local chest_meta = minetest.get_meta(chest_pos);
+					local chest_inv = chest_meta:get_inventory();
+					local leftover = chest_inv:add_item("main", stack);
+					vil_inv:set_stack("main", index, leftover);
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+				end
+			end
+		end
+		-- from chest to villager
+		if take_func then
+			local chest_meta = minetest.get_meta(chest_pos);
+			local chest_inv = chest_meta:get_inventory();
+			local size = chest_inv:get_size("main");
+			for index = 1,size do
+				chest_meta = minetest.get_meta(chest_pos);
+				chest_inv = chest_meta:get_inventory();
+				local stack = chest_inv:get_stack("main", index);
+				if (not stack:is_empty()) and (take_func(self, stack, data)) then
+					local leftover = vil_inv:add_item("main", stack);
+					chest_inv:set_stack("main", index, leftover);
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+				end
+			end
+		end
+	else
+		log.error("Villager %s doe's not find cheston position %s.", self.inventory_name, minetest.pos_to_string(chest_pos))
+	end
 end
 
 function working_villages.villager.wait_until_dawn()
@@ -347,6 +388,7 @@ function working_villages.villager:handle_night()
 			self.job_data.in_work = false;
 		end
 		self:goto_bed()
+		self.job_data.manipulated_chest = false;
 	end
 end
 
@@ -354,15 +396,34 @@ function working_villages.villager:goto_job()
 	log.action("villager %s is going home", self.inventory_name)
 	if self.pos_data.job_pos==nil then
 		log.warning("villager %s couldn't find his job position",self.inventory_name)
-		self:set_state_info("I am going to my job position.")
 		self.job_data.in_work = true;
 	else
+		log.action("villager %s going to job position %s", self.inventory_name, minetest.pos_to_string(self.pos_data.job_pos))
 		self:set_state_info("I am going to my job position.")
 		self:set_displayed_action("going to job")
 		self:go_to(self.pos_data.job_pos)
 		self.job_data.in_work = true;
 	end
+	self:set_state_info("I'm working.")
+	self:set_displayed_action("active")
 	return true
+end
+
+function working_villages.villager:handle_chest(take_func, put_func, data)
+	if (not self.job_data.manipulated_chest) then
+		local chest_pos = self.pos_data.chest_pos
+		if (chest_pos~=nil) then
+			log.action("villager %s is handling chest at %s", self.inventory_name, minetest.pos_to_string(chest_pos))
+			self:set_state_info("I am taking and puting items from/to my chest.")
+			self:set_displayed_action("active")
+			local chest = minetest.get_node(chest_pos);
+			local dir = minetest.facedir_to_dir(chest.param2);
+			local destination = vector.subtract(chest_pos, dir);
+			self:go_to(destination)
+			self:manipulate_chest(chest_pos, take_func, put_func, data);
+		end
+		self.job_data.manipulated_chest = true;
+	end
 end
 
 function working_villages.villager:handle_job_pos()

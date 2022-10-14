@@ -44,6 +44,11 @@ local farming_plants = {
 	},
 }
 
+local farming_demands = {
+	["farming:beanpole"] = 99,
+	["farming:trellis"] = 99,
+}
+
 function farming_plants.get_plant(item_name)
 	-- check more priority definitions
 	for key, value in pairs(farming_plants.names) do
@@ -73,12 +78,32 @@ end
 
 local searching_range = {x = 10, y = 3, z = 10}
 
+local function put_func(_,stack)
+	if farming_demands[stack:get_name()] then
+		return false
+	end
+	return true;
+end
+local function take_func(villager,stack)
+	local item_name = stack:get_name()
+	if farming_demands[item_name] then
+		local inv = villager:get_inventory()
+		local itemstack = ItemStack(item_name)
+		itemstack:set_count(farming_demands[item_name])
+		if (not inv:contains_item("main", itemstack)) then
+			return true
+		end
+	end
+	return false
+end
+
 working_villages.register_job("working_villages:job_farmer", {
 	description			= "farmer (working_villages)",
 	long_description = "I look for farming plants to collect and replant them.",
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	jobfunc = function(self)
 		self:handle_night()
+		self:handle_chest(take_func, put_func)
 		self:handle_job_pos()
 
 		self:count_timer("farmer:search")
