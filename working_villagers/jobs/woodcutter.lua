@@ -27,13 +27,21 @@ local function is_sapling_spot(pos)
 	-- FIXME: need a player name if villagers can own a protected area
 	if minetest.is_protected(pos, "") then return false end
 	if working_villages.failed_pos_test(pos) then return false end
-	local node = minetest.get_node(pos)
-	if node.name ~= "air" then return false end
 	local lpos = vector.add(pos, {x = 0, y = -1, z = 0})
 	local lnode = minetest.get_node(lpos)
 	if minetest.get_item_group(lnode.name, "soil") == 0 then return false end
 	local light_level = minetest.get_node_light(pos)
 	if light_level <= 12 then return false end
+	-- A sapling needs room to grow. Require a volume of air around the spot.
+	for x = -1,1 do
+		for z = -1,1 do
+			for y = 0,2 do
+				lpos = vector.add(pos, {x=x, y=y, z=z})
+				lnode = minetest.get_node(lpos)
+				if lnode.name ~= "air" then return false end
+			end
+		end
+	end
 	return true
 end
 
