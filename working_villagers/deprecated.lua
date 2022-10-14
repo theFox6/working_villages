@@ -177,7 +177,7 @@ function func.villager_state_machine_job(job_name,job_description,actions, sprop
 	local function to_search_idle(self)
 		self:set_timer(1,0)
 		self:set_timer(2,0)
-		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.object:set_velocity{x = 0, y = 0, z = 0}
 		self:set_animation(working_villages.animation_frames.STAND)
 	end
 
@@ -196,7 +196,7 @@ function func.villager_state_machine_job(job_name,job_description,actions, sprop
 	end
 	local function to_sleep(self)
 		log.action("villager %s is laying down", self.inventory_name)
-		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.object:set_velocity{x = 0, y = 0, z = 0}
 		local bed_pos=self:get_home():get_bed()
 		local bed_top = func.find_adjacent_pos(bed_pos,
 			function(p) return string.find(minetest.get_node(p).name,"_top") end)
@@ -274,15 +274,15 @@ function func.villager_state_machine_job(job_name,job_description,actions, sprop
 	end
 	--job definitions
 	local function on_start(self)
-		self.object:setacceleration{x = 0, y = -10, z = 0}
-		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.object:set_acceleration{x = 0, y = -10, z = 0}
+		self.object:set_velocity{x = 0, y = 0, z = 0}
 		self.job_state = self:get_job().states.SEARCH
 		self.time_counters = {}
 		self.path = nil
 		self:get_job().states.SEARCH.to_state(self)
 	end
 	local function on_stop(self)
-		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.object:set_velocity{x = 0, y = 0, z = 0}
 		self.job_state = nil
 		self.time_counters = nil
 		self.path = nil
@@ -290,13 +290,13 @@ function func.villager_state_machine_job(job_name,job_description,actions, sprop
 	end
 	local function on_resume(self)
 		local job = self:get_job()
-		self.object:setacceleration{x = 0, y = -10, z = 0}
-		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.object:set_acceleration{x = 0, y = -10, z = 0}
+		self.object:set_velocity{x = 0, y = 0, z = 0}
 		self.job_state = job.states.SEARCH
 		job.states.SEARCH.to_state(self)
 	end
 	local function on_pause(self)
-		self.object:setvelocity{x = 0, y = 0, z = 0}
+		self.object:set_velocity{x = 0, y = 0, z = 0}
 		self.job_state = nil
 		self:set_animation(working_villages.animation_frames.STAND)
 	end

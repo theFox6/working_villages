@@ -213,7 +213,7 @@ end
 -- working_villages.villager.get_look_direction returns a normalized vector that is
 -- the villagers's looking direction.
 function working_villages.villager:get_look_direction()
-  local yaw = self.object:getyaw()
+  local yaw = self.object:get_yaw()
   return vector.normalize{x = -math.sin(yaw), y = 0.0, z = math.cos(yaw)}
 end
 
@@ -234,7 +234,7 @@ end
 -- working_villages.villager.set_yaw_by_direction sets the villager's yaw
 -- by a direction vector.
 function working_villages.villager:set_yaw_by_direction(direction)
-  self.object:setyaw(math.atan2(direction.z, direction.x) - math.pi / 2)
+  self.object:set_yaw(math.atan2(direction.z, direction.x) - math.pi / 2)
 end
 
 -- working_villages.villager.get_wield_item_stack returns the villager's wield item's stack.
@@ -306,7 +306,7 @@ function working_villages.villager:change_direction(destination)
   direction.y = 0
   local velocity = vector.multiply(vector.normalize(direction), 1.5)
 
-  self.object:setvelocity(velocity)
+  self.object:set_velocity(velocity)
   self:set_yaw_by_direction(direction)
 end
 
@@ -318,7 +318,7 @@ function working_villages.villager:change_direction_randomly()
     z = math.random(0, 5) * 2 - 5,
   }
   local velocity = vector.multiply(vector.normalize(direction), 1.5)
-  self.object:setvelocity(velocity)
+  self.object:set_velocity(velocity)
   self:set_yaw_by_direction(direction)
   self:set_animation(working_villages.animation_frames.WALK)
 end
@@ -401,27 +401,27 @@ function working_villages.villager:handle_liquids()
   if minetest.get_item_group(inside_node.name,"liquid") > 0 then
     -- swim
     local viscosity = minetest.registered_nodes[inside_node.name].liquid_viscosity
-    ctrl:setacceleration{x = 0, y = -self.initial_properties.weight/(100*viscosity), z = 0}
+    ctrl:set_acceleration{x = 0, y = -self.initial_properties.weight/(100*viscosity), z = 0}
   elseif minetest.registered_nodes[inside_node.name].climbable then
     --go down slowly
-    ctrl:setacceleration{x = 0, y = -0.1, z = 0}
+    ctrl:set_acceleration{x = 0, y = -0.1, z = 0}
   else
     -- fall
-    ctrl:setacceleration{x = 0, y = -self.initial_properties.weight, z = 0}
+    ctrl:set_acceleration{x = 0, y = -self.initial_properties.weight, z = 0}
   end
 end
 
 function working_villages.villager:jump()
   local ctrl = self.object
   local below_node = minetest.get_node(vector.subtract(ctrl:get_pos(),{x=0,y=1,z=0}))
-  local velocity = ctrl:getvelocity()
+  local velocity = ctrl:get_velocity()
   if below_node.name == "air" then return false end
   local jump_force = math.sqrt(self.initial_properties.weight) * 1.5
   if minetest.get_item_group(below_node.name,"liquid") > 0 then
     local viscosity = minetest.registered_nodes[below_node.name].liquid_viscosity
     jump_force = jump_force/(viscosity*100)
   end
-  ctrl:setvelocity{x = velocity.x, y = jump_force, z = velocity.z}
+  ctrl:set_velocity{x = velocity.x, y = jump_force, z = velocity.z}
 end
 
 --working_villages.villager.handle_obstacles(ignore_fence,ignore_doors)
@@ -429,7 +429,7 @@ end
 --if ignore_fence is false the villager will not jump over fences
 --if ignore_doors is false and the villager hits a door he opens it
 function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
-  local velocity = self.object:getvelocity()
+  local velocity = self.object:get_velocity()
   local front_diff = self:get_look_direction()
   for i,v in pairs(front_diff) do
     local front_pos = vector.new(0,0,0)
@@ -549,7 +549,7 @@ function working_villages.villager:set_paused(reason)
   print("self:set_paused() is deprecated use self:set_pause() and self:set_displayed_action() instead")
   --[[
   self.pause = "resting"
-  self.object:setvelocity{x = 0, y = 0, z = 0}
+  self.object:set_velocity{x = 0, y = 0, z = 0}
   self:set_animation(working_villages.animation_frames.STAND)
   ]]
   self:set_pause(true)
@@ -907,8 +907,8 @@ function working_villages.register_villager(product_name, def)
       text = self.nametag
     }
 
-    self.object:setvelocity{x = 0, y = 0, z = 0}
-    self.object:setacceleration{x = 0, y = -self.initial_properties.weight, z = 0}
+    self.object:set_velocity{x = 0, y = 0, z = 0}
+    self.object:set_acceleration{x = 0, y = -self.initial_properties.weight, z = 0}
 
     --legacy
     if type(self.pause) == "string" then

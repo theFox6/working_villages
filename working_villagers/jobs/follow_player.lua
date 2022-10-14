@@ -7,12 +7,12 @@ function follower.walk_in_direction(v,dir)
     v:jump()
   end
 
-  local velocity = v.object:getvelocity()
+  local velocity = v.object:get_velocity()
   if velocity.x==0 and velocity.y==0 then
     v:set_animation(working_villages.animation_frames.WALK)
   end
   --speed should actually be limited
-  v.object:setvelocity{x = dir.x, y = velocity.y, z = dir.z}
+  v.object:set_velocity{x = dir.x, y = velocity.y, z = dir.z}
   v:set_yaw_by_direction(dir)
 
   --if villager is stoped by obstacle, the villager must jump.
@@ -20,10 +20,10 @@ function follower.walk_in_direction(v,dir)
 end
 
 function follower.stop(v)
-  local velocity = v.object:getvelocity()
+  local velocity = v.object:get_velocity()
   if velocity.x~=0 or velocity.y~=0 then
     v:set_animation(working_villages.animation_frames.STAND)
-    v.object:setvelocity{x = 0, y = velocity.y, z = 0}
+    v.object:set_velocity{x = 0, y = velocity.y, z = 0}
   end
 end
 

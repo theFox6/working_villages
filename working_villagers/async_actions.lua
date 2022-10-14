@@ -67,7 +67,7 @@ function working_villages.villager:go_to(pos)
 		coroutine.yield()
 	end
 	-- stop
-	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self.object:set_velocity{x = 0, y = 0, z = 0}
 	self.path = nil
 	self:set_animation(working_villages.animation_frames.STAND)
 	return true
@@ -91,7 +91,7 @@ local drop_range = {x = 2, y = 10, z = 2}
 
 function working_villages.villager:dig(pos,collect_drops)
 	if func.is_protected(self, pos) then return false, fail.protected end
-	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self.object:set_velocity{x = 0, y = 0, z = 0}
 	local dist = vector.subtract(pos, self.object:get_pos())
 	if vector.length(dist) > 5 then
 		self:set_animation(working_villages.animation_frames.STAND)
@@ -193,7 +193,7 @@ function working_villages.villager:place(item,pos)
 	 return false, fail.not_in_inventory
 	end
 	--set animation
-	if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+	if self.object:get_velocity().x==0 and self.object:get_velocity().z==0 then
 		self:set_animation(working_villages.animation_frames.MINE)
 	else
 		self:set_animation(working_villages.animation_frames.WALK_MINE)
@@ -242,7 +242,7 @@ function working_villages.villager:place(item,pos)
 		end
 	end
 	--reset animation
-	if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+	if self.object:get_velocity().x==0 and self.object:get_velocity().z==0 then
 		self:set_animation(working_villages.animation_frames.STAND)
 	else
 		self:set_animation(working_villages.animation_frames.WALK)
@@ -301,7 +301,7 @@ end
 
 function working_villages.villager:sleep()
 	log.action("villager %s is laying down",self.inventory_name)
-	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self.object:set_velocity{x = 0, y = 0, z = 0}
 	local bed_pos = vector.new(self.pos_data.bed_pos)
 	local bed_top = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_top") end)
