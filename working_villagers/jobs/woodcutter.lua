@@ -3,6 +3,8 @@ local func = working_villages.require("jobs/util")
 local function find_tree(p)
 	local adj_node = minetest.get_node(p)
 	if minetest.get_item_group(adj_node.name, "tree") > 0 then
+		-- FIXME: need a player name if villagers can own a protected area
+		if minetest.is_protected(p, "") then return false end
 		return true
 	end
 	return false
@@ -22,6 +24,8 @@ local function is_sapling(n)
 end
 
 local function is_sapling_spot(pos)
+	-- FIXME: need a player name if villagers can own a protected area
+	if minetest.is_protected(pos, "") then return false end
 	local node = minetest.get_node(pos)
 	if node.name ~= "air" then return false end
 	local lpos = vector.add(pos, {x = 0, y = -1, z = 0})
