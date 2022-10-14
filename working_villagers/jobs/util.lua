@@ -73,6 +73,8 @@ end
 
 local find_adjacent_clear = func.find_adjacent_clear
 
+-- search in an expanding box around pos in the XZ plane
+-- first hit would be closest
 local function search_surrounding(pos, pred, searching_range)
 	pos = vector.round(pos)
 	local max_xz = math.max(searching_range.x, searching_range.z)
@@ -87,47 +89,53 @@ local function search_surrounding(pos, pred, searching_range)
 		mod_y = searching_range.h
 	end
 
-	for j = mod_y - searching_range.y, searching_range.y do
-		local p = vector.add({x = 0, y = j, z = 0}, pos)
-		if pred(p) and find_adjacent_clear(p)~=false then
-			return p
+	local ret = {}
+
+	local function check_column(dx, dz)
+		if ret.pos ~= nil then return end
+		for j = mod_y - searching_range.y, searching_range.y do
+			local p = vector.add({x = dx, y = j, z = dz}, pos)
+			if pred(p) and find_adjacent_clear(p)~=false then
+				ret.pos = p
+				return
+			end
 		end
 	end
 
 	for i = 0, max_xz do
-		for j = mod_y - searching_range.y, searching_range.y do
-			for k = -i, i do
-				if searching_range.x >= k and searching_range.z >= i then
-					local p = vector.add({x = k, y = j, z = i}, pos)
-					if pred(p) and find_adjacent_clear(p)~=false then
-						return p
-					end
-
-					p = vector.add({x = k, y = j, z = -i}, pos)
-					if pred(p) and find_adjacent_clear(p)~=false then
-						return p
-					end
+		for k = 0, i do
+			-- hit the 8 points of symmetry, bound check and skip duplicates
+			if k <= searching_range.x and i <= searching_range.z then
+				check_column(k, i)
+				if i > 0 then
+					check_column(k, -i)
 				end
-
-				if searching_range.z >= i and searching_range.z >= k then
-					if i ~= k then
-						local p = vector.add({x = i, y = j, z = k}, pos)
-						if pred(p) and find_adjacent_clear(p)~=false then
-							return p
-						end
-					end
-
-					if -i ~= k then
-						local p = vector.add({x = -i, y = j, z = k}, pos)
-						if pred(p) and find_adjacent_clear(p)~=false then
-							return p
-						end
+				if k > 0 then
+					check_column(-k, i)
+					if k ~= i then
+						check_column(-k, -i)
 					end
 				end
 			end
+
+			if i <= searching_range.x and k <= searching_range.z then
+				if i > 0 then
+					check_column(-i, k)
+				end
+				if k ~= i then
+					check_column(i, k)
+					if k > 0 then
+						check_column(-i, -k)
+						check_column(i, -k)
+					end
+				end
+			end
+			if ret.pos ~= nil then
+				break
+			end
 		end
 	end
-	return nil
+	return ret.pos
 end
 
 func.search_surrounding = search_surrounding
