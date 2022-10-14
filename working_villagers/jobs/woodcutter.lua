@@ -26,6 +26,7 @@ end
 local function is_sapling_spot(pos)
 	-- FIXME: need a player name if villagers can own a protected area
 	if minetest.is_protected(pos, "") then return false end
+	if working_villages.failed_pos_test(pos) then return false end
 	local node = minetest.get_node(pos)
 	if node.name ~= "air" then return false end
 	local lpos = vector.add(pos, {x = 0, y = -1, z = 0})
@@ -77,7 +78,12 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 					end
 					self:set_displayed_action("planting a tree")
 					self:go_to(destination)
-					self:place(is_sapling, target)
+					local success, ret = self:place(is_sapling, target)
+					if not success then
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why planting failed")
+						self:delay(100)
+					end
 				end
 			end
 			local target = func.search_surrounding(self.object:get_pos(), find_tree, searching_range)
