@@ -5,6 +5,7 @@ local function find_tree(p)
 	if minetest.get_item_group(adj_node.name, "tree") > 0 then
 		-- FIXME: need a player name if villagers can own a protected area
 		if minetest.is_protected(p, "") then return false end
+		if working_villages.failed_pos_test(p) then return false end
 		return true
 	end
 	return false
@@ -103,8 +104,20 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 					destination = target
 				end
 				self:set_displayed_action("cutting a tree")
-				self:go_to(destination)
-				self:dig(target,true)
+				-- We may not be able to reach the log
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable log")
+					self:delay(100)
+				else
+					success, ret = self:dig(target,true)
+					if not success then
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why cutting failed")
+						self:delay(100)
+					end
+				end
 			end
 			self:set_displayed_action("looking for work")
 		elseif self:timer_exceeded("woodcutter:change_dir",50) then
