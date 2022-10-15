@@ -67,7 +67,7 @@ function working_villages.villager:go_to(pos)
 		coroutine.yield()
 	end
 	-- stop
-	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self.object:set_velocity{x = 0, y = 0, z = 0}
 	self.path = nil
 	self:set_animation(working_villages.animation_frames.STAND)
 	return true
@@ -91,7 +91,7 @@ local drop_range = {x = 2, y = 10, z = 2}
 
 function working_villages.villager:dig(pos,collect_drops)
 	if func.is_protected(self, pos) then return false, fail.protected end
-	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self.object:set_velocity{x = 0, y = 0, z = 0}
 	local dist = vector.subtract(pos, self.object:get_pos())
 	if vector.length(dist) > 5 then
 		self:set_animation(working_villages.animation_frames.STAND)
@@ -193,7 +193,7 @@ function working_villages.villager:place(item,pos)
 	 return false, fail.not_in_inventory
 	end
 	--set animation
-	if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+	if self.object:get_velocity().x==0 and self.object:get_velocity().z==0 then
 		self:set_animation(working_villages.animation_frames.MINE)
 	else
 		self:set_animation(working_villages.animation_frames.WALK_MINE)
@@ -223,9 +223,9 @@ function working_villages.villager:place(item,pos)
 		local before_count = stack:get_count()
 		local itemdef = stack:get_definition()
 		if itemdef.on_place then
-			stack = itemdef.on_place(stack, self.object, pointed_thing)
+			stack = itemdef.on_place(stack, self, pointed_thing)
 		elseif itemdef.type=="node" then
-			stack = minetest.item_place_node(stack, self.object, pointed_thing)
+			stack = minetest.item_place_node(stack, self, pointed_thing)
 		end
 		local after_node = minetest.get_node(pos)
 		-- if the node didn't change, then the callback failed
@@ -239,6 +239,7 @@ function working_villages.villager:place(item,pos)
 	end
 	--take item
 	self:set_wield_item_stack(stack)
+	coroutine.yield()
 	--handle sounds
 	local sounds = minetest.registered_nodes[itemname]
 	if sounds then
@@ -250,13 +251,53 @@ function working_villages.villager:place(item,pos)
 		end
 	end
 	--reset animation
-	if self.object:getvelocity().x==0 and self.object:getvelocity().z==0 then
+	if self.object:get_velocity().x==0 and self.object:get_velocity().z==0 then
 		self:set_animation(working_villages.animation_frames.STAND)
 	else
 		self:set_animation(working_villages.animation_frames.WALK)
 	end
 
 	return true
+end
+
+function working_villages.villager:manipulate_chest(chest_pos, take_func, put_func, data)
+	if func.is_chest(chest_pos) then
+		-- try to put items
+		local vil_inv = self:get_inventory();
+
+		-- from villager to chest
+		if put_func then
+			local size = vil_inv:get_size("main");
+			for index = 1,size do
+				local stack = vil_inv:get_stack("main", index);
+				if (not stack:is_empty()) and (put_func(self, stack, data)) then
+					local chest_meta = minetest.get_meta(chest_pos);
+					local chest_inv = chest_meta:get_inventory();
+					local leftover = chest_inv:add_item("main", stack);
+					vil_inv:set_stack("main", index, leftover);
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+				end
+			end
+		end
+		-- from chest to villager
+		if take_func then
+			local chest_meta = minetest.get_meta(chest_pos);
+			local chest_inv = chest_meta:get_inventory();
+			local size = chest_inv:get_size("main");
+			for index = 1,size do
+				chest_meta = minetest.get_meta(chest_pos);
+				chest_inv = chest_meta:get_inventory();
+				local stack = chest_inv:get_stack("main", index);
+				if (not stack:is_empty()) and (take_func(self, stack, data)) then
+					local leftover = vil_inv:add_item("main", stack);
+					chest_inv:set_stack("main", index, leftover);
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+				end
+			end
+		end
+	else
+		log.error("Villager %s doe's not find cheston position %s.", self.inventory_name, minetest.pos_to_string(chest_pos))
+	end
 end
 
 function working_villages.villager.wait_until_dawn()
@@ -269,7 +310,7 @@ end
 
 function working_villages.villager:sleep()
 	log.action("villager %s is laying down",self.inventory_name)
-	self.object:setvelocity{x = 0, y = 0, z = 0}
+	self.object:set_velocity{x = 0, y = 0, z = 0}
 	local bed_pos = vector.new(self.pos_data.bed_pos)
 	local bed_top = func.find_adjacent_pos(bed_pos,
 		function(p) return string.find(minetest.get_node(p).name,"_top") end)
@@ -356,6 +397,7 @@ function working_villages.villager:handle_night()
 			self.job_data.in_work = false;
 		end
 		self:goto_bed()
+		self.job_data.manipulated_chest = false;
 	end
 end
 
@@ -363,15 +405,34 @@ function working_villages.villager:goto_job()
 	log.action("villager %s is going home", self.inventory_name)
 	if self.pos_data.job_pos==nil then
 		log.warning("villager %s couldn't find his job position",self.inventory_name)
-		self:set_state_info("I am going to my job position.")
 		self.job_data.in_work = true;
 	else
+		log.action("villager %s going to job position %s", self.inventory_name, minetest.pos_to_string(self.pos_data.job_pos))
 		self:set_state_info("I am going to my job position.")
 		self:set_displayed_action("going to job")
 		self:go_to(self.pos_data.job_pos)
 		self.job_data.in_work = true;
 	end
+	self:set_state_info("I'm working.")
+	self:set_displayed_action("active")
 	return true
+end
+
+function working_villages.villager:handle_chest(take_func, put_func, data)
+	if (not self.job_data.manipulated_chest) then
+		local chest_pos = self.pos_data.chest_pos
+		if (chest_pos~=nil) then
+			log.action("villager %s is handling chest at %s", self.inventory_name, minetest.pos_to_string(chest_pos))
+			self:set_state_info("I am taking and puting items from/to my chest.")
+			self:set_displayed_action("active")
+			local chest = minetest.get_node(chest_pos);
+			local dir = minetest.facedir_to_dir(chest.param2);
+			local destination = vector.subtract(chest_pos, dir);
+			self:go_to(destination)
+			self:manipulate_chest(chest_pos, take_func, put_func, data);
+		end
+		self.job_data.manipulated_chest = true;
+	end
 end
 
 function working_villages.villager:handle_job_pos()
