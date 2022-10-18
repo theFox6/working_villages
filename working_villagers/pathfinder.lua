@@ -1,5 +1,7 @@
 local pathfinder = {}
 
+local debug_pathfinder = true
+
 --[[
 minetest.get_content_id(name)
 minetest.registered_nodes
@@ -144,6 +146,45 @@ end
 --TODO: path to the nearest of multiple endpoints
 -- or first path nearest to the endpoint
 
+-- illustrate the path -- adapted from minetest's pathfinder test.
+local function show_particles(path)
+	local prev = path[1]
+	for s=1, #path do
+		local pos = path[s]
+		local t
+		if s == #path then
+			t = "testpathfinder_waypoint_end.png"
+		elseif s == 1 then
+			t = "testpathfinder_waypoint_start.png"
+		else
+			local tn = "testpathfinder_waypoint.png"
+			if pos.y ~= prev.y then
+				if pos.x == prev.x and pos.z == prev.z then
+					if pos.y > prev.y then
+						tn = "testpathfinder_waypoint_up.png"
+					else
+						tn = "testpathfinder_waypoint_down.png"
+					end
+				else
+					tn = "testpathfinder_waypoint_jump.png"
+				end
+			end
+			local c = math.floor(((#path-s)/#path)*255)
+			t = string.format("%s^[multiply:#%02x%02x00", tn, 0xFF-c, c)
+		end
+		minetest.add_particle({
+			pos = pos,
+			expirationtime = 5 + 0.2 * s,
+			playername = "singleplayer",
+			glow = minetest.LIGHT_MAX,
+			texture = t,
+			size = 3,
+		})
+		prev = pos
+	end
+end
+
+
 function pathfinder.find_path(pos, endpos, entity)
 	--print("searching for a path to:" .. minetest.pos_to_string(endpos))
 	local start_index = minetest.hash_node_position(pos)
@@ -208,6 +249,9 @@ function pathfinder.find_path(pos, endpos, entity)
 			 print("path's length is "..#path.." but reverse path has length "..#reverse_path)
 			end
 			--print("path length: "..#reverse_path)
+			if debug_pathfinder then
+				show_particles(path)
+			end
 			return reverse_path,path
 		end
 
