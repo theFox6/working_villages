@@ -46,6 +46,7 @@ local function get_distance_to_neighbor(start_pos, end_pos)
 		return (14 * distX + 10 * (distZ - distX)) * (distY + 1)
 	end
 end
+
 local function walkable(node)
 		if string.find(node.name,"doors:") then
 			return false
@@ -58,12 +59,13 @@ local function walkable(node)
 		end
 end
 
-local function check_clearance(cpos, x, z, height) --TODO: this is unused
+-- Check if we have @height clear nodes above cpos.
+-- We already checked that cpos is clear.
+local function check_clearance(cpos, height)
 	for i = 1, height do
-		local n_name = minetest.get_node({x = cpos.x + x, y = cpos.y + i, z = cpos.z + z}).name
-		local c_name = minetest.get_node({x = cpos.x, y = cpos.y + i, z = cpos.z}).name
-		--print(i, n_name, c_name)
-		if walkable(n_name) or walkable(c_name) then
+		local hpos = {x=cpos.x, y=cpos.y+i, z=cpos.z}
+		local node = minetest.get_node(hpos)
+		if walkable(node) then
 			return false
 		end
 	end
@@ -99,6 +101,8 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 end
 
 local function get_neighbors(current_pos, entity_height, entity_jump_height, entity_fear_height)
+	-- check to see if we can jump in the current pos
+	local can_jump = check_clearance(current_pos, entity_height + entity_jump_height)
 	local neighbors = {}
 	local neighbors_index = 1
 	for z = -1, 1 do
@@ -107,61 +111,33 @@ local function get_neighbors(current_pos, entity_height, entity_jump_height, ent
 		local neighbor = minetest.get_node(neighbor_pos)
 		local neighbor_ground_level = get_neighbor_ground_level(neighbor_pos, entity_jump_height, entity_fear_height)
 		local neighbor_clearance = false
-		if neighbor_ground_level then
-			-- print(neighbor_ground_level.y - current_pos.y)
-			-- minetest.set_node(neighbor_ground_level, {name = "default:dry_shrub"})
-			local node_above_head = minetest.get_node(
-					{x = current_pos.x, y = current_pos.y + entity_height, z = current_pos.z})
-			if neighbor_ground_level.y - current_pos.y > 0 and not(walkable(node_above_head)) then
-				local height = -1
-				repeat
-					height = height + 1
-					local node = minetest.get_node(
-							{x = neighbor_ground_level.x,
-							y = neighbor_ground_level.y + height,
-							z = neighbor_ground_level.z})
-				until walkable(node) or height > entity_height
-				if height >= entity_height then
-					neighbor_clearance = true
-				end
-			elseif neighbor_ground_level.y - current_pos.y > 0 and walkable(node_above_head) then
-				neighbors[neighbors_index] = {
-						hash = nil,
-						pos = nil,
-						clear = nil,
-						walkable = nil,
-				}
-			else
-				local height = -1
-				repeat
-					height = height + 1
-					local node = minetest.get_node(
-							{x = neighbor_ground_level.x,
-							y = current_pos.y + height,
-							z = neighbor_ground_level.z})
-				until walkable(node) or height > entity_height
-				if height >= entity_height then
-					neighbor_clearance = true
-				end
+		-- did we find a walkable node within range with a non-walkable node above?
+		if neighbor_ground_level and can_jump or current_pos.y >= neighbor_ground_level.y then
+			-- check headroom, if we are jumping, we need extra
+			local needed_height = entity_height
+			if neighbor_ground_level.y > current_pos.y then
+				needed_height = needed_height + entity_jump_height - (neighbor_ground_level.y - current_pos.y)
 			end
-
+			neighbor_clearance = check_clearance(neighbor_pos, needed_height)
+		end
+		if neighbor_clearance and neighbor_ground_level then
 			neighbors[neighbors_index] = {
-					hash = minetest.hash_node_position(neighbor_ground_level),
-					pos = neighbor_ground_level,
-					clear = neighbor_clearance,
-					walkable = walkable(neighbor),
+				hash = minetest.hash_node_position(neighbor_ground_level),
+				pos = neighbor_ground_level,
+				clear = true,
+				walkable = true, -- FIXME: clear and walkable are always the same
 			}
 		else
 			neighbors[neighbors_index] = {
-					hash = nil,
-					pos = nil,
-					clear = nil,
-					walkable = nil,
+				hash = nil,
+				pos = nil,
+				clear = nil,
+				walkable = nil,
 			}
 		end
 		neighbors_index = neighbors_index + 1
-	end
-	end
+	end -- for x
+	end -- for z
 	return neighbors
 end
 
