@@ -39,7 +39,8 @@ If I have the materials of course. Also I'll look for building markers within a 
 			else
 				local meta = minetest.get_meta(marker)
 				local build_pos = working_villages.buildings.get_build_pos(meta)
-				if meta:get_int("index") > #working_villages.buildings.get(build_pos).nodedata then
+        local building_on_pos = working_villages.buildings.get(build_pos)
+				if building_on_pos.nodedata and (meta:get_int("index") > #building_on_pos.nodedata) then
 				  self:set_state_info("I am currently marking a building as finished.")
 					local destination = func.find_adjacent_clear(marker)
 					destination = func.find_ground_below(destination)
