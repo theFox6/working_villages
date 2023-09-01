@@ -18,6 +18,46 @@ working_villages.registered_jobs = {}
 
 working_villages.registered_eggs = {}
 
+-- records failed node place attempts to prevent repeating mistakes
+-- key=minetest.pos_to_string(pos) val=(os.clock()+180)
+local failed_pos_data = {}
+local failed_pos_time = 0
+
+-- remove old positions
+local function failed_pos_cleanup()
+	-- build a list of all items to discard
+	local discard_tab = {}
+	local now = os.clock()
+	for key, val in pairs(failed_pos_data) do
+		if now >= val then
+			discard_tab[key] = true
+		end
+	end
+	-- discard the old entries
+	for key, _ in pairs(discard_tab) do
+		failed_pos_data[key] = nil
+	end
+end
+
+-- add a failed place position
+function working_villages.failed_pos_record(pos)
+	local key = minetest.hash_node_position(pos)
+	failed_pos_data[key] = os.clock() + 180 -- mark for 3 minutes
+
+	-- cleanup if more than 1 minute has passed since the last cleanup
+	if os.clock() > failed_pos_time then
+		failed_pos_time = os.clock() + 60
+		failed_pos_cleanup()
+	end
+end
+
+-- check if a position is marked as failed and hasn't expired
+function working_villages.failed_pos_test(pos)
+	local key = minetest.hash_node_position(pos)
+	local exp = failed_pos_data[key]
+	return exp ~= nil and exp >= os.clock()
+end
+
 -- working_villages.is_job reports whether a item is a job item by the name.
 function working_villages.is_job(item_name)
   if working_villages.registered_jobs[item_name] then

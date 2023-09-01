@@ -3,6 +3,9 @@ local func = working_villages.require("jobs/util")
 local function find_tree(p)
 	local adj_node = minetest.get_node(p)
 	if minetest.get_item_group(adj_node.name, "tree") > 0 then
+		-- FIXME: need a player name if villagers can own a protected area
+		if minetest.is_protected(p, "") then return false end
+		if working_villages.failed_pos_test(p) then return false end
 		return true
 	end
 	return false
@@ -22,13 +25,24 @@ local function is_sapling(n)
 end
 
 local function is_sapling_spot(pos)
-	local node = minetest.get_node(pos)
-	if node.name ~= "air" then return false end
+	-- FIXME: need a player name if villagers can own a protected area
+	if minetest.is_protected(pos, "") then return false end
+	if working_villages.failed_pos_test(pos) then return false end
 	local lpos = vector.add(pos, {x = 0, y = -1, z = 0})
 	local lnode = minetest.get_node(lpos)
 	if minetest.get_item_group(lnode.name, "soil") == 0 then return false end
 	local light_level = minetest.get_node_light(pos)
 	if light_level <= 12 then return false end
+	-- A sapling needs room to grow. Require a volume of air around the spot.
+	for x = -1,1 do
+		for z = -1,1 do
+			for y = 0,2 do
+				lpos = vector.add(pos, {x=x, y=y, z=z})
+				lnode = minetest.get_node(lpos)
+				if lnode.name ~= "air" then return false end
+			end
+		end
+	end
 	return true
 end
 
@@ -73,7 +87,12 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 					end
 					self:set_displayed_action("planting a tree")
 					self:go_to(destination)
-					self:place(is_sapling, target)
+					local success, ret = self:place(is_sapling, target)
+					if not success then
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why planting failed")
+						self:delay(100)
+					end
 				end
 			end
 			local target = func.search_surrounding(self.object:get_pos(), find_tree, searching_range)
@@ -85,8 +104,20 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 					destination = target
 				end
 				self:set_displayed_action("cutting a tree")
-				self:go_to(destination)
-				self:dig(target,true)
+				-- We may not be able to reach the log
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable log")
+					self:delay(100)
+				else
+					success, ret = self:dig(target,true)
+					if not success then
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why cutting failed")
+						self:delay(100)
+					end
+				end
 			end
 			self:set_displayed_action("looking for work")
 		elseif self:timer_exceeded("woodcutter:change_dir",50) then
