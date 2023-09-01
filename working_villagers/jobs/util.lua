@@ -228,4 +228,20 @@ function func.is_protected(self, pos)
     return func.is_protected_owner(self.owner_name, pos)
 end
 
+-- chest manipulation support functions
+function func.is_chest(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="default:chest" then
+    return true;
+  end
+  local is_chest = minetest.get_item_group(node.name, "chest");
+  if (is_chest~=0) then
+    return true;
+  end
+  return false;
+end
+
 return func

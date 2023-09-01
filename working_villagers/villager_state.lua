@@ -2,7 +2,7 @@ function working_villages.villager:set_pause(state)
   assert(type(state) == "boolean","pause state must be a boolean")
   self.pause = state
   if state then
-    self.object:setvelocity{x = 0, y = 0, z = 0}
+    self.object:set_velocity{x = 0, y = 0, z = 0}
     --perhaps check what animation we are in
     self:set_animation(working_villages.animation_frames.STAND)
   end

@@ -1,5 +1,10 @@
 max_line_length = 240
 
+ignore = {
+	-- ignore unused self argument
+	"212/self",
+}
+
 read_globals = {
 	-- minetest
 	"AreaStore",

@@ -34,18 +34,18 @@ working_villages.register_job("working_villages:job_guard", {
 			local target_position = escort_target:get_pos()
 			local distance = vector.subtract(target_position, self.object:get_pos())
 
-			local velocity = self.object:getvelocity()
+			local velocity = self.object:get_velocity()
 			if vector.length(distance) < 3 then
 				if velocity.x~=0 or velocity.y~=0 then
 					self:set_animation(working_villages.animation_frames.STAND)
-					self.object:setvelocity{x = 0, y = velocity.y, z = 0}
+					self.object:set_velocity{x = 0, y = velocity.y, z = 0}
 				end
 			else
 				if velocity.x==0 and velocity.y==0 then
 					self:set_animation(working_villages.animation_frames.WALK)
 				end
 				--FIXME: don't run too fast, perhaps go_to
-				self.object:setvelocity{x = distance.x, y = velocity.y, z = distance.z}
+				self.object:set_velocity{x = distance.x, y = velocity.y, z = distance.z}
 				self:set_yaw_by_direction(distance)
 
 				--if villager is stoped by obstacle, the villager must jump.
