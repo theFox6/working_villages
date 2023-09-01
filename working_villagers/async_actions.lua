@@ -343,11 +343,7 @@ function working_villages.villager:goto_bed()
 		self:set_state_info("I'm waiting for dawn to come.")
 		self:set_displayed_action("waiting until dawn")
 		self:set_animation(working_villages.animation_frames.SIT)
-		local tod = minetest.get_timeofday()
-		while (tod > 0.2 and tod < 0.805) do
-			coroutine.yield()
-			tod = minetest.get_timeofday()
-		end
+		self.object:set_velocity{x = 0, y = 0, z = 0}
 		self.wait_until_dawn()
 		self:set_animation(working_villages.animation_frames.STAND)
 		self:set_state_info("I'm starting into the new day.")
@@ -370,6 +366,7 @@ function working_villages.villager:goto_bed()
 			self:set_state_info("I'm waiting for dawn to come.")
 			self:set_displayed_action("waiting until dawn")
 			self:set_animation(working_villages.animation_frames.SIT)
+			self.object:set_velocity{x = 0, y = 0, z = 0}
 			self.wait_until_dawn()
 		else
 			log.info("villager %s bed is at: %s", self.inventory_name, minetest.pos_to_string(self.pos_data.bed_pos))
