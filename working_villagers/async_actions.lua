@@ -87,6 +87,13 @@ function working_villages.villager:collect_nearest_item_by_condition(cond, searc
 	end
 end
 
+-- delay the async action by @step_count steps
+function working_villages.villager:delay(step_count)
+	for _=0,step_count do
+		coroutine.yield()
+	end
+end
+
 local drop_range = {x = 2, y = 10, z = 2}
 
 function working_villages.villager:dig(pos,collect_drops)
