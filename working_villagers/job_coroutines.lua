@@ -39,7 +39,10 @@ function job_coroutines.resume(self,dtime)
        self:set_displayed_action(ret[3])
       end
     else
-      error("error in job_thread " .. ret[2]..": "..debug.traceback(self.job_thread))
+      log.error("error in job_thread " .. ret[2]..": "..debug.traceback(self.job_thread))
+      minetest.chat_send_all("villager " .. self.inventory_name .. " encountered an error in " .. job.description)
+      self:set_pause(true)
+      self:set_displayed_action("I encountered an error in my job.")
     end
   end
 end
