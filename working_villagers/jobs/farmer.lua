@@ -47,6 +47,15 @@ local farming_plants = {
 local farming_demands = {
 	["farming:beanpole"] = 99,
 	["farming:trellis"] = 99,
+	--["farming:hoe_wood"] = 99,
+	--["farming:hoe_stone"] = 99,
+	--["farming:hoe_steel"] = 99,
+}
+local farming_tools = {
+	-- the gardener handles this logic now
+	--["farming:hoe_wood"] = 99,
+	--["farming:hoe_stone"] = 99,
+	--["farming:hoe_steel"] = 99,
 }
 
 function farming_plants.get_plant(item_name)
@@ -104,6 +113,12 @@ working_villages.register_job("working_villages:job_farmer", {
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)
+		--local stack  = self:get_wield_item_stack()
+		--if stack:is_empty() then
+		--self:move_main_to_wield(function(name)
+  		--	return farming_tools[name] ~= nil
+		--end)
+		--end
 		self:handle_job_pos()
 
 		self:count_timer("farmer:search")

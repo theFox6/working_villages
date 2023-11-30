@@ -445,3 +445,289 @@ function working_villages.villager:handle_job_pos()
 	end
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- data = {
+--   appliance_id  = <some_key>,
+--   appliance_pos = {x=<x>, y=<y>, z=<z>}
+--   ... see below
+-- }
+-- self.job_data.manipulated_appliance = {
+--   <some_key> = true|false,
+-- }
+function working_villages.villager:handle_appliance(data)
+	assert(data ~= nil)
+	if (not self.job_data.manipulated_appliance) then
+		self.job_data.manipulated_appliance = {}
+	end
+	local app_id = data.appliance_id
+	assert(app_id ~= nil)
+	local appliance_pos = data.appliance_pos
+	assert(appliance_pos ~= nil)
+	--if (self.job_data.manipulated_appliance[app_id]) then
+	--	log.error("villager %s already handled appliance at %s", self.inventory_name, minetest.pos_to_string(appliance_pos))
+	--	return
+	--end
+	if (appliance_pos==nil) then return end
+	--log.action("villager %s is handling appliance at %s", self.inventory_name, minetest.pos_to_string(appliance_pos))
+	self:set_state_info("I am taking and puting items from/to my appliance.")
+	self:set_displayed_action("active")
+	local appliance = minetest.get_node(appliance_pos);
+	local dir = minetest.facedir_to_dir(appliance.param2);
+	local destination = vector.subtract(appliance_pos, dir);
+	self:go_to(destination)
+	self:manipulate_appliance(appliance_pos, data)
+	--end
+	-- TODO check whether appliance is ready/inactive
+	self.job_data.manipulated_appliance[app_id] = true;
+end
+-- data = {
+--   appliance_id = <some_key>,
+--   appliance_pos = {x=<x>, y=<y>, z=<z>}
+--   is_appliance  = function(pos) return true end,
+--   operations    = {
+--     [0] = {
+--       list      = "src",
+--       is_put    = true,
+--       put_func  = function(villager, stack, data) return true end,
+--       data      = ...,
+--     },
+--     [1] = {
+--       list      = "fuel",
+--       is_put    = true,
+--       put_func  = function(villager, stack, data) return true end,
+--       data      = ...,
+--     },
+--     [2] = {
+--       list      = "dst",
+--       is_take   = true,
+--       take_func = function(villager, stack, data) return true end,
+--       data      = ...,
+--     },
+--   },
+-- }
+function working_villages.villager:manipulate_appliance(appliance_pos, data)
+	assert(data ~= nil)
+	assert(data.is_appliance ~= nil)
+	if not data.is_appliance(appliance_pos) then
+		log.error("Villager %s doe's not find appliance on position %s.", self.inventory_name, minetest.pos_to_string(appliance_pos))
+		return
+	end
+	--log.error("Villager %s finds appliance on position %s.", self.inventory_name, minetest.pos_to_string(appliance_pos))
+
+	-- try to put items
+	local vil_inv     = self:get_inventory();
+	local target_node = minetest.get_node(appliance_pos)
+	local target_def  = minetest.registered_nodes[target_node.name]
+	local placer = self
+
+	assert(data.operations ~= nil)
+	local operations = data.operations
+	assert(#operations > 0)
+	for _, operation in ipairs(operations) do
+		assert(operation ~= nil)
+		local app_list_name = operation.list
+		assert(app_list_name ~= nil)
+		if operation.is_put then -- from villager to appliance
+			assert(operation.is_take == nil)
+			assert(operation.put_func ~= nil)
+			local size = vil_inv:get_size("main");
+			for index = 1,size do
+				local stack = vil_inv:get_stack("main", index);
+--if not stack:is_empty() then
+--	log.error("Villager %s deciding whether to move %s from inventory to appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
+--end
+				if (not stack:is_empty()) and (operation.put_func(self, stack, operation.data)) then
+					local appliance_meta = minetest.get_meta(appliance_pos);
+					local appliance_inv = appliance_meta:get_inventory();
+					--if(target_def.allow_metadata_inventory_put ~= nil) and target_def.allow_metadata_inventory_put(furnace_pos, "fuel", index, stack, placer) then -- extra sanity check... I don't know why it doesn't work
+					if operation.data ~= nil and operation.data.target_count ~= nil then
+						stack = stack:take_item(operation.data.target_count)
+					end
+					local leftover
+					if operation.data == nil or operation.data.target_index == nil then
+						leftover = appliance_inv:add_item(app_list_name, stack);
+					else
+						local i = operation.data.target_index
+						if appliance_inv:get_stack(app_list_name, i):is_empty() then
+							leftover = appliance_inv:set_stack(app_list_name, i, stack);
+						else
+							leftover = stack:get_size()
+						end
+					end
+					if operation.data == nil or operation.data.target_count == nil then -- TODO
+					vil_inv:set_stack("main", index, leftover);
+					end
+					if(target_def.on_metadata_inventory_put ~= nil) then -- active furnace doesn't have this
+						target_def.on_metadata_inventory_put(appliance_pos, app_list_name, index, stack, placer) -- index should be 0 ?
+					end
+					log.info("Villager %s moves %s from inventory to appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+				end
+			end
+
+		else -- from appliance to villager
+			assert(operation.is_take)
+			assert(operation.is_put == nil)
+			assert(operation.take_func ~= nil)
+			local appliance_meta = minetest.get_meta(appliance_pos);
+			local appliance_inv = appliance_meta:get_inventory();
+			local size = appliance_inv:get_size(app_list_name);
+			for index = 1,size do
+				appliance_meta = minetest.get_meta(appliance_pos);
+				appliance_inv = appliance_meta:get_inventory();
+				local stack = appliance_inv:get_stack(app_list_name, index);
+--if not stack:is_empty() then
+--	log.error("Villager %s deciding whether to move %s to inventory from appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
+--end
+				if (not stack:is_empty()) and (operation.take_func(self, stack, operation.data)) then
+					--if(target_def.allow_metadata_inventory_take ~= nil) and target_def.allow_metadata_inventory_take(furnace_pos, "fuel", index, stack, placer) then -- extra sanity check... I don't know why it doesn't work
+					local leftover = vil_inv:add_item("main", stack);
+					appliance_inv:set_stack(app_list_name, index, leftover);
+					if(target_def.on_metadata_inventory_take ~= nil) then -- active furnace doesn't have this
+						target_def.on_metadata_inventory_take(appliance_pos, app_list_name, index, stack, placer) -- index should be 0 ?
+					end
+					log.info("Villager %s moves %s to inventory from appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+				end
+			end
+		end
+	end
+end
+
+function working_villages.villager:handle_furnace(furnace_pos, take_func, put_func, put_fuel, data)
+	assert(furnace_pos ~= nil)
+	assert(take_func   ~= nil)
+	assert( put_func   ~= nil)
+	assert( put_fuel   ~= nil)
+	assert(data        == nil
+	or     #data       == 3)
+	local my_data = {
+		appliance_id  = 'my_furnace',
+		appliance_pos = furnace_pos,
+		is_appliance  = func.is_furnace,
+		operations    = {
+			[1]   = {
+				list      = "fuel",
+				is_put    = true,
+				put_func  = put_fuel,
+				--data      = data[0] or nil,
+			},
+			[2]   = {
+				list      = "src",
+				is_put    = true,
+				put_func  = put_func,
+				--data      = data[1] or nil,
+			},
+			[3]   = {
+				list      = "dst",
+				is_take   = true,
+				take_func = take_func,
+				--data      = data[2] or nil
+			},
+		},
+	}
+	self:handle_appliance(my_data)
+end
+
+function working_villages.villager:handle_lockworkshop(lockworkshop_pos, take_func, put_func, put_lock, data)
+	local my_data = {
+		appliance_id  = 'my_lockworkshop',
+		appliance_pos = lockworkshop_pos,
+		is_appliance  = func.is_lockworkshop,
+		operations    = {
+			[1]   = {
+				list      = "lock",
+				is_put    = true,
+				put_func  = put_lock,
+				--data      = data[0] or nil,
+			},
+			[2]   = {
+				list      = "input",
+				is_put    = true,
+				put_func  = put_func,
+				--data      = data[1] or nil,
+			},
+			[3]   = {
+				list      = "output",
+				is_take   = true,
+				take_func = take_func,
+				--data      = data[2] or nil
+			},
+		},
+	}
+	self:handle_appliance(my_data)
+end
+
+function working_villages.villager:handle_fakerytable(fakerytable_pos, take_func, put_func, put_lock, data)
+	local my_data = {
+		appliance_id  = 'my_fakerytable',
+		appliance_pos = fakerytable_pos,
+		is_appliance  = func.is_fakerytable,
+		operations    = {
+			[1]   = {
+				list      = "dye",
+				is_put    = true,
+				put_func  = put_lock,
+				--data      = data[0] or nil,
+			},
+			[2]   = {
+				list      = "metal",
+				is_put    = true,
+				put_func  = put_func,
+				--data      = data[1] or nil,
+			},
+			[3]   = {
+				list      = "dest",
+				is_take   = true,
+				take_func = take_func,
+				--data      = data[2] or nil
+			},
+		},
+	}
+	self:handle_appliance(my_data)
+end
+
+function working_villages.villager:handle_refinery(refinery_pos, take_func, put_func, data)
+	assert(refinery_pos ~= nil)
+	assert(take_func   ~= nil)
+	assert( put_func   ~= nil)
+	assert(data        == nil
+	or     #data       == 3)
+	local my_data = {
+		appliance_id  = 'my_refinery',
+		appliance_pos = refinery_pos,
+		is_appliance  = func.is_refinery,
+		operations    = {
+			[1]   = {
+				list      = "src",
+				is_put    = true,
+				put_func  = put_func,
+				--data      = data[1] or nil,
+			},
+			[2]   = {
+				list      = "dst",
+				is_take   = true,
+				take_func = take_func,
+				--data      = data[2] or nil
+			},
+		},
+	}
+	self:handle_appliance(my_data)
+end

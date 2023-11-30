@@ -140,6 +140,80 @@ end
 
 func.search_surrounding = search_surrounding
 
+-- search in an expanding box around pos in the XZ plane
+-- first hit would be closest
+local function search_surrounding_inv(pos, pred, searching_range)
+	pos = vector.round(pos)
+	local max_xz = math.max(searching_range.x, searching_range.z)
+	local mod_y
+	if searching_range.h == nil then
+		if searching_range.y > 3 then
+			mod_y = 2
+		else
+			mod_y = 0
+		end
+	else
+		mod_y = searching_range.h
+	end
+
+	local ret = {}
+
+	local function check_column(dx, dz, j)
+		if ret.pos ~= nil then return end
+		local p = vector.add({x = dx, y = j, z = dz}, pos)
+		if pred(p) and find_adjacent_clear(p)~=false then
+			ret.pos = p
+			return
+		end
+	end
+	local function check_plane(j)
+		for i = 0, max_xz do
+			for k = 0, i do
+				-- hit the 8 points of symmetry, bound check and skip duplicates
+				if k <= searching_range.x and i <= searching_range.z then
+					check_column(k, i, j)
+					if i > 0 then
+						check_column(k, -i, j)
+					end
+					if k > 0 then
+						check_column(-k, i, j)
+						if k ~= i then
+							check_column(-k, -i, j)
+						end
+					end
+				end
+
+				if i <= searching_range.x and k <= searching_range.z then
+					if i > 0 then
+						check_column(-i, k, j)
+					end
+					if k ~= i then
+						check_column(i, k, j)
+						if k > 0 then
+							check_column(-i, -k, j)
+							check_column(i, -k, j)
+						end
+					end
+				end
+
+				if ret.pos ~= nil then
+					break
+				end
+			end
+		end
+	end
+
+	--for j = mod_y - searching_range.y, searching_range.y do
+	for j = searching_range.y, mod_y - searching_range.y, -1 do
+		check_plane(j)
+		if ret.pos ~= nil then
+			break
+		end
+	end
+	return ret.pos
+end
+func.search_surrounding_inv = search_surrounding_inv
+
 function func.find_adjacent_pos(pos,pred)
 	local dest_pos
 	if pred(pos) then
@@ -242,7 +316,10 @@ function func.is_chest(pos)
   if (node==nil) then
     return false;
   end
-  if node.name=="default:chest" then
+  if node.name=="default:chest"
+  or node.name=="default:chest_open" -- fix error when villager tries to use same chest as player
+  or node.name=="default:chest_locked" -- villagers should protect their stuff... there are thieves, you know
+  or node.name=="default:chest_locked_open" then
     return true;
   end
   local is_chest = minetest.get_item_group(node.name, "chest");
@@ -250,6 +327,94 @@ function func.is_chest(pos)
     return true;
   end
   return false;
+end
+
+function func.is_furnace(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="default:furnace"
+  or node.name=="default:furnace_active" then
+    return true;
+  end
+  local is_furnace = minetest.get_item_group(node.name, "furnace"); -- oven ? idk
+  return (is_furnace~=0)
+end
+
+function func.is_refinery(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="biofuel:refinery"
+  or node.name=="biofuel:refinery_active" then
+    return true;
+  end
+  local is_refinery = minetest.get_item_group(node.name, "refinery"); -- oven ? idk
+  return (is_refinery~=0)
+end
+
+function func.is_lockworkshop(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="mcg_lockworkshop:lock_workshop" then
+    return true;
+  end
+  local is_lockworkshop = minetest.get_item_group(node.name, "lockworkshop");
+  return (is_lockworkshop~=0)
+end
+
+function func.is_fakerytable(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="fakery:table" then
+    return true;
+  end
+  --local is_fakerytable = minetest.get_item_group(node.name, "table");
+  --if (is_fakerytable~=0) then
+  --  return true;
+  --end
+  --return false;
+  return false
+end
+
+function func.is_claycrafter(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="claycrafter:claycrafter"
+  or node.name=="claycrafter:claycrafter_active" then
+    return true;
+  end
+  --local is_fakerytable = minetest.get_item_group(node.name, "table");
+  --if (is_fakerytable~=0) then
+  --  return true;
+  --end
+  --return false;
+  return false
+end
+
+function func.is_recycler(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="decraft:table"
+  or node.name=="uncraft:uncrafttable" then
+    return true;
+  end
+  --local is_fakerytable = minetest.get_item_group(node.name, "table");
+  --if (is_fakerytable~=0) then
+  --  return true;
+  --end
+  --return false;
+  return false
 end
 
 return func

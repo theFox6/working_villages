@@ -69,6 +69,12 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)
+		local stack  = self:get_wield_item_stack()
+		if stack:is_empty() then
+		self:move_main_to_wield(function(name)
+  			return (minetest.get_item_group(name, "axe")~=0)
+		end)
+		end
 		self:handle_job_pos()
 
 		self:count_timer("woodcutter:search")

@@ -144,6 +144,52 @@ function working_villages.villager:get_nearest_player(range_distance,pos)
   end
   return player,ppos,min_distance
 end
+function working_villages.villager:get_near_players(range_distance,pos)
+  local min_distance = range_distance
+  local result   = {}
+  local position = pos or self.object:get_pos()
+
+  local all_objects = minetest.get_objects_inside_radius(position, range_distance)
+  for _, object in pairs(all_objects) do
+    if object:is_player() then
+      local player_position = object:get_pos()
+      local distance = vector.distance(position, player_position)
+      if distance < min_distance then
+        min_distance = distance
+      end
+      local data = {
+        player  =object,
+	position=player_position,
+	distance=distance,
+      }
+      table.insert(result, data)
+    end
+  end
+  return result,min_distance
+end
+function working_villages.villager:get_nearest_player_with_condition(range_distance,pos, condition)
+  local min_distance = range_distance
+  local player,ppos
+  local position = pos or self.object:get_pos()
+
+  local all_objects = minetest.get_objects_inside_radius(position, range_distance)
+  for _, object in pairs(all_objects) do
+	  local inv = object:get_inventory()
+    if --object:is_player() and -- ehh, is there a reason why a thief shouldn't rob a non-player ?
+       condition(inv)
+    then
+      local player_position = object:get_pos()
+      local distance = vector.distance(position, player_position)
+
+      if distance < min_distance then
+        min_distance = distance
+        player = object
+        ppos = player_position
+      end
+    end
+  end
+  return player,ppos,min_distance
+end
 
 -- working_villages.villager.get_nearest_enemy returns an enemy who is the nearest to the villager.
 function working_villages.villager:get_nearest_enemy(range_distance)
@@ -319,6 +365,17 @@ function working_villages.villager:move_main_to_wield(pred)
     end
   end
   return false
+end
+function working_villages.villager:get_wielded_item()
+	return self:get_wield_item_stack()
+  --local inv = self:get_inventory()
+  --return inv:get_stack("wield_item", 1)
+end
+function working_villages.villager:set_wielded_item(item)
+	return self:set_wield_item_stack(item)
+end
+function working_villages.villager:get_pos()
+  return self.object:get_pos()
 end
 
 -- working_villages.villager.is_named reports the villager is still named.
@@ -600,7 +657,17 @@ working_villages.require("async_actions")
 
 -- compatibility with like player object
 function working_villages.villager:get_player_name()
-  return self.object:get_player_name()
+  --return self.object:get_player_name()
+  return self.nametag
+end
+function working_villages.villager:get_properties()
+	return self.object:get_properties()
+end
+function working_villages.villager:get_hp()
+	return self.object:get_hp()
+end
+function working_villages.villager:set_hp(hp)
+	return self.object:set_hp(hp)
 end
 
 function working_villages.villager:is_player()
@@ -904,6 +971,14 @@ function working_villages.register_villager(product_name, def)
       --if village then
         --self.pos_data = village:get_villager_pos_data(self.inventory_name)
       --end
+      -- TODO need a global table of {[village_name] = village,}
+      -- village needs a register_citizen() that can be called by a villager when he spawns
+      -- then during his job, the burglar/courier can get his own village name,
+      -- lookup his village object in the global table
+      -- get the set of that village's registered villagers
+      -- solve the traveling salesman problem
+      -- and then we've gotta figure out some strategy so that the workers and burglars don't contend over the square in front of their chest... I'm envisioning a drop box system
+      --
       -- remove this later
       return -- do semething for luacheck
     end
@@ -1035,6 +1110,7 @@ function working_villages.register_villager(product_name, def)
   -- on_punch is a callback function that is called when a player punches a villager.
   local function on_punch()--self, puncher, time_from_last_punch, tool_capabilities, dir
   --TODO: aggression (add player ratings table)
+  -- the whole village should coordinate
   end
 
   -- register a definition of a new villager.
@@ -1083,6 +1159,7 @@ function working_villages.register_villager(product_name, def)
   villager_def.on_rightclick               = on_rightclick
   villager_def.on_punch                    = on_punch
   villager_def.get_staticdata              = get_staticdata
+  -- TODO drop inventory, bones on death
 
   -- storage methods
   villager_def.get_stored_table            = working_villages.get_stored_villager_table
@@ -1105,4 +1182,3 @@ function working_villages.register_villager(product_name, def)
     product_name    = name,
   })
 end
-

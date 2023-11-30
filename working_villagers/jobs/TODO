@@ -1,0 +1,37 @@
+burglar         -- move stuff between villagers' chests
+trash collector -- simple item pickup
+blacksmith      -- toolrepair
+  => village can produce high level items
+excavator       -- digs out a block of the specified size and places walls, floor, ceiling
+city planner    -- places building signs for builder
+
+craftsman       -- does preset recipes. combined with the burglar, we should have a functioning pipeline from raw materials to products
+
+handle deaths
+- drop items
+- spawn bones with meta
+
+pooping villagers
+- villagers eat, set timer, handle_toilet()
+- toilets will need to be integrated with a pipe mod
+- deliver poop to fuel maker
+- make use of bucket mod if no toilet available
+
+grass mats + fancy beds
+- villagers accept different sleeping accomodations
+
+skills
+- NPCs have skills which can increase in level
+=> can pay high level NPCs to do basic tasks
+
+
+hide & seek  -- for child AIs
+
+hit & run    -- for glass cannon melee
+hide & shoot -- based on hider AI, seek cover and shoot player
+flanker      -- attacks from opposite direction as another AI
+trapper      -- builds obstacles & traps
+rangers      -- long range, short range & homing
+tank         -- high HP, low damage
+healer       -- annoying support role
+resurrector  -- respawns dead entities based on bones meta

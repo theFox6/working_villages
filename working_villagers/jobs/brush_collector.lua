@@ -1,30 +1,31 @@
 local func = working_villages.require("jobs/util")
 
-local herbs = {
+local shrubs = {
   -- more priority definitions
 	names = {
-		["default:apple"]={},
+		["default:blueberry_bush_leaves_with_berries"]={},
 		["default:cactus"]={collect_only_top=true},
 		["default:papyrus"]={collect_only_top=true},
-		["default:dry_shrub"]={},
-		["flowers:mushroom_brown"]={responsible_foraging=true},
-		["flowers:mushroom_red"]={responsible_foraging=true},
+		["default:bush_leaves"]={},
+		["default:bush_stem"]={},
+		--["flowers:mushroom_red"]={},
 	},
   -- less priority definitions
 	groups = {
-		["flora"]={responsible_foraging=true},
+		["leaves"]={},
+		--["wood"]={},
 	},
 }
 
-function herbs.get_herb(item_name)
+function shrubs.get_shrub(item_name)
   -- check more priority definitions
-	for key, value in pairs(herbs.names) do
+	for key, value in pairs(shrubs.names) do
 		if item_name==key then
 			return value
 		end
 	end
   -- check less priority definitions
-	for key, value in pairs(herbs.groups) do
+	for key, value in pairs(shrubs.groups) do
 		if minetest.get_item_group(item_name, key) > 0 then
 			return value;
 		end
@@ -32,8 +33,8 @@ function herbs.get_herb(item_name)
 	return nil
 end
 
-function herbs.is_herb(item_name)
-  local data = herbs.get_herb(item_name);
+function shrubs.is_shrub(item_name)
+  local data = shrubs.get_shrub(item_name);
   if (not data) then
     return false;
   end
@@ -42,7 +43,7 @@ end
 
 local function find_herb_node(pos)
 	local node = minetest.get_node(pos);
-  local data = herbs.get_herb(node.name);
+  local data = shrubs.get_shrub(node.name);
   if (not data) then
     return false;
   end
@@ -61,10 +62,6 @@ local function find_herb_node(pos)
     end
   end
 
-  if data.responsible_foraging then
-    return minetest.find_node_near(pos, 9, node.name) ~= nil
-  end
-
   return true;
 end
 
@@ -74,20 +71,21 @@ local function put_func()
   return true;
 end
 
-working_villages.register_job("working_villages:job_herbcollector", {
-	description      = "herb collector (working_villages)",
-	long_description = "I look for all sorts of plants and collect them.",
+-- copied from the plant/herb collector
+working_villages.register_job("working_villages:job_brushcollector", {
+	description      = "brush collector (working_villages)",
+	long_description = "I look for all sorts of brush and collect it.",
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(nil, put_func)
 		self:handle_job_pos()
 
-		self:count_timer("herbcollector:search")
-		self:count_timer("herbcollector:change_dir")
+		self:count_timer("brushcollector:search")
+		self:count_timer("brushcollector:change_dir")
 		self:handle_obstacles()
-		if self:timer_exceeded("herbcollector:search",20) then
-			self:collect_nearest_item_by_condition(herbs.is_herb, searching_range)
+		if self:timer_exceeded("brushcollector:search",20) then
+			self:collect_nearest_item_by_condition(shrubs.is_shrub, searching_range)
 			local target = func.search_surrounding(self.object:get_pos(), find_herb_node, searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
@@ -99,14 +97,14 @@ working_villages.register_job("working_villages:job_herbcollector", {
 					destination = target
 				end
 				self:go_to(destination)
-        --local herb_data = herbs.get_herb(minetest.get_node(target).name);
-        herbs.get_herb(minetest.get_node(target).name);
+        --local herb_data = shrubs.get_shrub(minetest.get_node(target).name);
+        --shrubs.get_shrub(minetest.get_node(target).name);
 				self:dig(target,true)
 			end
-		elseif self:timer_exceeded("herbcollector:change_dir",50) then
+		elseif self:timer_exceeded("brushcollector:change_dir",50) then
 			self:change_direction_randomly()
 		end
 	end,
 })
 
-working_villages.herbs = herbs
+working_villages.shrubs = shrubs

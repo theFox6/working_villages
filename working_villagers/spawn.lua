@@ -64,3 +64,360 @@ minetest.register_abm({
     action = spawner("working_villages:job_woodcutter"),
 })
 
+
+working_villages.require("jobs/brush_collector")
+
+local shrub_names = {}
+for name,_ in pairs(working_villages.shrubs.names) do
+    shrub_names[#shrub_names + 1] = name
+end
+for name,_ in pairs(working_villages.shrubs.groups) do
+    shrub_names[#shrub_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn brush collector",
+    nodenames = shrub_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_brushcollector"),
+})
+
+working_villages.require("jobs/bug_collector")
+
+local bug_names = {}
+for name,_ in pairs(working_villages.bugs.names) do
+    bug_names[#bug_names + 1] = name
+end
+for name,_ in pairs(working_villages.bugs.groups) do
+    bug_names[#bug_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn bug collector",
+    nodenames = bug_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_bugcollector"),
+})
+
+working_villages.require("jobs/bone_collector")
+
+local bone_names = {}
+for name,_ in pairs(working_villages.bones.names) do
+    bone_names[#bone_names + 1] = name
+end
+for name,_ in pairs(working_villages.bones.groups) do
+    bone_names[#bone_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn bone collector",
+    nodenames = bone_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_bonecollector"),
+})
+
+working_villages.require("jobs/landscaper")
+
+local dirt_names = {}
+for name,_ in pairs(working_villages.dirts.names) do
+    dirt_names[#dirt_names + 1] = name
+end
+for name,_ in pairs(working_villages.dirts.groups) do
+    dirt_names[#dirt_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn landscaper",
+    nodenames = dirt_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_landscaper"),
+})
+
+working_villages.require("jobs/watercarrier")
+
+local liquid_names = {}
+for name,_ in pairs(working_villages.liquids.names) do
+    liquid_names[#liquid_names + 1] = name
+end
+for name,_ in pairs(working_villages.liquids.groups) do
+    liquid_names[#liquid_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn water carrier",
+    nodenames = liquid_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_watercarrier"),
+})
+
+working_villages.require("jobs/miner")
+
+local stone_names = {}
+for name,_ in pairs(working_villages.stones.names) do
+    stone_names[#stone_names + 1] = name
+end
+for name,_ in pairs(working_villages.stones.groups) do
+    stone_names[#stone_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn miner",
+    nodenames = stone_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_miner"),
+})
+
+working_villages.require("jobs/baker")
+
+local furnace_names = {}
+for name,_ in pairs(working_villages.furnaces.names) do
+    furnace_names[#furnace_names + 1] = name
+end
+for name,_ in pairs(working_villages.furnaces.groups) do
+    furnace_names[#furnace_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn baker",
+    nodenames = furnace_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_baker"),
+})
+
+if minetest.get_modpath("mcg_lockworkshop") then
+    working_villages.require("jobs/locksmith")
+    
+    local lockworkshop_names = {}
+    for name,_ in pairs(working_villages.lockworkshops.names) do
+        lockworkshop_names[#lockworkshop_names + 1] = name
+    end
+    for name,_ in pairs(working_villages.lockworkshops.groups) do
+        lockworkshop_names[#lockworkshop_names + 1] = "group:"..name
+    end
+    
+    minetest.register_abm({
+        label = "Spawn locksmith",
+        nodenames = lockworkshop_names,
+        neighbors = "air",
+        interval = 60,
+        chance = 2048,
+        catch_up = false,
+        action = spawner("working_villages:job_locksmith"),
+    })
+end
+
+if minetest.get_modpath("fakery") then
+    working_villages.require("jobs/counterfeiter")
+
+    local fakerytable_names = {}
+    for name,_ in pairs(working_villages.fakerytables.names) do
+        fakerytable_names[#fakerytable_names + 1] = name
+    end
+    for name,_ in pairs(working_villages.fakerytables.groups) do
+        fakerytable_names[#fakerytable_names + 1] = "group:"..name
+    end
+    
+    minetest.register_abm({
+        label = "Spawn counterfeiter",
+        nodenames = fakerytable_names,
+        neighbors = "air",
+        interval = 60,
+        chance = 2048,
+        catch_up = false,
+        action = spawner("working_villages:job_counterfeiter"),
+    })
+end
+
+if minetest.get_modpath("mcg_dyemixer") then
+    working_villages.require("jobs/dyemixer")
+
+    local dyemixer_names = {}
+    for name,_ in pairs(working_villages.dyemixers.names) do
+        dyemixer_names[#dyemixer_names + 1] = name
+    end
+    for name,_ in pairs(working_villages.dyemixers.groups) do
+        dyemixer_names[#dyemixer_names + 1] = "group:"..name
+    end
+    
+    minetest.register_abm({
+        label = "Spawn dyemixer",
+        nodenames = dyemixer_names,
+        neighbors = "air",
+        interval = 60,
+        chance = 2048,
+        catch_up = false,
+        action = spawner("working_villages:job_dyemixer"),
+    })
+end
+
+if minetest.get_modpath("claycrafter") then
+    working_villages.require("jobs/claycrafter")
+
+    local claycrafter_names = {}
+    for name,_ in pairs(working_villages.claycrafters.names) do
+        claycrafter_names[#claycrafter_names + 1] = name
+    end
+    for name,_ in pairs(working_villages.claycrafters.groups) do
+        claycrafter_names[#claycrafter_names + 1] = "group:"..name
+    end
+    
+    minetest.register_abm({
+        label = "Spawn claycrafter",
+        nodenames = claycrafter_names,
+        neighbors = "air",
+        interval = 60,
+        chance = 2048,
+        catch_up = false,
+        action = spawner("working_villages:job_claycrafter"),
+    })
+end
+
+if minetest.get_modpath("decraft") then
+    working_villages.require("jobs/recycler")
+
+    local recycler_names = {}
+    for name,_ in pairs(working_villages.recyclers.names) do
+        recycler_names[#recycler_names + 1] = name
+    end
+    for name,_ in pairs(working_villages.recyclers.groups) do
+        recycler_names[#recycler_names + 1] = "group:"..name
+    end
+    
+    minetest.register_abm({
+        label = "Spawn recycler",
+        nodenames = recycler_names,
+        neighbors = "air",
+        interval = 60,
+        chance = 2048,
+        catch_up = false,
+        action = spawner("working_villages:job_recycler"),
+    })
+end
+
+if minetest.get_modpath("crafting_bench")
+or minetest.get_modpath("craft_table") then
+    working_villages.require("jobs/craftsman")
+
+    local craft_table_names = {}
+    for name,_ in pairs(working_villages.craft_tables.names) do
+        craft_table_names[#craft_table_names + 1] = name
+    end
+    for name,_ in pairs(working_villages.craft_tables.groups) do
+        craft_table_names[#craft_table_names + 1] = "group:"..name
+    end
+    
+    minetest.register_abm({
+        label = "Spawn craftsman",
+        nodenames = craft_table_names,
+        neighbors = "air",
+        interval = 60,
+        chance = 2048,
+        catch_up = false,
+        action = spawner("working_villages:job_craftsman"),
+    })
+end
+
+if minetest.get_modpath("iadiscordia") then
+    working_villages.require("jobs/wizard")
+
+    local book_names = {}
+    for name,_ in pairs(working_villages.books.names) do
+        book_names[#book_names + 1] = name
+    end
+    for name,_ in pairs(working_villages.books.groups) do
+        book_names[#book_names + 1] = "group:"..name
+    end
+    
+    minetest.register_abm({
+        label = "Spawn wizard",
+        nodenames = book_names,
+        neighbors = "air",
+        interval = 60,
+        chance = 2048,
+        catch_up = false,
+        action = spawner("working_villages:job_wizard"),
+    })
+end
+
+working_villages.require("jobs/gardener")
+
+local garden_names = {}
+for name,_ in pairs(working_villages.gardening_nodes.names) do
+    garden_names[#garden_names + 1] = name
+end
+for name,_ in pairs(working_villages.gardening_nodes.groups) do
+    garden_names[#garden_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn gardener",
+    nodenames = garden_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_gardener"),
+})
+
+if minetest.get_modpath("biofuel") then
+working_villages.require("jobs/biofuel")
+
+local refinery_names = {}
+for name,_ in pairs(working_villages.refineries.names) do
+    refinery_names[#refinery_names + 1] = name
+end
+for name,_ in pairs(working_villages.refineries.groups) do
+    refinery_names[#refinery_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn biofuel",
+    nodenames = refinery_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_biofuel"),
+})
+
+if minetest.get_modpath("composting") then
+working_villages.require("jobs/composter")
+
+local refinery_names = {}
+for name,_ in pairs(working_villages.composter_nodes.names) do
+    composter_names[#composter_names + 1] = name
+end
+for name,_ in pairs(working_villages.composter_nodes.groups) do
+    composter_names[#composter_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn composter",
+    nodenames = composter_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_composter"),
+})

@@ -47,11 +47,22 @@ function follower.step(v)
   end
 end
 
+local follower_tools = {
+	-- need a 3d armor light for the villagers
+	["default:torch"] = 99,
+}
+-- TODO collect nearby items that the player has dropped, etc. (e.g., by digging)
 working_villages.register_job("working_villages:job_folow_player", {
   description      = "follower (working_villages)",
   long_description = "I'll just follow you wherever you go.",
   inventory_image  = "default_paper.png^memorandum_letters.png",
   jobfunc = function(v)
+    local stack  = v:get_wield_item_stack()
+    if stack:is_empty() then
+        v:move_main_to_wield(function(name)
+          return follower_tools[name] ~= nil
+    	end)
+    end
     while (v.pause) do
       coroutine.yield()
     end

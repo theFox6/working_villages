@@ -14,6 +14,28 @@ The plan is to make villagers build up their own villages.
 * jobs
   * miner, farmer, woodcutter and many more
 
+* realism
+  * villagers experience hunger, stamina and other effects
+  * villagers use tools, integrated with tool ranks
+  * drop inv, bones on death
+* more realism
+  * integration with getname
+  * mobs_redo-like offspring and lineage-tracking
+  * generation of histories & other heirlooms
+  * => randomly generated villages with high rank items with cool backstories
+* more jobs
+  * blacksmith: repairs tools
+  * craftsmen:  higher level crafts needed for builder, salesmen and military
+    * build on a single craftsman AI, but limited to certain recipes for simplying automation
+      => mineables go to the mason
+      => choppables go to the carpenter
+      this will help regulate how much of each material goes to each recipe,
+      which make it easier to build a pipeline from raw resources to an overpriced retail front
+      combined with toolranks and tool repair, we might be able to make products worth buying
+* clothing, armor, upgrades
+* starfleet
+  * need some way for flyingships-like mods to notify villagers that all their location data just got teleported
+
 ## implemented Features
 no crafting recipes yet (you will have to use creative)
 features:
