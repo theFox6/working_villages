@@ -1,3 +1,7 @@
+-- TODO he uses the tool till it breaks... it would be better if he takes it back to his chest
+
+
+
 
 local func = working_villages.require("jobs/util")
 
