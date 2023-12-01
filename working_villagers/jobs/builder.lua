@@ -71,6 +71,8 @@ If I have the materials of course. Also I'll look for building markers within a 
 				local function is_material(name)
 					return name == nname
 				end
+--print('nname: '..nname)
+--print('index: '..meta:get_int('index'))
 				local wield_stack = self:get_wield_item_stack()
 				if nname:find("beds:") and nname:find("_top") then
 					local inv = self:get_inventory()
@@ -130,7 +132,16 @@ If I have the materials of course. Also I'll look for building markers within a 
 						print(msg)
 					end
 					self:set_state_info(("I am currently waiting for somebody to give me some %s."):format(nname))
-					coroutine.yield(co_command.pause,"waiting for materials")
+					--coroutine.yield(co_command.pause,"waiting for materials")
+					self.job_data.manipulated_chest = false;
+					self:handle_chest(function(villager, stack)
+						local item_name = stack:get_name()
+						if not is_material(item_name) then return false end
+						local inv = villager:get_inventory()
+						local itemstack = ItemStack(item_name)
+						itemstack:set_count(99)
+						return (not inv:contains_item("main", itemstack))
+					end, nil)
 				end
 			end
 		end

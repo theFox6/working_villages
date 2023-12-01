@@ -169,6 +169,16 @@ function working_villages.villager:dig(pos,collect_drops)
 	return true
 end
 
+local function is_player_at(pos)
+    	local all_objects = minetest.get_objects_inside_radius(pos, 1)
+    	for _, obj in ipairs(all_objects) do
+      		--local luaentity = obj:get_luaentity()
+		if obj:is_player() then
+			return true
+		end
+	end
+	return false
+end
 function working_villages.villager:place(item,pos)
 	if type(pos)~="table" then
 		error("no target position given")
@@ -209,6 +219,19 @@ function working_villages.villager:place(item,pos)
 	self:set_yaw_by_direction(dist)
 	--wait 15 steps
 	for _=0,15 do coroutine.yield() end
+
+	-- fix #5: check for player at position
+	if is_player_at(pos) then
+	  --print('position blocked issue 5')
+	  if self.object:get_velocity().x==0 and self.object:get_velocity().z==0 then
+		  self:set_animation(working_villages.animation_frames.STAND)
+	  else
+		  self:set_animation(working_villages.animation_frames.WALK)
+	  end
+          return false, fail.blocked
+	end
+	
+
 	--get wielded item
 	local stack = self:get_wield_item_stack()
 	--create pointed_thing facing upward
