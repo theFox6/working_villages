@@ -28,7 +28,9 @@ for _,name in pairs(list_of_chests) do
 end
 
 local list_of_bed_top = {
-	"beds:bed_top"
+	"beds:bed_top",
+	"beds:fancy_bed_top",
+	"sleeping_mat:mat_top",
 }
 for _,name in pairs(list_of_bed_top) do
 	local item_def = minetest.registered_items[name]
@@ -40,7 +42,9 @@ for _,name in pairs(list_of_bed_top) do
 end
 
 local list_of_bed_bottom = {
-	"beds:bed_bottom"
+	"beds:bed_bottom",
+	"beds:fancy_bed_bottom",
+	"sleeping_mat:mat_bottom",
 }
 for _,name in pairs(list_of_bed_bottom) do
 	local item_def = minetest.registered_items[name]
