@@ -521,6 +521,18 @@ function working_villages.villager:jump()
   ctrl:set_velocity{x = velocity.x, y = jump_force, z = velocity.z}
 end
 
+local function walkable(node)
+	-- copied from pathfinder
+		--if string.find(node.name,"doors:") then
+		--	return false
+		--else
+			if minetest.registered_nodes[node.name]~= nil then
+				return minetest.registered_nodes[node.name].walkable
+			else
+				return true
+			end
+		--end
+end
 --working_villages.villager.handle_obstacles(ignore_fence,ignore_doors)
 --if the villager hits a walkable he wil jump
 --if ignore_fence is false the villager will not jump over fences
@@ -550,10 +562,11 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
           door:open()
         end
       end
-    elseif minetest.registered_nodes[front_node.name].walkable
-      and not(minetest.registered_nodes[above_node.name].walkable) then
+    elseif walkable(front_node) --minetest.registered_nodes[front_node.name].walkable
+      and not(walkable(above_node)) then --not(minetest.registered_nodes[above_node.name].walkable) then
       if velocity.y == 0 then
-        local nBox = minetest.registered_nodes[front_node.name].node_box
+        local nBox = minetest.registered_nodes[front_node.name]
+	if nBox ~= nil then nBox = nBox.node_box end
         if (nBox == nil) then
           nBox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
         else
