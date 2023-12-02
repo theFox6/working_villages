@@ -2,7 +2,8 @@
 
 -- TODO I can't find a craft table that I like
 
-CRAFT_TABLE_TYPE = "craft_table"
+--CRAFT_TABLE_TYPE = "craft_table"
+CRAFT_TABLE_TYPE = "crafting_bench"
 
 
 local func = working_villages.require("jobs/util")
@@ -340,12 +341,10 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 				--target_index = xy,
 			},
 		}
-
+		
 		index = index + 1
 		my_data.operations[index]   = {
-			list      = "rec",
-			is_take   = true,
-			take_func = take_func,
+			noop = 300,
 		}
 
 		index = index + 1
@@ -357,17 +356,18 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 
 		index = index + 1
 		my_data.operations[index]   = {
-			list      = "src",
+			list      = "rec",
 			is_take   = true,
 			take_func = take_func,
 		}
 
 		index = index + 1
 		my_data.operations[index]   = {
-			list      = "rec",
+			list      = "src",
 			is_take   = true,
 			take_func = take_func,
 		}
+
 		end
 	end
 	for iteration=1,#my_data.operations,1 do

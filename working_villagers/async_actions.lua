@@ -565,8 +565,11 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 	assert(#operations > 0)
 	for _, operation in ipairs(operations) do
 		assert(operation ~= nil)
-		local app_list_name = operation.list
-		assert(app_list_name ~= nil)
+		if operation.noop then
+			for _=0,operation.noop do coroutine.yield() end --wait 10 steps
+		else
+			local app_list_name = operation.list
+			assert(app_list_name ~= nil)
 		if operation.is_put then -- from villager to appliance
 			assert(operation.is_take == nil)
 			assert(operation.put_func ~= nil)
@@ -581,25 +584,32 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 					local appliance_inv = appliance_meta:get_inventory();
 					--if(target_def.allow_metadata_inventory_put ~= nil) and target_def.allow_metadata_inventory_put(furnace_pos, "fuel", index, stack, placer) then -- extra sanity check... I don't know why it doesn't work
 					if operation.data ~= nil and operation.data.target_count ~= nil then
-						stack = stack:take_item(operation.data.target_count)
-					end
-					local leftover
-					if operation.data == nil or operation.data.target_index == nil then
-						leftover = appliance_inv:add_item(app_list_name, stack);
-					else
+
 						local i = operation.data.target_index
+						local leftover
 						if appliance_inv:get_stack(app_list_name, i):is_empty() then
-							leftover = appliance_inv:set_stack(app_list_name, i, stack);
-						else
-							leftover = stack:get_size()
+							--leftover = appliance_inv:set_stack(app_list_name, i, stack);
+							local new_stack = stack:take_item(operation.data.target_count)
+							appliance_inv:set_stack(app_list_name, i, new_stack);
+		vil_inv:set_stack("main", index, stack);
+							-- TODO check if success ?
+						--else
+							--leftover = stack:get_count()
+							--leftover = stack
+							if(target_def.on_metadata_inventory_put ~= nil) then -- active furnace doesn't have this
+								target_def.on_metadata_inventory_put(appliance_pos, app_list_name, index, new_stack, placer) -- index should be 0 ?
+							end
+						end
+					else
+						local leftover = appliance_inv:add_item(app_list_name, stack);
+						vil_inv:set_stack("main", index, leftover);
+						if(target_def.on_metadata_inventory_put ~= nil) then -- active furnace doesn't have this
+							target_def.on_metadata_inventory_put(appliance_pos, app_list_name, index, stack, placer) -- index should be 0 ?
 						end
 					end
-					if operation.data == nil or operation.data.target_count == nil then -- TODO
-					vil_inv:set_stack("main", index, leftover);
-					end
-					if(target_def.on_metadata_inventory_put ~= nil) then -- active furnace doesn't have this
-						target_def.on_metadata_inventory_put(appliance_pos, app_list_name, index, stack, placer) -- index should be 0 ?
-					end
+					--if operation.data == nil or operation.data.target_count == nil then -- TODO
+					--vil_inv:set_stack("main", index, leftover);
+					--end
 					log.info("Villager %s moves %s from inventory to appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
 					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
@@ -630,6 +640,7 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
 			end
+		end
 		end
 	end
 end
