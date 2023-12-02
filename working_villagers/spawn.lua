@@ -185,6 +185,27 @@ minetest.register_abm({
     action = spawner("working_villages:job_miner"),
 })
 
+working_villages.require("jobs/mayor")
+
+-- don't be rowdy
+--local throne_names = {}
+--for name,_ in pairs(working_villages.thrones.names) do
+--    throne_names[#throne_names + 1] = name
+--end
+--for name,_ in pairs(working_villages.thrones.groups) do
+--    throne_names[#throne_names + 1] = "group:"..name
+--end
+--
+--minetest.register_abm({
+--    label = "Spawn mayor",
+--    nodenames = throne_names,
+--    neighbors = "air",
+--    interval = 60,
+--    chance = 2048,
+--    catch_up = false,
+--    action = spawner("working_villages:job_mayor"),
+--})
+
 working_villages.require("jobs/baker")
 
 local furnace_names = {}

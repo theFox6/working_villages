@@ -21,6 +21,7 @@ The plan is to make villagers build up their own villages.
 * more realism
   * integration with getname
   * mobs_redo-like offspring and lineage-tracking
+  * => randomly generated stories
   * generation of histories & other heirlooms
   * => randomly generated villages with high rank items with cool backstories
 * more jobs
@@ -33,6 +34,7 @@ The plan is to make villagers build up their own villages.
       which make it easier to build a pipeline from raw resources to an overpriced retail front
       combined with toolranks and tool repair, we might be able to make products worth buying
 * clothing, armor, upgrades
+  * I think the mods add inv lists to the player for these, so likewise can be done to the villagers
 * starfleet
   * need some way for flyingships-like mods to notify villagers that all their location data just got teleported
 
