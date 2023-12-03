@@ -4,10 +4,18 @@ local dirts = {
   -- more priority definitions
 	names = {
 		["default:dirt"]={},
+		["default:dry_dirt"]={},
 		["default:dirt_with_grass"]={},
+		["default:dirt_with_dry_grass"]={},
+		["default:dry_dirt_with_dry_grass"]={},
 		["default:dirt_with_snow"]={},
+		["default:dirt_with_coniferous_litter"]={},
+		["default:dirt_with_rainforest_litter"]={},
+
 		["default:sand"]={},
+		["default:desert_sand"]={},
 		["default:silver_sand"]={},
+
 		["default:gravel"]={},
 	},
   -- less priority definitions
@@ -135,7 +143,7 @@ working_villages.register_job("working_villages:job_landscaper", {
 					success, ret = self:dig(target,true)
 					if not success then
 						working_villages.failed_pos_record(target)
-						self:set_displayed_action("confused as to why digging failed")
+						self:set_displayed_action("confused as to why digging failed at (x="..target.x..', y='..target.y..', z='..target.z..')')
 						self:delay(100)
 					end
 				end

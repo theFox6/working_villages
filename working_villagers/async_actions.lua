@@ -124,6 +124,7 @@ function working_villages.villager:dig(pos,collect_drops)
 			minetest.add_item(pos, leftover)
 		end
 	end
+	-- TODO use wield item
 	if (old_meta) then
 		def_node.after_dig_node(pos, destnode, old_meta, nil)
 	end

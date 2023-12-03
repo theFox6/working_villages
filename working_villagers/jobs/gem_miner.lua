@@ -1,38 +1,31 @@
 local func = working_villages.require("jobs/util")
 
-local stones = {
+local gems = {
   -- more priority definitions
 	names = {
-		["default:cobble"]={},
-		["default:mossycobble"]={},
-		["default:desert_cobble"]={},
-
-		["default:stone"]={},
-		["default:desert_stone"]={},
-		["default:sandstone"]={},
-		["default:desert_sandstone"]={},
-		["default:silver_sandstone"]={},
-
-		["default:permafrost_with_stones"]={},
-
-		--["default:gravel"]={},
+		["default:stone_with_tin"]={},
+		["default:stone_with_coal"]={},
+		["default:stone_with_gold"]={},
+		["default:stone_with_iron"]={},
+		["default:stone_with_mese"]={},
+		["default:stone_with_copper"]={},
+		["default:stone_diamond"]={},
 	},
   -- less priority definitions
 	groups = {
-		--["rock"]={},
-		["stone"]={},
+		["ore"]={},
 	},
 }
 
-function stones.get_stone(item_name)
+function gems.get_ore(item_name)
   -- check more priority definitions
-	for key, value in pairs(stones.names) do
+	for key, value in pairs(gems.names) do
 		if item_name==key then
 			return value
 		end
 	end
   -- check less priority definitions
-	for key, value in pairs(stones.groups) do
+	for key, value in pairs(gems.groups) do
 		if minetest.get_item_group(item_name, key) > 0 then
 			return value;
 		end
@@ -40,17 +33,17 @@ function stones.get_stone(item_name)
 	return nil
 end
 
-function stones.is_stone(item_name)
-  local data = stones.get_stone(item_name);
+function gems.is_ore(item_name)
+  local data = gems.get_ore(item_name);
   if (not data) then
     return false;
   end
   return true;
 end
 
-local function find_stone_node(pos)
+local function find_ore_node(pos)
 	local node = minetest.get_node(pos);
-  local data = stones.get_stone(node.name);
+  local data = gems.get_ore(node.name);
   if (not data) then
     return false;
   end
@@ -95,9 +88,9 @@ local function take_func(villager,stack)
 	return (not inv:contains_item("main", itemstack))
 end
 
-working_villages.register_job("working_villages:job_miner", {
-	description      = "miner (working_villages)",
-	long_description = "I look for all sorts of rocks and collect them.",
+working_villages.register_job("working_villages:job_gem_miner", {
+	description      = "gem miner (working_villages)",
+	long_description = "I look for fancy rocks and collect them.",
 	inventory_image  = "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()
@@ -110,13 +103,13 @@ working_villages.register_job("working_villages:job_miner", {
 		end
 		self:handle_job_pos()
 
-		self:count_timer("miner:search")
-		self:count_timer("miner:change_dir")
+		self:count_timer("gemminer:search")
+		self:count_timer("gemminer:change_dir")
 		self:handle_obstacles()
-		if self:timer_exceeded("miner:search",20) then
+		if self:timer_exceeded("gemminer:search",20) then
 			searching_range.h = 2 -- this doesn't prevent burrowing
-			self:collect_nearest_item_by_condition(stones.is_stone, searching_range)
-			local target = func.search_surrounding_inv(self.object:get_pos(), find_stone_node, searching_range) -- that should fix 'em
+			self:collect_nearest_item_by_condition(gems.is_ore, searching_range)
+			local target = func.search_surrounding_inv(self.object:get_pos(), find_ore_node, searching_range) -- that should fix 'em
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then -- this definitely makes him burrow
@@ -126,8 +119,8 @@ working_villages.register_job("working_villages:job_miner", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-        --local herb_data = stones.get_stone(minetest.get_node(target).name);
-        --stones.get_stone(minetest.get_node(target).name);
+        --local herb_data = gems.get_ore(minetest.get_node(target).name);
+        --gems.get_ore(minetest.get_node(target).name);
 				self:set_displayed_action("mining some rocks")
 				-- We may not be able to reach the log
 				local success, ret = self:go_to(destination)
@@ -139,15 +132,15 @@ working_villages.register_job("working_villages:job_miner", {
 					success, ret = self:dig(target,true)
 					if not success then
 						working_villages.failed_pos_record(target)
-						self:set_displayed_action("confused as to why mining failed at (x="..target.x..', y='..target.y..', z='..target.z..')')
+						self:set_displayed_action("confused as to why mining failed")
 						self:delay(100)
 					end
 				end
 			end
-		elseif self:timer_exceeded("miner:change_dir",50) then
+		elseif self:timer_exceeded("gemminer:change_dir",50) then
 			self:change_direction_randomly()
 		end
 	end,
 })
 
-working_villages.stones = stones
+working_villages.gems = gems

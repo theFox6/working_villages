@@ -185,6 +185,26 @@ minetest.register_abm({
     action = spawner("working_villages:job_miner"),
 })
 
+working_villages.require("jobs/gem_miner")
+
+local gem_names = {}
+for name,_ in pairs(working_villages.gems.names) do
+    gem_names[#gem_names + 1] = name
+end
+for name,_ in pairs(working_villages.gems.groups) do
+    gem_names[#gem_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn gem miner",
+    nodenames = gem_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_gem_miner"),
+})
+
 working_villages.require("jobs/mayor")
 
 -- don't be rowdy

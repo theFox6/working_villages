@@ -2,6 +2,28 @@ local func = working_villages.require("jobs/util")
 local function find_snow(p) return minetest.get_node(p).name == "default:snow" end
 local searching_range = {x = 10, y = 3, z = 10}
 
+local landscaping_demands = {
+	["default:shovel_wood"] = 1,
+	["default:shovel_mese"] = 1,
+	["default:shovel_steel"] = 1,
+	["default:shovel_stone"] = 1,
+	["default:shovel_bronze"] = 1,
+	["default:shovel_diamond"] = 1,
+}
+local function put_func(_,stack)
+	return landscaping_demands[item_name] == nil
+end
+local function take_func(villager,stack)
+	local item_name = stack:get_name()
+	if not landscaping_demands[item_name] then return false end
+	-- TODO don't take more than one shovel
+	local inv = villager:get_inventory()
+	local itemstack = ItemStack(item_name)
+	itemstack:set_count(landscaping_demands[item_name])
+	--return (not inv:contains_item("wield_item", itemstack))
+	return (not inv:contains_item("main", itemstack))
+end
+
 working_villages.register_job("working_villages:job_snowclearer", {
 	description      = "snowclearer (working_villages)",
 	long_description = "I clear away snow you know.\
@@ -11,6 +33,13 @@ I'm doing anyway, clearing the snow away.",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
 	jobfunc = function(self)
 		self:handle_night()
+		self:handle_chest(take_func, put_func)
+		local stack  = self:get_wield_item_stack()
+		if stack:is_empty() then
+		self:move_main_to_wield(function(name)
+  			return landscaping_demands[name] ~= nil
+		end)
+		end
 		self:handle_job_pos()
 
 		self:count_timer("snowclearer:search")
