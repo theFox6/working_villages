@@ -133,8 +133,8 @@ working_villages.register_job("working_villages:job_composter", {
 
 				--local stack
 
-				if node.name == "composting:composter"
-				and self:move_main_to_wield(is_compostable) then
+				if --node.name == "composting:composter" and
+				self:move_main_to_wield(is_compostable) then
     local wield_item = self:get_wielded_item();
     assert(wield_item ~= nil)
     local item_name = wield_item:get_name();
@@ -145,6 +145,7 @@ if true then
 minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
 					--minetest.node_punch(target, node, puncher, pointed_thing)
     if wield_item:get_count() == self:get_wielded_item():get_count() then
+					working_villages.failed_pos_record(target)
 					log.error("something wrong composting %s",item_name)
 					self:set_displayed_action("something wrong composting "..item_name)
     end
@@ -157,8 +158,8 @@ end
 					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
 
-				if node.name == "composting:composter_filled"
-				and self:move_main_to_wield(function(name)
+				if --node.name == "composting:composter_filled" and
+				self:move_main_to_wield(function(name)
   					return composting_tools[name] ~= nil
 				end) then
     local wield_item = self:get_wielded_item();
@@ -171,8 +172,9 @@ if true then
 minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
 					--minetest.node_punch(target, node, puncher, pointed_thing)
     if wield_item:get_count() == self:get_wielded_item():get_count() then
-					--log.error("something wrong composting %s",item_name)
-					--self:set_displayed_action("something wrong composting "..item_name)
+					working_villages.failed_pos_record(target)
+					log.error("something wrong composting %s",item_name)
+					self:set_displayed_action("something wrong composting "..item_name)
     end
 else
     local def = wield_item:get_definition() -- minetest.registered_items[item_name]
