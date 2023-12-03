@@ -116,7 +116,9 @@ working_villages.register_job("working_villages:job_gardener", {
 					destination = target
 				end
 				self:go_to(destination)
-				local plant_data = gardening_nodes.get_dirt(minetest.get_node(target).name);
+				local plant_name = minetest.get_node(target).name
+				self:set_displayed_action("tilling some "..plant_name)
+				local plant_data = gardening_nodes.get_dirt(plant_name)
 				--self:dig(target,true)
 				--if plant_data and plant_data.replant then
 				--	for index, value in ipairs(plant_data.replant) do
@@ -132,6 +134,7 @@ working_villages.register_job("working_villages:job_gardener", {
 				local user   = self
 				local pointed_thing = {under=target, type="node",}
 				local new_stack = on_use(stack, user, pointed_thing)
+				-- TODO register position failure ?
 				self:set_wield_item_stack(new_stack)
 				for _=0,10 do coroutine.yield() end --wait 10 steps
 			end

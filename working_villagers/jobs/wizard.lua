@@ -104,81 +104,53 @@ working_villages.register_job("working_villages:job_wizard", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
---				local plant_data = spellbooks.get_book(minetest.get_node(target).name);
-
-				-- TODO wield the bucket instead
-				-- first we need an empty bucket
-				--self:set_displayed_action("checking for empty bucket")
---				local item_name = "iadiscordia:kallisti"
---				local inv = self:get_inventory()
---				local itemstack = ItemStack(item_name)
---				itemstack:set_count(1)
---				--if (not inv:contains_item("wield_item", itemstack)) then
---				if (not inv:contains_item("main", itemstack)) then
---					-- need a bucket
---					self.job_data.manipulated_chest2 = false
---					return
---				end
---
---				-- next we need the filled bucket
---				self:set_displayed_action("checking for room for filled bucket")
---				local plantstack = ItemStack(plant_data)
---				plantstack:set_count(1)
---				if not inv:room_for_item("main", plantstack) then
---					-- no room for new bucket
---					self.job_data.manipulated_chest2 = false
---					return
---				end
---
---				self:set_displayed_action("spellcasting some book")
---				-- now we can do the action
---				--self:dig(target,true) -- spellcasting is different than digging
---				minetest.remove_node(target)
---
---				--local taken = inv:remove_item("wield_item", itemstack)
---				local taken = inv:remove_item("main", itemstack)
---				assert(taken:get_count() == 1)
---
---				local leftover = inv:add_item("main", plantstack)
---				assert(leftover:get_count() == 0)
---
-				self:set_displayed_action("checking for spells in book")
---				-- TODO check HP+MP, and eat+sleep if necessary
-				local name   = stack:get_name()
-				--local def    = minetest.registered_items[name]
-				local def = stack:get_definition() -- minetest.registered_items[item_name]
-				local on_use = def.on_use
-				local user   = self
-				--local playername = user.nametag
-				local playername = self:get_player_name()
-				assert(playername ~= nil)
-				print('player name: '..playername)
-	if mana.playerlist[playername] == nil then
-		mana.playerlist[playername] = {}
-		mana.playerlist[playername].mana = 0
-		mana.playerlist[playername].maxmana = mana.settings.default_max
-		mana.playerlist[playername].regen = mana.settings.default_regen
-		mana.playerlist[playername].remainder = 0
-	end
-	assert(mana.playerlist[playername] ~= nil)
-	--SkillsFramework.append_skills(playername, {
-	SkillsFramework.attach_skillset(playername, {
-		"iadiscordia:Chaos Magick",
-	})
-	-- TODO mana regen
-		if mana.playerlist[playername].mana < mana.playerlist[playername].maxmana then
-				self:set_displayed_action("insufficient mana: "..
-				mana.playerlist[playername].mana .. " < " ..
-				mana.playerlist[playername].maxmana)
-			return
-		end
-				self:set_displayed_action("attempting spell")
-				local pointed_thing = {under=target, type="node",}
-				local new_stack = on_use(stack, user, pointed_thing)
-				self:set_wield_item_stack(new_stack)
-				for _=0,10 do coroutine.yield() end --wait 10 steps
-				-- TODO record successes so he's useful
+				self:set_displayed_action("casting some spells")
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable snow")
+					self:delay(100)
+				else
+					self:set_displayed_action("checking for spells in book")
+	--				-- TODO check HP+MP, and eat+sleep if necessary
+					local name   = stack:get_name()
+					--local def    = minetest.registered_items[name]
+					local def = stack:get_definition() -- minetest.registered_items[item_name]
+					local on_use = def.on_use
+					local user   = self
+					--local playername = user.nametag
+					local playername = self:get_player_name()
+					assert(playername ~= nil)
+					print('player name: '..playername)
+					-- TODO this belongs in api
+					if mana.playerlist[playername] == nil then
+						mana.playerlist[playername] = {}
+						mana.playerlist[playername].mana = 0
+						mana.playerlist[playername].maxmana = mana.settings.default_max
+						mana.playerlist[playername].regen = mana.settings.default_regen
+						mana.playerlist[playername].remainder = 0
+					end
+					assert(mana.playerlist[playername] ~= nil)
+					--SkillsFramework.append_skills(playername, {
+					-- TODO this needs to be done once and probably in api
+					SkillsFramework.attach_skillset(playername, {
+						"iadiscordia:Chaos Magick",
+					})
+					-- TODO mana regen
+					if mana.playerlist[playername].mana < mana.playerlist[playername].maxmana then
+						self:set_displayed_action("insufficient mana: "..
+						mana.playerlist[playername].mana .. " < " ..
+						mana.playerlist[playername].maxmana)
+						return
+					end
+					self:set_displayed_action("attempting spell")
+					local pointed_thing = {under=target, type="node",}
+					local new_stack = on_use(stack, user, pointed_thing)
+					self:set_wield_item_stack(new_stack)
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+					-- TODO record successes so he's useful
+				end
 			end
 		elseif self:timer_exceeded("wizard:change_dir",50) then
 			self:change_direction_randomly()

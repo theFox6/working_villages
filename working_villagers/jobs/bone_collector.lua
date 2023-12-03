@@ -108,10 +108,24 @@ working_villages.register_job("working_villages:job_bonecollector", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
+				--self:go_to(destination)
         --local herb_data = bones.get_bone(minetest.get_node(target).name);
         --bones.get_bone(minetest.get_node(target).name);
-				self:dig(target,true)
+				--self:dig(target,true)
+				self:set_displayed_action("collecting some bones")
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable bones")
+					self:delay(100)
+				else
+					success, ret = self:dig(target,true)
+					if not success then
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why collecting failed")
+						self:delay(100)
+					end
+				end
 			end
 		elseif self:timer_exceeded("bonecollector:change_dir",50) then
 			-- TODO I don't suppose a search pattern would be applicable

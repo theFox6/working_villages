@@ -136,8 +136,10 @@ working_villages.register_job("working_villages:job_farmer", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
+				local plant_name = minetest.get_node(target).name
+				self:set_displayed_action("farming some "..plant_name)
 				self:go_to(destination)
-				local plant_data = farming_plants.get_plant(minetest.get_node(target).name);
+				local plant_data = farming_plants.get_plant(plant_name);
 				self:dig(target,true)
 				if plant_data and plant_data.replant then
 					for index, value in ipairs(plant_data.replant) do

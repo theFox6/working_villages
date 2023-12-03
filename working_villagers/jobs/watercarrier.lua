@@ -87,46 +87,53 @@ working_villages.register_job("working_villages:job_watercarrier", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local plant_data = liquids.get_liquid(minetest.get_node(target).name);
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable snow")
+					self:delay(100)
+				else
+					local plant_data = liquids.get_liquid(minetest.get_node(target).name);
 
-				-- TODO wield the bucket instead
-				-- first we need an empty bucket
-				self:set_displayed_action("checking for empty bucket")
-				local item_name = "bucket:bucket_empty"
-				local inv = self:get_inventory()
-				local itemstack = ItemStack(item_name)
-				itemstack:set_count(1)
-				--if (not inv:contains_item("wield_item", itemstack)) then
-				if (not inv:contains_item("main", itemstack)) then
-					-- need a bucket
-					self.job_data.manipulated_chest2 = false
-					return
+					-- TODO wield the bucket instead
+					-- first we need an empty bucket
+					self:set_displayed_action("checking for empty bucket")
+					local item_name = "bucket:bucket_empty"
+					local inv = self:get_inventory()
+					local itemstack = ItemStack(item_name)
+					itemstack:set_count(1)
+					--if (not inv:contains_item("wield_item", itemstack)) then
+					if (not inv:contains_item("main", itemstack)) then
+						-- need a bucket
+						self.job_data.manipulated_chest2 = false
+						return
+					end
+
+					-- next we need the filled bucket
+					self:set_displayed_action("checking for room for filled bucket")
+					local plantstack = ItemStack(plant_data)
+					plantstack:set_count(1)
+					if not inv:room_for_item("main", plantstack) then
+						-- no room for new bucket
+						self.job_data.manipulated_chest2 = false
+						return
+					end
+
+					self:set_displayed_action("bucketing some liquid")
+					-- now we can do the action
+					--self:dig(target,true) -- bucketing is different than digging
+					minetest.remove_node(target)
+
+					--local taken = inv:remove_item("wield_item", itemstack)
+					local taken = inv:remove_item("main", itemstack)
+					assert(taken:get_count() == 1)
+
+					local leftover = inv:add_item("main", plantstack)
+					assert(leftover:get_count() == 0)
+
+					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
-
-				-- next we need the filled bucket
-				self:set_displayed_action("checking for room for filled bucket")
-				local plantstack = ItemStack(plant_data)
-				plantstack:set_count(1)
-				if not inv:room_for_item("main", plantstack) then
-					-- no room for new bucket
-					self.job_data.manipulated_chest2 = false
-					return
-				end
-
-				self:set_displayed_action("bucketing some liquid")
-				-- now we can do the action
-				--self:dig(target,true) -- bucketing is different than digging
-				minetest.remove_node(target)
-
-				--local taken = inv:remove_item("wield_item", itemstack)
-				local taken = inv:remove_item("main", itemstack)
-				assert(taken:get_count() == 1)
-
-				local leftover = inv:add_item("main", plantstack)
-				assert(leftover:get_count() == 0)
-
-				for _=0,10 do coroutine.yield() end --wait 10 steps
 			end
 		elseif self:timer_exceeded("watercarrier:change_dir",50) then
 			self:change_direction_randomly()

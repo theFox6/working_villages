@@ -98,10 +98,24 @@ working_villages.register_job("working_villages:job_herbcollector", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
+				--self:go_to(destination)
+				self:set_displayed_action("collecting some plants")
+				local success, ret = self:go_to(destination)
         --local herb_data = herbs.get_herb(minetest.get_node(target).name);
-        herbs.get_herb(minetest.get_node(target).name);
-				self:dig(target,true)
+        --herbs.get_herb(minetest.get_node(target).name);
+				--self:dig(target,true)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable plant")
+					self:delay(100)
+				else
+					success, ret = self:dig(target,true)
+					if not success then
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why collecting failed")
+						self:delay(100)
+					end
+				end
 			end
 		elseif self:timer_exceeded("herbcollector:change_dir",50) then
 			self:change_direction_randomly()

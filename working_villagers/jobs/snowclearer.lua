@@ -54,8 +54,21 @@ I'm doing anyway, clearing the snow away.",
 					destination = target
 				end
 				self:set_displayed_action("clearing snow away")
-				self:go_to(destination)
-				self:dig(target,true)
+				--self:go_to(destination)
+				--self:dig(target,true)
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable snow")
+					self:delay(100)
+				else
+					success, ret = self:dig(target,true)
+					if not success then
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why clearing failed")
+						self:delay(100)
+					end
+				end
 			end
 			self:set_displayed_action("looking for work")
 		elseif self:timer_exceeded("snowclearer:change_dir",50) then
