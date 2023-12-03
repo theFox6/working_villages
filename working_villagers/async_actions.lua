@@ -82,8 +82,16 @@ function working_villages.villager:collect_nearest_item_by_condition(cond, searc
 	--print("collecting item at:".. minetest.pos_to_string(pos))
 	local inv=self:get_inventory()
 	if inv:room_for_item("main", ItemStack(item:get_luaentity().itemstring)) then
-		self:go_to(pos)
-		self:pickup_item()
+		--self:go_to(pos)
+		local success, ret = self:go_to(pos)
+		if not success then
+			assert(pos ~= nil)
+			working_villages.failed_pos_record(pos)
+			self:set_displayed_action("looking at the unreachable item")
+			self:delay(100)
+		else
+			self:pickup_item()
+		end
 	end
 end
 
@@ -438,8 +446,16 @@ function working_villages.villager:goto_job()
 		log.action("villager %s going to job position %s", self.inventory_name, minetest.pos_to_string(self.pos_data.job_pos))
 		self:set_state_info("I am going to my job position.")
 		self:set_displayed_action("going to job")
-		self:go_to(self.pos_data.job_pos)
-		self.job_data.in_work = true;
+		--self:go_to(self.pos_data.job_pos)
+		local success, ret = self:go_to(self.pos_data.job_pos)
+		if not success then
+			assert(self.pos_data.job_pos ~= nil)
+			working_villages.failed_pos_record(self.pos_data.job_pos)
+			self:set_displayed_action("looking at the unreachable job site")
+			self:delay(100)
+		else
+			self.job_data.in_work = true;
+		end
 	end
 	self:set_state_info("I'm working.")
 	self:set_displayed_action("active")
@@ -456,8 +472,16 @@ function working_villages.villager:handle_chest(take_func, put_func, data)
 			local chest = minetest.get_node(chest_pos);
 			local dir = minetest.facedir_to_dir(chest.param2);
 			local destination = vector.subtract(chest_pos, dir);
-			self:go_to(destination)
-			self:manipulate_chest(chest_pos, take_func, put_func, data);
+			--self:go_to(destination)
+			local success, ret = self:go_to(destination)
+			if not success then
+				assert(destination ~= nil)
+				working_villages.failed_pos_record(destination)
+				self:set_displayed_action("looking at the unreachable chest")
+				self:delay(100)
+			else
+				self:manipulate_chest(chest_pos, take_func, put_func, data);
+			end
 		end
 		self.job_data.manipulated_chest = true;
 	end
@@ -516,10 +540,18 @@ function working_villages.villager:handle_appliance(data)
 	local dir = minetest.facedir_to_dir(appliance.param2);
 	local destination = vector.subtract(appliance_pos, dir);
 	self:go_to(destination)
-	self:manipulate_appliance(appliance_pos, data)
-	--end
-	-- TODO check whether appliance is ready/inactive
-	self.job_data.manipulated_appliance[app_id] = true;
+	local success, ret = self:go_to(destination)
+	if not success then
+		assert(destination ~= nil)
+		working_villages.failed_pos_record(destination)
+		self:set_displayed_action("looking at the unreachable job site")
+		self:delay(100)
+	else
+		self:manipulate_appliance(appliance_pos, data)
+		--end
+		-- TODO check whether appliance is ready/inactive
+		self.job_data.manipulated_appliance[app_id] = true;
+	end
 end
 -- data = {
 --   appliance_id = <some_key>,
