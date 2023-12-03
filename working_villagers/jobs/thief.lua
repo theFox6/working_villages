@@ -149,7 +149,7 @@ working_villages.register_job("working_villages:job_thief", {
 		--self:handle_job_pos()
 		self:count_timer("thief:search")
 		self:count_timer("thief:change_dir")
-		self:handle_obstacles()
+		--self:handle_obstacles()
 		if self:timer_exceeded("thief:search",20) then
 			thief.step(self)
 		elseif self:timer_exceeded("thief:change_dir",50) then

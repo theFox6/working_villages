@@ -549,7 +549,8 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
     local front_node = minetest.get_node(front_pos)
     above_node = vector.add(above_node,{x=0,y=1,z=0})
     above_node = minetest.get_node(above_node)
-    if minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence) then
+    if --string.find(front_node.name, "mobs:fence") or -- #42
+    (minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence)) then
       self:change_direction_randomly()
     elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
       local door = doors.get(front_pos)
@@ -562,6 +563,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
           door:open()
         end
       end
+    -- TODO trap doors & ladders
     elseif walkable(front_node) --minetest.registered_nodes[front_node.name].walkable
       and not(walkable(above_node)) then --not(minetest.registered_nodes[above_node.name].walkable) then
       if velocity.y == 0 then

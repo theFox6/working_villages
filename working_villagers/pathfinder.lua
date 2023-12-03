@@ -47,7 +47,9 @@ local function get_distance_to_neighbor(start_pos, end_pos)
 	end
 end
 local function walkable(node)
-		if string.find(node.name,"doors:") then
+		if string.find(node.name,"doors:")
+		--or string.find(node.name, "mobs:fence") -- #42
+		then
 			return false
 		else
 			if minetest.registered_nodes[node.name]~= nil then
@@ -75,6 +77,9 @@ assert(check_clearance)
 local function get_neighbor_ground_level(pos, jump_height, fall_height)
 	local node = minetest.get_node(pos)
 	local height = 0
+	if string.find(node.name, "mobs:fence") then -- #42
+		return nil
+	end
 	if walkable(node) then
 		repeat
 			height = height + 1

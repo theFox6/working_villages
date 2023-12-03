@@ -60,7 +60,7 @@ function hider.walk_in_direction(v,dir)
   v:set_yaw_by_direction(dir)
 
   --if villager is stoped by obstacle, the villager must jump.
-  v:handle_obstacles(true)
+  v:handle_obstacles(true,true)
 end
 
 function get_keys(t)
