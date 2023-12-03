@@ -39,15 +39,16 @@ function bugs.is_bug(item_name)
   return true;
 end
 
-local function find_bug_node(pos)
-		if minetest.is_protected(pos, "") then return false end
+local function find_bug_node(self)
+	return function(pos)
+		if minetest.is_protected(pos, self:get_player_name()) then return false end
 		if working_villages.failed_pos_test(pos) then return false end
 
-	local node = minetest.get_node(pos);
-  local data = bugs.get_bug(node.name);
-  if (not data) then
-    return false;
-  end
+		local node = minetest.get_node(pos);
+  		local data = bugs.get_bug(node.name);
+  		if (not data) then
+    			return false;
+  		end
 
 --  if data.collect_only_top then
 --    -- prevent to collect plat part, which can continue to grow
@@ -63,7 +64,8 @@ local function find_bug_node(pos)
 --    end
 --  end
 
-  return true;
+  		return true;
+	end
 end
 
 local searching_range = {x = 10, y = 5, z = 10}
@@ -112,7 +114,7 @@ working_villages.register_job("working_villages:job_bugcollector", {
 		self:handle_obstacles()
 		if self:timer_exceeded("bugcollector:search",20) then
 			self:collect_nearest_item_by_condition(bugs.is_bug, searching_range)
-			local target = func.search_surrounding(self.object:get_pos(), find_bug_node, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_bug_node(self), searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then

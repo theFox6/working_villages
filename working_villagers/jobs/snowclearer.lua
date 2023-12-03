@@ -1,9 +1,11 @@
 local func = working_villages.require("jobs/util")
-local function find_snow(p)
-		if minetest.is_protected(p, "") then return false end
+local function find_snow(self)
+	return function(p)
+		if minetest.is_protected(p, self:get_player_name()) then return false end
 		if working_villages.failed_pos_test(p) then return false end
-		-- what about ice? better bring bucket boy if you enable better ice
-	return minetest.get_node(p).name == "default:snow"
+		-- TODO what about ice? better bring bucket boy if you enable better ice
+		return minetest.get_node(p).name == "default:snow"
+	end
 end
 local searching_range = {x = 10, y = 3, z = 10}
 
@@ -51,7 +53,7 @@ I'm doing anyway, clearing the snow away.",
 		self:count_timer("snowclearer:change_dir")
 		self:handle_obstacles()
 		if self:timer_exceeded("snowclearer:search",20) then
-			local target = func.search_surrounding(self.object:get_pos(), find_snow, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_snow(self), searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination==false then

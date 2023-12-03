@@ -48,15 +48,16 @@ function stones.is_stone(item_name)
   return true;
 end
 
-local function find_stone_node(pos)
-		if minetest.is_protected(pos, "") then return false end
+local function find_stone_node(self)
+	return function(pos)
+		if minetest.is_protected(pos, self:get_player_name()) then return false end
 		if working_villages.failed_pos_test(pos) then return false end
 
-	local node = minetest.get_node(pos);
-  local data = stones.get_stone(node.name);
-  if (not data) then
-    return false;
-  end
+		local node = minetest.get_node(pos);
+  		local data = stones.get_stone(node.name);
+  		if (not data) then
+    			return false;
+  		end
 
 --  if data.collect_only_top then
 --    -- prevent to collect plat part, which can continue to grow
@@ -72,7 +73,8 @@ local function find_stone_node(pos)
 --    end
 --  end
 
-  return true;
+  		return true;
+	end
 end
 
 local searching_range = {x = 10, y = 5, z = 10}
@@ -119,7 +121,7 @@ working_villages.register_job("working_villages:job_miner", {
 		if self:timer_exceeded("miner:search",20) then
 			searching_range.h = 2 -- this doesn't prevent burrowing
 			self:collect_nearest_item_by_condition(stones.is_stone, searching_range)
-			local target = func.search_surrounding_inv(self.object:get_pos(), find_stone_node, searching_range) -- that should fix 'em
+			local target = func.search_surrounding_inv(self.object:get_pos(), find_stone_node(self), searching_range) -- that should fix 'em
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then -- this definitely makes him burrow

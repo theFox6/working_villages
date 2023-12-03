@@ -1,14 +1,16 @@
 local func = working_villages.require("jobs/util")
 
-local function find_tree(p)
-	local adj_node = minetest.get_node(p)
-	if minetest.get_item_group(adj_node.name, "tree") > 0 then
-		-- FIXME: need a player name if villagers can own a protected area
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
-		return true
+local function find_tree(self)
+	return function(p)
+		local adj_node = minetest.get_node(p)
+		if minetest.get_item_group(adj_node.name, "tree") > 0 then
+			-- FIXME: need a player name if villagers can own a protected area
+			if minetest.is_protected(p, self:get_player_name()) then return false end
+			if working_villages.failed_pos_test(p) then return false end
+			return true
+		end
+		return false
 	end
-	return false
 end
 
 local function is_sapling(n)
@@ -101,7 +103,7 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 					end
 				end
 			end
-			local target = func.search_surrounding(self.object:get_pos(), find_tree, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_tree(self), searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				destination = func.find_ground_below(destination)

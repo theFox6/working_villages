@@ -40,35 +40,38 @@ function herbs.is_herb(item_name)
   return true;
 end
 
-local function find_herb_node(pos)
-		if minetest.is_protected(pos, "") then return false end
+local function find_herb_node(self)
+	return function(pos)
+		if minetest.is_protected(pos, self:get_player_name()) then return false end
 		if working_villages.failed_pos_test(pos) then return false end
 
-	local node = minetest.get_node(pos);
-  local data = herbs.get_herb(node.name);
-  if (not data) then
-    return false;
-  end
+		local node = minetest.get_node(pos);
+  		local data = herbs.get_herb(node.name);
+  		if (not data) then
+    			return false;
+  		end
 
-  if data.collect_only_top then
-    -- prevent to collect plat part, which can continue to grow
-    local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
-    local node_below = minetest.get_node(pos_below);
-    if (node_below.name~=node.name) then
-      return false;
-    end
-    local pos_above = {x=pos.x, y=pos.y+1, z=pos.z}
-    local node_above = minetest.get_node(pos_above);
-    if (node_above.name==node.name) then
-      return false;
-    end
-  end
+  		if data.collect_only_top then
+    			-- prevent to collect plat part, which can continue to grow
+    			local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
+    			local node_below = minetest.get_node(pos_below);
+    			if (node_below.name~=node.name) then
+      				return false;
+    			end
+    			local pos_above = {x=pos.x, y=pos.y+1, z=pos.z}
+    			local node_above = minetest.get_node(pos_above);
+    			if (node_above.name==node.name) then
+      				return false;
+    			end
+  		end
 
-  if data.responsible_foraging then
-    return minetest.find_node_near(pos, 9, node.name) ~= nil
-  end
+		-- don't raze renewable resources
+  		if data.responsible_foraging then
+    			return minetest.find_node_near(pos, 9, node.name) ~= nil
+  		end
 
-  return true;
+  		return true;
+	end
 end
 
 local searching_range = {x = 10, y = 5, z = 10}
@@ -91,7 +94,7 @@ working_villages.register_job("working_villages:job_herbcollector", {
 		self:handle_obstacles()
 		if self:timer_exceeded("herbcollector:search",20) then
 			self:collect_nearest_item_by_condition(herbs.is_herb, searching_range)
-			local target = func.search_surrounding(self.object:get_pos(), find_herb_node, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_herb_node(self), searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then

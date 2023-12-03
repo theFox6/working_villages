@@ -37,23 +37,26 @@ function spellbooks.is_book(item_name)
 	return true;
 end
 
-local function find_book_nodes(pos)
+-- TODO support other types of magick items
+local function find_book_nodes(self)
+	return function(pos)
 		if minetest.is_protected(pos, "") then return false end
 		if working_villages.failed_pos_test(pos) then return false end
 
-	local node = minetest.get_node(pos);
-	local data = spellbooks.get_book(node.name);
-	if (not data) then
-		return false;
+		local node = minetest.get_node(pos);
+		local data = spellbooks.get_book(node.name);
+		if (not data) then
+			return false;
+		end
+		local meta  = minetest.get_meta(pos)
+		local text  = meta:get_string("text")
+		local owner = meta:get_string("owner")
+		local title = meta:get_string("title")
+		if text  == nil or text  == "" then return false end
+		if owner == nil or owner == "" then return false end
+		if title == nil or title == "" then return false end
+		return true;
 	end
-	local meta  = minetest.get_meta(pos)
-	local text  = meta:get_string("text")
-	local owner = meta:get_string("owner")
-	local title = meta:get_string("title")
-	if text  == nil or text  == "" then return false end
-	if owner == nil or owner == "" then return false end
-	if title == nil or title == "" then return false end
-	return true;
 end
 
 local searching_range = {x = 10, y = 3, z = 10}
@@ -97,7 +100,7 @@ working_villages.register_job("working_villages:job_wizard", {
 		self:handle_obstacles()
 		if self:timer_exceeded("wizard:search",20) then
 			self:collect_nearest_item_by_condition(spellbooks.is_book, searching_range)
-			local target = func.search_surrounding(self.object:get_pos(), find_book_nodes, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_book_nodes(self), searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then
