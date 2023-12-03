@@ -145,6 +145,7 @@ if true then
 minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
 					--minetest.node_punch(target, node, puncher, pointed_thing)
     if wield_item:get_count() == self:get_wielded_item():get_count() then
+	    				-- TODO separate failed_pos registries: the shovel might work
 					working_villages.failed_pos_record(target)
 					log.error("something wrong composting %s",item_name)
 					self:set_displayed_action("something wrong composting "..item_name)
@@ -172,6 +173,7 @@ if true then
 minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
 					--minetest.node_punch(target, node, puncher, pointed_thing)
     if wield_item:get_count() == self:get_wielded_item():get_count() then
+	    				-- TODO separate failed_pos registries: adding more leaves might work
 					working_villages.failed_pos_record(target)
 					log.error("something wrong composting %s",item_name)
 					self:set_displayed_action("something wrong composting "..item_name)
