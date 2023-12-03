@@ -31,6 +31,10 @@ local recipes = {
 		{"default:mese_crystal", "default:mese_crystal", "default:mese_crystal",},
 		{"default:mese_crystal", "default:mese_crystal", "default:mese_crystal",},
 	},
+	[2] = {
+		{"default:stone", "default:stone",},
+		{"default:stone", "default:stone",},
+	},
 }
 
 function recipe_requires(recipe, item_name, target_x, target_y)
@@ -309,9 +313,17 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 		elseif CRAFT_TABLE_TYPE == "crafting_bench" then
 			list_name = "rec"
 		else assert(false) end
-		for x=1,3,1 do -- 3 x 3 = 9
-			for y=1,3,1 do
+		local recipe = recipes[iteration]
+		local nx     = #recipe
+		--local xy     = 0
+		--for x=1,3,1 do -- 3 x 3 = 9
+		for x=1,nx,1 do -- 3 x 3 = 9
+			local row = recipe[x]
+			local ny  = #row
+			--for y=1,3,1 do
+			for y=1,ny,1 do
 				local xy = 3*(x-1)+y
+				--xy    = xy    + 1
 				index = index + 1
 				my_data.operations[index]   = {
 					list      = list_name,

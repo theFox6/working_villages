@@ -103,6 +103,8 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 	end
 end
 
+-- TODO need to check for impassable entities
+
 local function get_neighbors(current_pos, entity_height, entity_jump_height, entity_fear_height)
 	local neighbors = {}
 	local neighbors_index = 1

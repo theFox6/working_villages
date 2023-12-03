@@ -12,6 +12,7 @@ local furnaces = {
 local bakables = {
 	fuel_names = {
 		["default:coalblock"] = 99,
+		["default:coal_lump"] = 99,
 		["bucket:bucket_lava"] = 99,
 		["default:lava_source"] = 99,
 		--["default:jungletree"] = 99,

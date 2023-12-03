@@ -79,6 +79,7 @@ working_villages.register_job("working_villages:job_guard", {
 			--TODO: walk randomly
 			self:count_timer("guard:change_dir")
 			if self:timer_exceeded("guard:change_dir",50) then
+				self:handle_obstacles(true)
 				self:change_direction_randomly()
 			end
 		end
