@@ -33,8 +33,8 @@ for _,name in pairs(list_of_doors) do
 end
 
 local list_of_chests = {
-	"default:chest"
-	"default:chest_locked"
+	"default:chest",
+	"default:chest_locked",
 }
 
 for _,name in pairs(list_of_chests) do
