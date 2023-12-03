@@ -77,8 +77,8 @@ function farming_plants.is_plant(item_name)
 end
 
 local function find_plant_node(pos)
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
+		if minetest.is_protected(pos, "") then return false end
+		if working_villages.failed_pos_test(pos) then return false end
 
 	local node = minetest.get_node(pos);
 	local data = farming_plants.get_plant(node.name);
@@ -141,12 +141,35 @@ working_villages.register_job("working_villages:job_farmer", {
 				end
 				local plant_name = minetest.get_node(target).name
 				self:set_displayed_action("farming some "..plant_name)
-				self:go_to(destination)
-				local plant_data = farming_plants.get_plant(plant_name);
-				self:dig(target,true)
-				if plant_data and plant_data.replant then
-					for index, value in ipairs(plant_data.replant) do
-						self:place(value, vector.add(target, vector.new(0,index-1,0)))
+				--self:go_to(destination)
+				--local plant_data = farming_plants.get_plant(plant_name);
+				--self:dig(target,true)
+				--if plant_data and plant_data.replant then
+				--	for index, value in ipairs(plant_data.replant) do
+				--		self:place(value, vector.add(target, vector.new(0,index-1,0)))
+				--	end
+				--end
+
+				local success, ret = self:go_to(destination)
+				if not success then
+					assert(target ~= nil)
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable plants")
+					self:delay(100)
+				else
+					local plant_data = farming_plants.get_plant(plant_name);
+					success, ret = self:dig(target,true)
+					if not success then
+						assert(target ~= nil)
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why farming failed")
+						self:delay(100)
+					else
+						if plant_data and plant_data.replant then
+							for index, value in ipairs(plant_data.replant) do
+								self:place(value, vector.add(target, vector.new(0,index-1,0)))
+							end
+						end
 					end
 				end
 			end

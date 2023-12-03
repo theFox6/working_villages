@@ -33,8 +33,8 @@ function liquids.is_liquid(item_name)
 end
 
 local function find_liquid_nodes(pos)
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
+		if minetest.is_protected(pos, "") then return false end
+		if working_villages.failed_pos_test(pos) then return false end
 
 	local node = minetest.get_node(pos);
 	local data = liquids.get_liquid(node.name);
@@ -93,6 +93,7 @@ working_villages.register_job("working_villages:job_watercarrier", {
 				--self:go_to(destination)
 				local success, ret = self:go_to(destination)
 				if not success then
+					assert(target ~= nil)
 					working_villages.failed_pos_record(target)
 					self:set_displayed_action("looking at the unreachable snow")
 					self:delay(100)
@@ -145,63 +146,4 @@ working_villages.register_job("working_villages:job_watercarrier", {
 })
 
 working_villages.liquids = liquids
-
--- move to wield item
---local log = working_villages.require("log")
---function working_villages.villager:manipulate_chest2(chest_pos, take_func, put_func, data)
---	if func.is_chest(chest_pos) then
---		-- try to put items
---		local vil_inv = self:get_inventory();
---
---		-- from villager to chest
---		if put_func then
---			local size = vil_inv:get_size("main");
---			for index = 1,size do
---				local stack = vil_inv:get_stack("main", index);
---				if (not stack:is_empty()) and (put_func(self, stack, data)) then
---					local chest_meta = minetest.get_meta(chest_pos);
---					local chest_inv = chest_meta:get_inventory();
---					local leftover = chest_inv:add_item("main", stack);
---					vil_inv:set_stack("main", index, leftover);
---					for _=0,10 do coroutine.yield() end --wait 10 steps
---				end
---			end
---		end
---		-- from chest to villager
---		if take_func then
---			local chest_meta = minetest.get_meta(chest_pos);
---			local chest_inv = chest_meta:get_inventory();
---			local size = chest_inv:get_size("main");
---			for index = 1,size do
---				chest_meta = minetest.get_meta(chest_pos);
---				chest_inv = chest_meta:get_inventory();
---				local stack = chest_inv:get_stack("main", index);
---				if (not stack:is_empty()) and (take_func(self, stack, data)) then
---					local leftover = vil_inv:add_item("wield_item", stack);
---					chest_inv:set_stack("main", index, leftover);
---					for _=0,10 do coroutine.yield() end --wait 10 steps
---				end
---			end
---		end
---	else
---		log.error("Villager %s doe's not find cheston position %s.", self.inventory_name, minetest.pos_to_string(chest_pos))
---	end
---end
---
---function working_villages.villager:handle_chest2(take_func, put_func, data)
---	if (not self.job_data.manipulated_chest2) then
---		local chest_pos = self.pos_data.chest_pos
---		if (chest_pos~=nil) then
---			log.action("villager %s is handling chest at %s", self.inventory_name, minetest.pos_to_string(chest_pos))
---			self:set_state_info("I am taking and puting items from/to my chest.")
---			self:set_displayed_action("active")
---			local chest = minetest.get_node(chest_pos);
---			local dir = minetest.facedir_to_dir(chest.param2);
---			local destination = vector.subtract(chest_pos, dir);
---			self:go_to(destination)
---			self:manipulate_chest2(chest_pos, take_func, put_func, data);
---		end
---		self.job_data.manipulated_chest2 = true;
---	end
---end
 

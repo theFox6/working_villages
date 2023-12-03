@@ -49,8 +49,8 @@ function stones.is_stone(item_name)
 end
 
 local function find_stone_node(pos)
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
+		if minetest.is_protected(pos, "") then return false end
+		if working_villages.failed_pos_test(pos) then return false end
 
 	local node = minetest.get_node(pos);
   local data = stones.get_stone(node.name);
@@ -135,12 +135,14 @@ working_villages.register_job("working_villages:job_miner", {
 				-- We may not be able to reach the log
 				local success, ret = self:go_to(destination)
 				if not success then
+					assert(target ~= nil)
 					working_villages.failed_pos_record(target)
 					self:set_displayed_action("looking at the unreachable rocks")
 					self:delay(100)
 				else
 					success, ret = self:dig(target,true)
 					if not success then
+						assert(target ~= nil)
 						working_villages.failed_pos_record(target)
 						self:set_displayed_action("confused as to why mining failed at (x="..target.x..', y='..target.y..', z='..target.z..')')
 						self:delay(100)

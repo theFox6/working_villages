@@ -45,8 +45,8 @@ function gardening_nodes.is_dirt(item_name)
 end
 
 local function find_dirt_node(pos)
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
+		if minetest.is_protected(pos, "") then return false end
+		if working_villages.failed_pos_test(pos) then return false end
 
 	local node = minetest.get_node(pos);
 	local data = gardening_nodes.get_dirt(node.name);
@@ -118,28 +118,36 @@ working_villages.register_job("working_villages:job_gardener", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
 				local plant_name = minetest.get_node(target).name
 				self:set_displayed_action("tilling some "..plant_name)
-				local plant_data = gardening_nodes.get_dirt(plant_name)
-				--self:dig(target,true)
-				--if plant_data and plant_data.replant then
-				--	for index, value in ipairs(plant_data.replant) do
-				--		self:place(value, vector.add(target, vector.new(0,index-1,0)))
-				--	end
-				--end
-				local name   = stack:get_name()
-				if name == nil then return end
-				local def    = minetest.registered_items[name]
-				if def == nil then return end
-				local on_use = def.on_use
-				if on_use == nil then return end
-				local user   = self
-				local pointed_thing = {under=target, type="node",}
-				local new_stack = on_use(stack, user, pointed_thing)
-				-- TODO register position failure ?
-				self:set_wield_item_stack(new_stack)
-				for _=0,10 do coroutine.yield() end --wait 10 steps
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					assert(target ~= nil)
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable dirt")
+					self:delay(100)
+				else
+					local plant_data = gardening_nodes.get_dirt(plant_name)
+					--self:dig(target,true)
+					--if plant_data and plant_data.replant then
+					--	for index, value in ipairs(plant_data.replant) do
+					--		self:place(value, vector.add(target, vector.new(0,index-1,0)))
+					--	end
+					--end
+					local name   = stack:get_name()
+					if name == nil then return end
+					local def    = minetest.registered_items[name]
+					if def == nil then return end
+					local on_use = def.on_use
+					if on_use == nil then return end
+					local user   = self
+					local pointed_thing = {under=target, type="node",}
+					local new_stack = on_use(stack, user, pointed_thing)
+					-- TODO register position failure ?
+					self:set_wield_item_stack(new_stack)
+					for _=0,10 do coroutine.yield() end --wait 10 steps
+				end
 			end
 		elseif self:timer_exceeded("gardener:change_dir",50) then
 			self:change_direction_randomly()

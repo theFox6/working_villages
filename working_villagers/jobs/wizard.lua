@@ -38,8 +38,8 @@ function spellbooks.is_book(item_name)
 end
 
 local function find_book_nodes(pos)
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
+		if minetest.is_protected(pos, "") then return false end
+		if working_villages.failed_pos_test(pos) then return false end
 
 	local node = minetest.get_node(pos);
 	local data = spellbooks.get_book(node.name);
@@ -111,6 +111,7 @@ working_villages.register_job("working_villages:job_wizard", {
 				--self:go_to(destination)
 				local success, ret = self:go_to(destination)
 				if not success then
+					assert(target ~= nil)
 					working_villages.failed_pos_record(target)
 					self:set_displayed_action("looking at the unreachable snow")
 					self:delay(100)
@@ -151,6 +152,7 @@ working_villages.register_job("working_villages:job_wizard", {
 					local pointed_thing = {under=target, type="node",}
 					local new_stack = on_use(stack, user, pointed_thing)
 					self:set_wield_item_stack(new_stack)
+					-- TODO record position failure
 					for _=0,10 do coroutine.yield() end --wait 10 steps
 					-- TODO record successes so he's useful
 				end
@@ -160,30 +162,6 @@ working_villages.register_job("working_villages:job_wizard", {
 		end
 	end,
 })
-
---function working_villages.villager:get_properties()
---	return self.object:get_properties()
-----	local entity = self.object:get_luaentity()
-----	assert(entity ~= nil)
-----	assert(entity.hp_max ~= nil)
-----	return {
-----		["hp_max"] = entity.hp_max,
-----	}
---end
---function working_villages.villager:get_hp()
---	return self.object:get_hp()
---end
---function working_villages.villager:set_hp(hp)
---	return self.object:set_hp(hp)
---end
----- TODO 
-----function working_villages.villager:get_hp()
-----	return 20
-----end
------- alright, this stubs it out.
-----function working_villages.villager:set_hp()
-----	return 20
-----end
 
 working_villages.spellbooks = spellbooks
 

@@ -63,12 +63,14 @@ I'm doing anyway, clearing the snow away.",
 				--self:dig(target,true)
 				local success, ret = self:go_to(destination)
 				if not success then
+					assert(target ~= nil)
 					working_villages.failed_pos_record(target)
 					self:set_displayed_action("looking at the unreachable snow")
 					self:delay(100)
 				else
 					success, ret = self:dig(target,true)
 					if not success then
+						assert(target ~= nil)
 						working_villages.failed_pos_record(target)
 						self:set_displayed_action("confused as to why clearing failed")
 						self:delay(100)

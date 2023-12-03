@@ -40,8 +40,8 @@ function bugs.is_bug(item_name)
 end
 
 local function find_bug_node(pos)
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
+		if minetest.is_protected(pos, "") then return false end
+		if working_villages.failed_pos_test(pos) then return false end
 
 	local node = minetest.get_node(pos);
   local data = bugs.get_bug(node.name);
@@ -129,12 +129,14 @@ working_villages.register_job("working_villages:job_bugcollector", {
 				self:set_displayed_action("collecting some bugs")
 				local success, ret = self:go_to(destination)
 				if not success then
+					assert(target ~= nil)
 					working_villages.failed_pos_record(target)
 					self:set_displayed_action("looking at the unreachable bugs")
 					self:delay(100)
 				else
 					success, ret = self:dig(target,true)
 					if not success then
+						assert(target ~= nil)
 						working_villages.failed_pos_record(target)
 						self:set_displayed_action("confused as to why collecting failed")
 						self:delay(100)
