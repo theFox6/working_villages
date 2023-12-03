@@ -2,7 +2,25 @@
 
 local list_of_doors = {
 	"doors:door_wood_a",
-	"doors:door_wood_c"
+	"doors:door_wood_c",
+
+	"doors:door_glass_a",
+	"doors:door_glass_c",
+
+	"doors:door_steel_a",
+	"doors:door_steel_c",
+
+	"doors:door_obsidian_glass_a",
+	"doors:door_obsidian_glass_c",
+
+	"doors:door_steel_bar_a",
+	"doors:door_steel_bar_c",
+
+	"doors:gate_wood",
+	"doors:gate_pine_wood",
+	"doors:gate_aspen_wood",
+	"doors:gate_junglewood",
+	"doors:gate_acacia_wood",
 }
 
 for _,name in pairs(list_of_doors) do
@@ -16,6 +34,7 @@ end
 
 local list_of_chests = {
 	"default:chest"
+	"default:chest_locked"
 }
 
 for _,name in pairs(list_of_chests) do
