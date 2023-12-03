@@ -36,6 +36,9 @@ function bones.is_bone(item_name)
 end
 
 local function find_bug_node(pos)
+		if minetest.is_protected(p, "") then return false end
+		if working_villages.failed_pos_test(p) then return false end
+
 	local node = minetest.get_node(pos);
   local data = bones.get_bone(node.name);
   if (not data) then

@@ -1,5 +1,10 @@
 local func = working_villages.require("jobs/util")
-local function find_snow(p) return minetest.get_node(p).name == "default:snow" end
+local function find_snow(p)
+		if minetest.is_protected(p, "") then return false end
+		if working_villages.failed_pos_test(p) then return false end
+		-- what about ice? better bring bucket boy if you enable better ice
+	return minetest.get_node(p).name == "default:snow"
+end
 local searching_range = {x = 10, y = 3, z = 10}
 
 local landscaping_demands = {

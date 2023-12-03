@@ -122,6 +122,7 @@ working_villages.register_job("working_villages:job_hider", {
 		self:handle_obstacles()
 		-- TODO don't check timer if we've been found
 		if self:timer_exceeded("hider:search",20) then
+			-- TODO don't re-hide if we haven't been found
 			local target = func.search_surrounding(self.object:get_pos(), find_stone_node(self), searching_range) -- that should fix 'em
 			if target ~= nil then
 				--local destination = func.find_adjacent_clear(target)

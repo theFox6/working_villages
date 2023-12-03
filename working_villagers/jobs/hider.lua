@@ -383,6 +383,8 @@ function hider.increment_hiding_path(v)
   assert(index ~= nil)
   if trace_increment_hiding_path then print('hider.increment_hiding_path() 9') end
   if index == #path then
+				 --"keep walking another step for good measure," they say
+				coroutine.yield()
     if trace_increment_hiding_path then print('hider.increment_hiding_path() 10') end
     v.job_data.path_info = nil
     if trace_increment_hiding_path then print('hider.increment_hiding_path() 11') end

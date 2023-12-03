@@ -49,6 +49,9 @@ function stones.is_stone(item_name)
 end
 
 local function find_stone_node(pos)
+		if minetest.is_protected(p, "") then return false end
+		if working_villages.failed_pos_test(p) then return false end
+
 	local node = minetest.get_node(pos);
   local data = stones.get_stone(node.name);
   if (not data) then

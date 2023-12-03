@@ -38,6 +38,9 @@ function spellbooks.is_book(item_name)
 end
 
 local function find_book_nodes(pos)
+		if minetest.is_protected(p, "") then return false end
+		if working_villages.failed_pos_test(p) then return false end
+
 	local node = minetest.get_node(pos);
 	local data = spellbooks.get_book(node.name);
 	if (not data) then

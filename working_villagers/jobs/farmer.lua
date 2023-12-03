@@ -77,6 +77,9 @@ function farming_plants.is_plant(item_name)
 end
 
 local function find_plant_node(pos)
+		if minetest.is_protected(p, "") then return false end
+		if working_villages.failed_pos_test(p) then return false end
+
 	local node = minetest.get_node(pos);
 	local data = farming_plants.get_plant(node.name);
 	if (not data) then
