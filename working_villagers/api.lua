@@ -684,6 +684,8 @@ function working_villages.villager:set_hp(hp)
 end
 
 function working_villages.villager:is_player()
+  -- TODO I think we're supposed to return true here:
+  --if player and player:is_player() and not player.is_fake_player then
   return false
 end
 
@@ -1185,6 +1187,7 @@ function working_villages.register_villager(product_name, def)
   villager_def.set_home                    = working_villages.set_home
   villager_def.remove_home                 = working_villages.remove_home
 
+  villager_def.is_fake_player              = true
 
   minetest.register_entity(name, villager_def)
 
