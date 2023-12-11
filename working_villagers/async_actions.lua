@@ -335,7 +335,7 @@ function working_villages.villager:manipulate_chest(chest_pos, take_func, put_fu
 			end
 		end
 	else
-		log.error("Villager %s doe's not find cheston position %s.", self.inventory_name, minetest.pos_to_string(chest_pos))
+		log.error("Villager %s does not find chest on position %s.", self.inventory_name, minetest.pos_to_string(chest_pos))
 	end
 end
 
@@ -526,7 +526,7 @@ function working_villages.villager:handle_appliance(data)
 	if not success then
 		assert(destination ~= nil)
 		working_villages.failed_pos_record(destination)
-		self:set_displayed_action("looking at the unreachable job site")
+		self:set_displayed_action("looking at the unreachable appliance")
 		self:delay(100)
 	else
 		self:manipulate_appliance(appliance_pos, data)
@@ -564,7 +564,7 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 	assert(data ~= nil)
 	assert(data.is_appliance ~= nil)
 	if not data.is_appliance(appliance_pos) then
-		log.error("Villager %s doe's not find appliance on position %s.", self.inventory_name, minetest.pos_to_string(appliance_pos))
+		log.error("Villager %s does not find appliance on position %s.", self.inventory_name, minetest.pos_to_string(appliance_pos))
 		return
 	end
 	--log.error("Villager %s finds appliance on position %s.", self.inventory_name, minetest.pos_to_string(appliance_pos))
