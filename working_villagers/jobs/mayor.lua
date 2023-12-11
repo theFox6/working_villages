@@ -17,8 +17,15 @@ function mayor.mayor_v1(v)
 	end
 	self:handle_job_pos()
 
-	local pos = self.object:get_pos()
-	minetest.forceload_block(pos, true) -- TODO unload the block if we leave it
+	local last_pos = self.job_data.last_pos
+	if last_pos ~= nil then
+		minetest.forceload_free_block(last_pos, true)
+		self.job_data.last_pos = nil
+	end
+
+	last_pos = self.object:get_pos()
+	self.job_data.last_pos = last_pos
+	minetest.forceload_block(last_pos, true)
 
 	self:count_timer("mayor:search")
 	self:count_timer("mayor:change_dir")
@@ -26,7 +33,7 @@ function mayor.mayor_v1(v)
 	if self:timer_exceeded("mayor:search",20) then
 		-- TODO something
 	elseif self:timer_exceeded("mayor:change_dir",50) then
-		-- TODO don't leave the village
+		-- TODO don't leave the village #4
 		--self:change_direction_randomly()
 	end
 end
@@ -43,7 +50,6 @@ working_villages.register_job("working_villages:job_mayor", {
     	end)
     end
     while (v.pause) do
-      --coroutine.yield()
       mayor.mayor_v1(v)
     end
     follower.step(v)

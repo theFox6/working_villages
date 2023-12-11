@@ -64,7 +64,7 @@ working_villages.require("jobs/miner")
 working_villages.require("jobs/gem_miner")
 working_villages.require("jobs/mayor")
 working_villages.require("jobs/baker")
-working_villages.require("jobs/hider")
+--working_villages.require("jobs/hider")
 if minetest.get_modpath("mcg_lockworkshop") then
 	working_villages.require("jobs/locksmith")
 end

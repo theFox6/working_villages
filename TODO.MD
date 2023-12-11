@@ -1,3 +1,7 @@
+# my personal TODO notes
+
+-----
+
 burglar/courier -- move stuff between villagers' chests
 trash collector -- simple item pickup
 blacksmith      -- toolrepair
@@ -35,3 +39,7 @@ resurrector  -- respawns dead entities based on bones meta
 pathmaker    -- makes a path for the gank-squad
 demolition   -- explosives expert
 captain      -- operates jumpdrive + space cannon TODO build a death star TODO reasonable handling of very large explosions
+
+
+
+villager lineage => create a separate mod to track this

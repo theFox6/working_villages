@@ -411,6 +411,7 @@ function working_villages.villager:change_direction_randomly()
     y = 0,
     z = math.random(0, 5) * 2 - 5,
   }
+  -- TODO check whether it's safe so we don't wander off a cliff #49
   local velocity = vector.multiply(vector.normalize(direction), 1.5)
   self.object:set_velocity(velocity)
   self:set_yaw_by_direction(direction)
@@ -810,6 +811,7 @@ working_villages.job_inv = minetest.create_detached_inventory("working_villages:
   end,
   on_put = function(inv, listname, _, stack)
     if inv:contains_item(listname, stack:peek_item(1)) then
+      -- #48
       --inv:remove_item(listname, stack)
       stack:clear()
     end
