@@ -1,4 +1,5 @@
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
 local co_command = working_villages.require("job_coroutines").commands
 
 local function find_building(p)

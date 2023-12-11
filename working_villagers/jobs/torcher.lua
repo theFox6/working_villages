@@ -2,6 +2,7 @@ local fail = working_villages.require("failures")
 local log = working_villages.require("log")
 local co_command = working_villages.require("job_coroutines").commands
 local follower = working_villages.require("jobs/follow_player")
+local S = minetest.get_translator("working_villages")
 
 local torcher = {}
 

@@ -1,4 +1,5 @@
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
 local dyemixer_recipes = working_villages.require("jobs/dyemixer_recipes")
 local log = working_villages.require("log")
 

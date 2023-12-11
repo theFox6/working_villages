@@ -1,4 +1,5 @@
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
 local function find_snow(self)
 	return function(p)
 		if minetest.is_protected(p, self:get_player_name()) then return false end

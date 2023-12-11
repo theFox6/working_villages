@@ -3,6 +3,7 @@ CRAFT_TABLE_TYPE = "crafting_bench"
 
 
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
 local log = working_villages.require("log")
 
 local craft_tables

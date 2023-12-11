@@ -1,4 +1,5 @@
 local log = working_villages.require("log")
+local S = minetest.get_translator("working_villages")
 local co_command = working_villages.require("job_coroutines").commands
 
 --modes: stationary,escort,patrol,wandering

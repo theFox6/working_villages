@@ -1,6 +1,7 @@
 -- TODO under development
 
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
 
 -- limited support to two replant definitions
 local wafflehaus_nodes = {

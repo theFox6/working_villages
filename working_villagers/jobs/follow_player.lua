@@ -1,4 +1,5 @@
 local follower = {}
+local S = minetest.get_translator("working_villages")
 
 function follower.walk_in_direction(v,dir)
   local position = v.object:get_pos()

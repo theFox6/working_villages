@@ -1,4 +1,5 @@
 local dyemixer_recipes = {}
+local S = minetest.get_translator("working_villages")
 
 -- TODO write a dependency management system
 function dyemixer_recipes.update_color_plan(self, target_color)

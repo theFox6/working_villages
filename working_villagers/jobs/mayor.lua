@@ -1,4 +1,5 @@
 local follower = working_villages.require("jobs/follow_player")
+local S = minetest.get_translator("working_villages")
 local mayor    = {}
 
 local follower_tools = {

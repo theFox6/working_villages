@@ -1,4 +1,5 @@
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
 
 local lockworkshops = {
 	names = {

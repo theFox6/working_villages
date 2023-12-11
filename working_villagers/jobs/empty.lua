@@ -1,5 +1,7 @@
+local S = minetest.get_translator("working_villages")
+
 working_villages.register_job("working_villages:job_empty", {
-	description      = "empty (working_villages)",
+	description      = S("empty (working_villages)"),
 	inventory_image  = "default_paper.png",
 	jobfunc          = function() end,
 })

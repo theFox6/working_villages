@@ -23,11 +23,6 @@ forms.put_link("working_villages:talking_menu", "working_villages:state",
   "What do you doing at the moment?")
 
 
--- TODO Who's your daddy and what does he do
--- TODO where is...
--- TODO what do you need to do your job
-
-
 forms.register_text_page("working_villages:trivia",
   function(villager)
     assert(villager ~= nil)
@@ -83,4 +78,8 @@ end)
 forms.put_link("working_villages:talking_menu", "working_villages:workflow",
 	"How do you do your job?")
 
--- where do you live/work
+-- TODO where do you live/work
+-- TODO Who's your daddy and what does he do
+-- TODO what do you need to do your job
+-- TODO where is...
+

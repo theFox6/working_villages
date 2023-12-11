@@ -2,6 +2,7 @@ local fail = working_villages.require("failures")
 local log = working_villages.require("log")
 local func = working_villages.require("jobs/util")
 local pathfinder = working_villages.require("pathfinder")
+local S = minetest.get_translator("working_villages")
 
 --TODO: add variable precision
 function working_villages.villager:go_to(pos)
