@@ -144,30 +144,7 @@ local function take_func(villager,stack,data)
 	return false
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local function put_func2(villager,stack,data)
+local function put_craftingsupplies(villager,stack,data)
 	assert(villager  ~= nil)
 	assert(stack     ~= nil)
 
@@ -190,34 +167,6 @@ local function put_func2(villager,stack,data)
 	end
 	return false
 end
-
-
-local function take_func2(villager,stack)
-	assert(villager  ~= nil)
-	assert(stack     ~= nil)
-	local item_name = stack:get_name()
-	local inv = villager:get_inventory()
-	return (inv:room_for_item("main", stack))
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 working_villages.register_job("working_villages:job_craftsman", {
 	description			= "craftsman (working_villages)",
@@ -246,16 +195,23 @@ working_villages.register_job("working_villages:job_craftsman", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local target_def = minetest.get_node(target)
-				local plant_data = craft_tables.get_craft_table(target_def.name);
-				if plant_data then
-					self:set_displayed_action("operating the crafting table")
-					self:handle_craft_table(
-					        target,
-						take_func2, -- take everything
-						put_func2
-					)
+				local success, ret = self:go_to(destination)
+				if not success then
+					assert(target ~= nil)
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable crafting table")
+					self:delay(100)
+				else
+					local target_def = minetest.get_node(target)
+					local plant_data = craft_tables.get_craft_table(target_def.name);
+					if plant_data then
+						self:set_displayed_action("operating the crafting table")
+						self:handle_craft_table(
+						        target,
+							func.take_everything, -- take everything
+							put_craftingsupplies
+						)
+					end
 				end
 			end
 		elseif self:timer_exceeded("craftsman:change_dir",50) then

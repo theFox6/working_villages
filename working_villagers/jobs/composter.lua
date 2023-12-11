@@ -113,74 +113,81 @@ working_villages.register_job("working_villages:job_composter", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local node          = minetest.get_node(target)
-				assert(node ~= nil)
-				local plant_data    = composter_nodes.get_composter(node.name)
-				assert(plant_data ~= nil)
-				local pointed_thing = {under=target, type="node",}
-				local puncher       = self
-				-- if filled, then punch with shovel
-				-- else punch with compostable
-				--
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable composter")
+					self:delay(100)
+				else
+					local node          = minetest.get_node(target)
+					assert(node ~= nil)
+					local plant_data    = composter_nodes.get_composter(node.name)
+					assert(plant_data ~= nil)
+					local pointed_thing = {under=target, type="node",}
+					local puncher       = self
+					-- if filled, then punch with shovel
+					-- else punch with compostable
+					--
 
+	
+					if --node.name == "composting:composter" and
+					self:move_main_to_wield(is_compostable) then
+    						local wield_item = self:get_wielded_item();
+    						assert(wield_item ~= nil)
+    						local item_name = wield_item:get_name();
+    						assert(item_name ~= nil)
+						log.action("composting %s",item_name)
+						self:set_displayed_action("composting "..item_name)
+						--if true then
+						minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
+						--minetest.node_punch(target, node, puncher, pointed_thing)
+    						if wield_item:get_count() == self:get_wielded_item():get_count() then
+		    					-- TODO separate failed_pos registries: the shovel might work
+							working_villages.failed_pos_record(target)
+							log.error("something wrong composting %s",item_name)
+							self:set_displayed_action("something wrong composting "..item_name)
+    						end
+						--[[
+						else -- TODO #50
+    							local def = wield_item:get_definition() -- minetest.registered_items[item_name]
+    							local on_use = def.on_use
+    							local new_stack = on_use(wield_item, self, pointed_thing)
+    							self:set_wield_item_stack(new_stack)
+						end
+						--]]
+						for _=0,10 do coroutine.yield() end --wait 10 steps
+					end
 
-				if --node.name == "composting:composter" and
-				self:move_main_to_wield(is_compostable) then
-    					local wield_item = self:get_wielded_item();
-    					assert(wield_item ~= nil)
-    					local item_name = wield_item:get_name();
-    					assert(item_name ~= nil)
-					log.action("composting %s",item_name)
-					self:set_displayed_action("composting "..item_name)
-					--if true then
-					minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
-					--minetest.node_punch(target, node, puncher, pointed_thing)
-    					if wield_item:get_count() == self:get_wielded_item():get_count() then
-	    					-- TODO separate failed_pos registries: the shovel might work
-						working_villages.failed_pos_record(target)
-						log.error("something wrong composting %s",item_name)
-						self:set_displayed_action("something wrong composting "..item_name)
-    					end
-					--[[
-					else -- TODO #50
+					if --node.name == "composting:composter_filled" and
+					self:move_main_to_wield(function(name)
+  						return composting_tools[name] ~= nil
+					end) then
+    						local wield_item = self:get_wielded_item();
+    						assert(wield_item ~= nil)
+    						local item_name = wield_item:get_name();
+    						assert(item_name ~= nil)
+						log.action("using %s",item_name)
+						self:set_displayed_action("using "..item_name)
+						--if true then
+						minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
+						--minetest.node_punch(target, node, puncher, pointed_thing)
+    						if wield_item:get_count() == self:get_wielded_item():get_count() then
+		    					-- TODO separate failed_pos registries: adding more leaves might work
+							working_villages.failed_pos_record(target)
+							log.error("something wrong composting %s",item_name)
+							self:set_displayed_action("something wrong composting "..item_name)
+    						end
+						--[[
+						else -- TODO #50
     						local def = wield_item:get_definition() -- minetest.registered_items[item_name]
     						local on_use = def.on_use
     						local new_stack = on_use(wield_item, self, pointed_thing)
     						self:set_wield_item_stack(new_stack)
+						end
+						--]]
+						for _=0,10 do coroutine.yield() end --wait 10 steps
 					end
-					--]]
-					for _=0,10 do coroutine.yield() end --wait 10 steps
-				end
-
-				if --node.name == "composting:composter_filled" and
-				self:move_main_to_wield(function(name)
-  					return composting_tools[name] ~= nil
-				end) then
-    					local wield_item = self:get_wielded_item();
-    					assert(wield_item ~= nil)
-    					local item_name = wield_item:get_name();
-    					assert(item_name ~= nil)
-					log.action("using %s",item_name)
-					self:set_displayed_action("using "..item_name)
-					--if true then
-					minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
-					--minetest.node_punch(target, node, puncher, pointed_thing)
-    					if wield_item:get_count() == self:get_wielded_item():get_count() then
-	    					-- TODO separate failed_pos registries: adding more leaves might work
-						working_villages.failed_pos_record(target)
-						log.error("something wrong composting %s",item_name)
-						self:set_displayed_action("something wrong composting "..item_name)
-    					end
-					--[[
-					else -- TODO #50
-    					local def = wield_item:get_definition() -- minetest.registered_items[item_name]
-    					local on_use = def.on_use
-    					local new_stack = on_use(wield_item, self, pointed_thing)
-    					self:set_wield_item_stack(new_stack)
-					end
-					--]]
-					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
 			end
 		elseif self:timer_exceeded("composter:change_dir",50) then

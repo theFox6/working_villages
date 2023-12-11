@@ -130,11 +130,6 @@ local function take_func(villager,stack)
 	itemstack:set_count(lockables.get_lockable(item_name))
 	return (not inv:contains_item("main", itemstack))
 end
-local function take_func2(villager,stack)
-	local item_name = stack:get_name()
-	local inv = villager:get_inventory()
-	return (inv:room_for_item("main", stack))
-end
 
 local function put_lock(_,stack)
 	return lockables.is_lock(stack:get_name())
@@ -171,20 +166,27 @@ working_villages.register_job("working_villages:job_locksmith", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local target_def = minetest.get_node(target)
-				local plant_data = lockworkshops.get_lockworkshop(target_def.name);
-				if plant_data then
-					self:set_displayed_action("operating the lock workshop")
-					self:handle_lockworkshop(
-					        target,
-						take_func2, -- take everything
-						put_unlocked, -- put what we need to furnace
-						put_lock
-					)
-					--self.job_data.manipulated_chest   = false;
-					--self.job_data.manipulated_furnace = false;
-					--self:set_displayed_action("waiting on furnace")
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable lock workshop")
+					self:delay(100)
+				else
+					local target_def = minetest.get_node(target)
+					local plant_data = lockworkshops.get_lockworkshop(target_def.name);
+					if plant_data then
+						self:set_displayed_action("operating the lock workshop")
+						self:handle_lockworkshop(
+						        target,
+							func.take_everything, -- take everything
+							put_unlocked, -- put what we need to furnace
+							put_lock
+						)
+						--self.job_data.manipulated_chest   = false;
+						--self.job_data.manipulated_furnace = false;
+						--self:set_displayed_action("waiting on furnace")
+					end
 				end
 			end
 		elseif self:timer_exceeded("locksmith:change_dir",50) then

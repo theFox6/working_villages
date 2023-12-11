@@ -435,16 +435,16 @@ end
 
 -- modulo like in other languages
 function func.mod(x, m)
-	assert(x ~= nil)
-	assert(m ~= nil)
-	local r = x % m
-	--if r < 0 then
-	--	r = r+m
-	--end
-	r = r % m
-	assert(0 <= r)
-	assert(r <  m)
-	return r
+  assert(x ~= nil)
+  assert(m ~= nil)
+  local r = x % m
+  --if r < 0 then
+  --	r = r+m
+  --end
+  r = r % m
+  assert(0 <= r)
+  assert(r <  m)
+  return r
 end
 
 function func.is_dyemixer(pos)
@@ -460,6 +460,14 @@ function func.is_dyemixer(pos)
     return true;
   end
   return false;
+end
+
+function util.take_everything(villager,stack)
+  assert(villager ~= nil)
+  assert(stack    ~= nil)
+  local item_name = stack:get_name()
+  local inv = villager:get_inventory()
+  return (inv:room_for_item("main", stack))
 end
 
 return func

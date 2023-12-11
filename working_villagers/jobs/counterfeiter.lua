@@ -137,11 +137,6 @@ local function take_func(villager,stack)
 	itemstack:set_count(fakables.get_fakable(item_name))
 	return (not inv:contains_item("main", itemstack))
 end
-local function take_func2(villager,stack)
-	local item_name = stack:get_name()
-	local inv = villager:get_inventory()
-	return (inv:room_for_item("main", stack))
-end
 
 local function put_dye(_,stack)
 	return fakables.is_dye(stack:get_name())
@@ -178,20 +173,27 @@ working_villages.register_job("working_villages:job_counterfeiter", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local target_def = minetest.get_node(target)
-				local plant_data = fakerytables.get_fakerytable(target_def.name);
-				if plant_data then
-					self:set_displayed_action("operating the fakery table")
-					self:handle_fakerytable(
-					        target,
-						take_func2, -- take everything
-						put_cheap_replacement, -- put what we need to furnace
-						put_dye
-					)
-					--self.job_data.manipulated_chest   = false;
-					--self.job_data.manipulated_furnace = false;
-					--self:set_displayed_action("waiting on furnace")
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable fakery table")
+					self:delay(100)
+				else
+					local target_def = minetest.get_node(target)
+					local plant_data = fakerytables.get_fakerytable(target_def.name);
+					if plant_data then
+						self:set_displayed_action("operating the fakery table")
+						self:handle_fakerytable(
+						        target,
+							func.take_everything, -- take everything
+							put_cheap_replacement, -- put what we need to furnace
+							put_dye
+						)
+						--self.job_data.manipulated_chest   = false;
+						--self.job_data.manipulated_furnace = false;
+						--self:set_displayed_action("waiting on furnace")
+					end
 				end
 			end
 		elseif self:timer_exceeded("counterfeiter:change_dir",50) then

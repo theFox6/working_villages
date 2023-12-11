@@ -114,19 +114,11 @@ local function take_func(villager,stack)
 	return (not inv:contains_item("main", itemstack))
 end
 
-local function put_func2(villager,stack)
+local function put_recyclables(villager,stack)
 	assert(villager ~= nil)
 	assert(stack    ~= nil)
 	--if not is_half_empty(villager) then return true end
 	return recyclables.is_recyclable(stack:get_name())
-end
-local function take_func2(villager,stack)
-	assert(villager ~= nil)
-	assert(stack    ~= nil)
-	--if not is_half_empty(villager) then return false end
-	local item_name = stack:get_name()
-	local inv = villager:get_inventory()
-	return (inv:room_for_item("main", stack))
 end
 
 working_villages.register_job("working_villages:job_recycler", {
@@ -161,23 +153,29 @@ working_villages.register_job("working_villages:job_recycler", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local target_def = minetest.get_node(target)
-				local plant_data = recyclers.get_recycler(target_def.name);
-				if plant_data then
-					self:set_displayed_action("operating the recycler")
-					assert(take_func2 ~= nil)
-					assert(put_func2  ~= nil)
-					self:handle_recycler(
-					        target,
-						take_func2, -- take everything
-						put_func2 -- put what we need to furnace
-					)
-					--self.job_data.manipulated_chest   = false;
-					--self.job_data.manipulated_furnace = false;
-					--self:set_displayed_action("waiting on furnace")
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable recycler")
+					self:delay(100)
+				else
+					local target_def = minetest.get_node(target)
+					local plant_data = recyclers.get_recycler(target_def.name);
+					if plant_data then
+						self:set_displayed_action("operating the recycler")
+						assert(put_recyclables  ~= nil)
+						self:handle_recycler(
+						        target,
+							func.take_everything, -- take everything
+							put_recyclables -- put what we need to furnace
+						)
+						--self.job_data.manipulated_chest   = false;
+						--self.job_data.manipulated_furnace = false;
+						--self:set_displayed_action("waiting on furnace")
+					end
+					self.job_data.manipulated_chest = self.job_data.manipulated_chest and not is_half_empty(self)
 				end
-				self.job_data.manipulated_chest = self.job_data.manipulated_chest and not is_half_empty(self)
 			end
 		elseif self:timer_exceeded("recycler:change_dir",50) then
 			self:change_direction_randomly()

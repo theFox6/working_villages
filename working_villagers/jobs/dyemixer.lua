@@ -183,17 +183,6 @@ local function take_func(villager,stack)
 	return false
 end
 
-
-local function take_func2(villager,stack)
-	assert(villager  ~= nil)
-	assert(stack     ~= nil)
-	-- TODO take all dyes and non-target wool
-	local item_name = stack:get_name()
-	local inv = villager:get_inventory()
-	return (inv:room_for_item("main", stack))
-end
-
-
 local function put_dye(villager,stack,data)--,iteration,ab)
 	assert(villager  ~= nil)
 	assert(stack     ~= nil)
@@ -273,7 +262,7 @@ working_villages.register_job("working_villages:job_dyemixer", {
 						self:set_displayed_action("operating the dyemixer")
 						self:handle_dyemixer(
 						        target,
-							take_func2, -- take everything
+							func.take_everything, -- take everything
 							put_dyeable, -- put what we need to furnace
 							put_dye,
 							take_target,

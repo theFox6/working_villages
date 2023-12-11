@@ -128,11 +128,6 @@ local function take_func(villager,stack)
 	itemstack:set_count(craftables.get_craftable(item_name))
 	return (not inv:contains_item("main", itemstack))
 end
-local function take_func2(villager,stack)
-	local item_name = stack:get_name()
-	local inv = villager:get_inventory()
-	return (inv:room_for_item("main", stack))
-end
 
 local function put_lock(_,stack)
 	return craftables.is_fuel(stack:get_name())
@@ -176,7 +171,7 @@ working_villages.register_job("working_villages:job_claycrafter", {
 					self:set_displayed_action("operating the claycrafter")
 					self:handle_claycrafter(
 					        target,
-						take_func2,
+						func.take_everything,
 						put_unlocked,
 						put_lock
 					)
