@@ -80,9 +80,6 @@ local function take_func(villager,stack)
 	end
 	return (taxable_items[name] ~= nil)
 end
-local function put_func(villager,stack)
-	return true -- put everything into chest
-end
 
 
 function thief.step(self)
@@ -145,7 +142,7 @@ working_villages.register_job("working_villages:job_thief", {
 		-- crime doesn't sleep, so here's a hack to reset his internal state for handle_chest()
 		local inv_is_full = not self:get_inventory():room_for_item("main", ItemStack("working_villages:commanding_sceptre 1"))
 		self.job_data.manipulated_chest    = not inv_is_full
-		self:handle_chest(nil, put_func)
+		self:handle_chest(nil, util.put_everything)
 		--self:handle_job_pos()
 		self:count_timer("thief:search")
 		self:count_timer("thief:change_dir")

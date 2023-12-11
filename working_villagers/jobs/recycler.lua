@@ -84,28 +84,16 @@ end
 
 local searching_range = {x = 10, y = 3, z = 10}
 
-local function is_half_empty(villager)
-	assert(villager ~= nil)
-	local inv = villager:get_inventory()
-	local sz  = inv:get_size("main")
-	local cnt = 0
-	for i=1,sz,1 do
-		local stk = inv:get_stack("main", i)
-		if stk:is_empty() then cnt = cnt + 1 end
-	end
-	return cnt >= sz / 2
-end
-
 local function put_func(villager,stack)
 	assert(villager ~= nil)
 	assert(stack    ~= nil)
-	if not is_half_empty(villager) then return true end
+	if not util.is_half_empty(villager) then return true end
 	return not recyclables.is_recyclable(stack:get_name())
 end
 local function take_func(villager,stack)
 	assert(villager ~= nil)
 	assert(stack    ~= nil)
-	if not is_half_empty(villager) then return false end
+	if not util.is_half_empty(villager) then return false end
 	local item_name = stack:get_name()
 	if not recyclables.is_recyclable(item_name) then return false end
 	local inv = villager:get_inventory()
@@ -117,7 +105,7 @@ end
 local function put_recyclables(villager,stack)
 	assert(villager ~= nil)
 	assert(stack    ~= nil)
-	--if not is_half_empty(villager) then return true end
+	--if not util.is_half_empty(villager) then return true end
 	return recyclables.is_recyclable(stack:get_name())
 end
 
@@ -135,7 +123,7 @@ working_villages.register_job("working_villages:job_recycler", {
 			take_func, -- take unlocked + locks
 			put_func   -- put not(unlocked or whitelist)
 		)
-		--assert(is_half_empty(self))
+		--assert(util.is_half_empty(self))
 		self:handle_job_pos()
 
 		self:count_timer("recycler:search")
@@ -174,7 +162,7 @@ working_villages.register_job("working_villages:job_recycler", {
 						--self.job_data.manipulated_furnace = false;
 						--self:set_displayed_action("waiting on furnace")
 					end
-					self.job_data.manipulated_chest = self.job_data.manipulated_chest and not is_half_empty(self)
+					self.job_data.manipulated_chest = self.job_data.manipulated_chest and not util.is_half_empty(self)
 				end
 			end
 		elseif self:timer_exceeded("recycler:change_dir",50) then

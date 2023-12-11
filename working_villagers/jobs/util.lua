@@ -448,7 +448,7 @@ function func.mod(x, m)
 end
 
 function func.is_dyemixer(pos)
-	local node = minetest.get_node(pos)
+  local node = minetest.get_node(pos)
   if (node==nil) then
     return false;
   end
@@ -463,11 +463,32 @@ function func.is_dyemixer(pos)
 end
 
 function util.take_everything(villager,stack)
+  -- take everything from chest if room in inventory
   assert(villager ~= nil)
   assert(stack    ~= nil)
   local item_name = stack:get_name()
   local inv = villager:get_inventory()
   return (inv:room_for_item("main", stack))
+end
+
+function util.put_everything(villager,stack)
+  -- put everything into chest
+  assert(villager ~= nil)
+  assert(stack    ~= nil)
+  return true
+end
+
+function util.is_half_empty(villager)
+  -- some jobs don't work so well unless the villager has room in his inventory
+  assert(villager ~= nil)
+  local inv = villager:get_inventory()
+  local sz  = inv:get_size("main")
+  local cnt = 0
+  for i=1,sz,1 do
+    local stk = inv:get_stack("main", i)
+    if stk:is_empty() then cnt = cnt + 1 end
+  end
+  return cnt >= sz / 2
 end
 
 return func

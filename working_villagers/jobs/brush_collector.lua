@@ -72,9 +72,6 @@ end
 
 local searching_range = {x = 10, y = 5, z = 10}
 
-local function put_func()
-  return true;
-end
 
 -- copied from the plant/herb collector
 working_villages.register_job("working_villages:job_brushcollector", {
@@ -83,7 +80,7 @@ working_villages.register_job("working_villages:job_brushcollector", {
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
 		self:handle_night()
-		self:handle_chest(nil, put_func)
+		self:handle_chest(nil, util.put_everything)
 		self:handle_job_pos()
 
 		self:count_timer("brushcollector:search")
