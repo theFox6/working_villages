@@ -120,18 +120,10 @@ working_villages.register_job("working_villages:job_composter", {
 				assert(plant_data ~= nil)
 				local pointed_thing = {under=target, type="node",}
 				local puncher       = self
-				--self:dig(target,true)
-				--if plant_data and plant_data.replant then
-				--	for index, value in ipairs(plant_data.replant) do
-				--		self:place(value, vector.add(target, vector.new(0,index-1,0)))
-				--	end
-				--end
-				--
 				-- if filled, then punch with shovel
 				-- else punch with compostable
 				--
 
-				--local stack
 
 				if --node.name == "composting:composter" and
 				self:move_main_to_wield(is_compostable) then
@@ -150,7 +142,7 @@ minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thi
 					log.error("something wrong composting %s",item_name)
 					self:set_displayed_action("something wrong composting "..item_name)
     end
-else
+else -- TODO #50
     local def = wield_item:get_definition() -- minetest.registered_items[item_name]
     local on_use = def.on_use
     local new_stack = on_use(wield_item, self, pointed_thing)
@@ -178,7 +170,7 @@ minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thi
 					log.error("something wrong composting %s",item_name)
 					self:set_displayed_action("something wrong composting "..item_name)
     end
-else
+else -- TODO #50
     local def = wield_item:get_definition() -- minetest.registered_items[item_name]
     local on_use = def.on_use
     local new_stack = on_use(wield_item, self, pointed_thing)
@@ -186,16 +178,6 @@ else
 end
 					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
-
---				local name   = stack:get_name()
---				--if stack:is_empty() then
---				local def    = minetest.registered_items[name]
---				local on_use = def.on_use
---				local user   = self
---				local pointed_thing = {under=target, type="node",}
---				local new_stack = on_use(stack, user, pointed_thing)
---				self:set_wield_item_stack(new_stack)
---				for _=0,10 do coroutine.yield() end --wait 10 steps
 			end
 		elseif self:timer_exceeded("composter:change_dir",50) then
 			self:change_direction_randomly()

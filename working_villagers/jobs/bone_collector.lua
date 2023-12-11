@@ -46,20 +46,6 @@ local function find_bug_node(self)
     			return false;
   		end
 
---  if data.collect_only_top then
---    -- prevent to collect plat part, which can continue to grow
---    local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
---    local node_below = minetest.get_node(pos_below);
---    if (node_below.name~=node.name) then
---      return false;
---    end
---    local pos_above = {x=pos.x, y=pos.y+1, z=pos.z}
---    local node_above = minetest.get_node(pos_above);
---    if (node_above.name==node.name) then
---      return false;
---    end
---  end
-
   		return true;
 	end
 end
@@ -113,10 +99,6 @@ working_villages.register_job("working_villages:job_bonecollector", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				--self:go_to(destination)
-        --local herb_data = bones.get_bone(minetest.get_node(target).name);
-        --bones.get_bone(minetest.get_node(target).name);
-				--self:dig(target,true)
 				self:set_displayed_action("collecting some bones")
 				local success, ret = self:go_to(destination)
 				if not success then
@@ -135,7 +117,7 @@ working_villages.register_job("working_villages:job_bonecollector", {
 				end
 			end
 		elseif self:timer_exceeded("bonecollector:change_dir",50) then
-			-- TODO I don't suppose a search pattern would be applicable
+			-- TODO get death positions of players and bone-spawning entities or use a search pattern
 			self:change_direction_randomly()
 		end
 	end,

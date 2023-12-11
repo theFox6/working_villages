@@ -175,7 +175,7 @@ working_villages.register_job("working_villages:job_locksmith", {
 				local target_def = minetest.get_node(target)
 				local plant_data = lockworkshops.get_lockworkshop(target_def.name);
 				if plant_data then
-					self:set_displayed_action("operating the furnace")
+					self:set_displayed_action("operating the lock workshop")
 					self:handle_lockworkshop(
 					        target,
 						take_func2, -- take everything

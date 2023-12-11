@@ -1,3 +1,6 @@
+-- PoC for using items and HB integration
+-- automates the deadly process of discovering magick incantations
+
 -- TODO mana regen
 -- TODO cleaner integration with mana mod
 
@@ -7,6 +10,9 @@ local func = working_villages.require("jobs/util")
 -- limited support to two replant definitions
 local spellbooks = {
 	-- TODO need to check their meta
+	-- TODO support more book types
+	-- TODO support other magic item types
+	-- TODO support engraved items
 	names = {
 		["default:book"]        = 1,
 		["default:book_open"]   = 1,

@@ -15,6 +15,7 @@ local gardening_nodes = {
 }
 
 local gardening_demands = {
+	-- maybe we need bonemeal or something
 	["farming:hoe_wood"] = 99,
 	["farming:hoe_stone"] = 99,
 	["farming:hoe_steel"] = 99,
@@ -100,6 +101,7 @@ working_villages.register_job("working_villages:job_gardener", {
   				return gardening_tools[name] ~= nil
 			end)
 		end
+		-- TODO
 		-- if stack wear is too much, then cycle tools
 		-- I'm still working on the blacksmith to repair tools
 		-- should work great with toolranks
@@ -122,7 +124,6 @@ working_villages.register_job("working_villages:job_gardener", {
 				end
 				local plant_name = minetest.get_node(target).name
 				self:set_displayed_action("tilling some "..plant_name)
-				--self:go_to(destination)
 				local success, ret = self:go_to(destination)
 				if not success then
 					assert(target ~= nil)

@@ -143,14 +143,6 @@ working_villages.register_job("working_villages:job_farmer", {
 				end
 				local plant_name = minetest.get_node(target).name
 				self:set_displayed_action("farming some "..plant_name)
-				--self:go_to(destination)
-				--local plant_data = farming_plants.get_plant(plant_name);
-				--self:dig(target,true)
-				--if plant_data and plant_data.replant then
-				--	for index, value in ipairs(plant_data.replant) do
-				--		self:place(value, vector.add(target, vector.new(0,index-1,0)))
-				--	end
-				--end
 
 				local success, ret = self:go_to(destination)
 				if not success then

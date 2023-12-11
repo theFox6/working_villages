@@ -103,10 +103,6 @@ function fakables.is_dye(item_name)
 end
 
 
-
-
-
-
 function fakerytables.get_fakerytable(item_name)
 	-- check more priority definitions
 	for key, value in pairs(fakerytables.names) do

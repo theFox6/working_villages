@@ -1,7 +1,3 @@
--- TODO not working
-
--- TODO I can't find a craft table that I like
-
 --CRAFT_TABLE_TYPE = "craft_table"
 CRAFT_TABLE_TYPE = "crafting_bench"
 
@@ -199,7 +195,6 @@ end
 local function take_func2(villager,stack)
 	assert(villager  ~= nil)
 	assert(stack     ~= nil)
-	-- TODO take all dyes and non-target wool
 	local item_name = stack:get_name()
 	local inv = villager:get_inventory()
 	return (inv:room_for_item("main", stack))
@@ -231,8 +226,8 @@ working_villages.register_job("working_villages:job_craftsman", {
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(
-			take_func, -- take dyeable + dye
-			put_func   -- put not(dyeable or dye)
+			take_func,
+			put_func
 		)
 		self:handle_job_pos()
 
@@ -269,122 +264,4 @@ working_villages.register_job("working_villages:job_craftsman", {
 	end,
 })
 
-
-
-function func.is_craft_table(pos)
-	local node = minetest.get_node(pos)
-  if (node==nil) then
-    return false;
-  end
-  if node.name=="crafting_bench:workbench"
-  or node.name=="craft_table:simple" then
-    return true;
-  end
-  local is_chest = minetest.get_item_group(node.name, "craft_table");
-  if (is_chest~=0) then
-    return true;
-  end
-  return false;
-end
-
-
-
-
---function working_villages.villager:handle_dyemixer(dyemixer_pos, take_func, put_func, put_lock, data)
-function working_villages.villager:handle_craft_table(craft_table_pos, take_func, put_func, data)
-	assert(craft_table_pos     ~= nil)
-	assert(take_func        ~= nil)
-	assert(put_func         ~= nil)
-	assert(data             == nil)
-	assert(func.is_craft_table ~= nil)
-	local my_data = {
-		appliance_id  = 'my_craft_table',
-		appliance_pos = craft_table_pos,
-		is_appliance  = func.is_craft_table,
-		operations    = {},
-	}
-	local ntarget = #recipes
-	local index = 0
-	for iteration=ntarget,1,-1 do
-		-- TODO handle shapless, small shapes, etc.
-		local list_name
-		if CRAFT_TABLE_TYPE == "craft_table" then
-			list_name = "craft"
-		elseif CRAFT_TABLE_TYPE == "crafting_bench" then
-			list_name = "rec"
-		else assert(false) end
-		local recipe = recipes[iteration]
-		local nx     = #recipe
-		--local xy     = 0
-		--for x=1,3,1 do -- 3 x 3 = 9
-		for x=1,nx,1 do -- 3 x 3 = 9
-			local row = recipe[x]
-			local ny  = #row
-			--for y=1,3,1 do
-			for y=1,ny,1 do
-				local xy = 3*(x-1)+y
-				--xy    = xy    + 1
-				index = index + 1
-				my_data.operations[index]   = {
-					list      = list_name,
-					is_put    = true,
-					put_func  = put_func,
-					data      = {
-						iteration    = iteration,
-						recipe_x     = x,
-						recipe_y     = y,
-						target_index = xy,
-						target_count = 1,
-					},
-				}
-			end
-		end
-
-		if CRAFT_TABLE_TYPE == "crafting_bench" then
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "src",
-			is_put    = true,
-			put_func  = put_func,
-			data      = {
-				iteration    = iteration,
-				--recipe_x     = x,
-				--recipe_y     = y,
-				--target_index = xy,
-			},
-		}
-		
-		index = index + 1
-		my_data.operations[index]   = {
-			noop = 300,
-		}
-
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "dst",
-			is_take   = true,
-			take_func = take_func,
-		}
-
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "rec",
-			is_take   = true,
-			take_func = take_func,
-		}
-
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "src",
-			is_take   = true,
-			take_func = take_func,
-		}
-
-		end
-	end
-	for iteration=1,#my_data.operations,1 do
-		assert(my_data.operations[iteration] ~= nil)
-	end
-	self:handle_appliance(my_data)
-end
-
+working_villages.craft_tables = craft_tables

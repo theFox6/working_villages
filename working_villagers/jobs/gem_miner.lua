@@ -52,20 +52,6 @@ local function find_ore_node(self)
     			return false;
   		end
 
---  if data.collect_only_top then
---    -- prevent to collect plat part, which can continue to grow
---    local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
---    local node_below = minetest.get_node(pos_below);
---    if (node_below.name~=node.name) then
---      return false;
---    end
---    local pos_above = {x=pos.x, y=pos.y+1, z=pos.z}
---    local node_above = minetest.get_node(pos_above);
---    if (node_above.name==node.name) then
---      return false;
---    end
---  end
-
   		return true;
 	end
 end
@@ -89,7 +75,6 @@ local function take_func(villager,stack)
 	local inv = villager:get_inventory()
 	local itemstack = ItemStack(item_name)
 	itemstack:set_count(mining_demands[item_name])
-	--return (not inv:contains_item("wield_item", itemstack))
 	return (not inv:contains_item("main", itemstack))
 end
 
@@ -124,8 +109,6 @@ working_villages.register_job("working_villages:job_gem_miner", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-        --local herb_data = gems.get_ore(minetest.get_node(target).name);
-        --gems.get_ore(minetest.get_node(target).name);
 				self:set_displayed_action("mining some rocks")
 				-- We may not be able to reach the log
 				local success, ret = self:go_to(destination)

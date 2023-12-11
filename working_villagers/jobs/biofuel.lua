@@ -9,28 +9,6 @@ local refineries = {
 	},
 }
 
---local bakables = {
---	names = {
---		["farming:flour"] = 99,
---		["default:cobble"] = 99,
---		["default:mossycobble"] = 99,
---		["default:desert_cobble"] = 99,
---		["default:clay_lump"] = 99,
---		["default:iron_lump"] = 99,
---		["default:copper_lump"] = 99,
---		["default:tin_lump"] = 99,
---		["default:gold_lump"] = 99,
---		["vessels:glass_fragments"] = 99,
---		["default:obsidian_shard"] = 99,
---	},
---  -- less priority definitions
---	groups = {
---		["ore"]=99,
---		["sand"]=99,
---	},
---}
-
-
 local function is_convertible(input)
                 if biomass.convertible_items[input] then
                         return true
@@ -47,53 +25,6 @@ local function is_convertible(input)
         end
         return false
 end
-
-
-
-
-
---function bakables.get_bakable(item_name)
---  -- check more priority definitions
---	for key, value in pairs(bakables.names) do
---		if item_name==key then
---			return value
---		end
---	end
---  -- check less priority definitions
---	for key, value in pairs(bakables.groups) do
---		if minetest.get_item_group(item_name, key) > 0 then
---			return value;
---		end
---	end
---	return nil
---end
---function bakables.is_bakable(item_name)
---  local data = bakables.get_bakable(item_name);
---  return data ~= nil
---end
---function bakables.get_cookable(item_name)
---  -- check more priority definitions
---	for key, value in pairs(bakables.names) do
---		if item_name==key then
---			return value
---		end
---	end
---  -- check less priority definitions
---	for key, value in pairs(bakables.groups) do
---		if minetest.get_item_group(item_name, key) > 0 then
---			return value;
---		end
---	end
---	return nil
---end
---function bakables.is_cookable(item_name)
---  local data = bakables.get_cookable(item_name);
---  return data ~= nil
---end
-
-
-
-
 
 function refineries.get_refinery(item_name)
 	-- check more priority definitions
@@ -119,16 +50,13 @@ end
 local searching_range = {x = 10, y = 3, z = 10}
 
 local function put_func(_,stack)
-	--return not bakables.is_bakable(stack:get_name())
 	return not is_convertible(stack:get_name())
 end
 local function take_func(villager,stack)
 	local item_name = stack:get_name()
-	--if not bakables.is_bakable(item_name) then return false end
 	if not is_convertible(item_name) then return false end
 	local inv = villager:get_inventory()
 	local itemstack = ItemStack(item_name)
-	--itemstack:set_count(bakables.get_bakable(item_name))
 	itemstack:set_count(99)
 	return (not inv:contains_item("main", itemstack))
 end
@@ -139,7 +67,6 @@ local function take_func2(villager,stack)
 end
 
 local function put_cookable(_,stack)
-	--return bakables.is_cookable(stack:get_name())
 	return is_convertible(stack:get_name())
 end
 

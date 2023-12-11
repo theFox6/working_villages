@@ -165,7 +165,7 @@ working_villages.register_job("working_villages:job_recycler", {
 				local target_def = minetest.get_node(target)
 				local plant_data = recyclers.get_recycler(target_def.name);
 				if plant_data then
-					self:set_displayed_action("operating the furnace")
+					self:set_displayed_action("operating the recycler")
 					assert(take_func2 ~= nil)
 					assert(put_func2  ~= nil)
 					self:handle_recycler(
@@ -187,36 +187,3 @@ working_villages.register_job("working_villages:job_recycler", {
 
 working_villages.recyclers = recyclers
 
-function working_villages.villager:handle_recycler(furnace_pos, take_func, put_func, data)
-	assert(furnace_pos ~= nil)
-	assert(take_func   ~= nil)
-	assert( put_func   ~= nil)
-	assert(data        == nil
-	or     #data       == 3)
-	local my_data = {
-		appliance_id  = 'my_recycler',
-		appliance_pos = furnace_pos,
-		is_appliance  = func.is_recycler,
-		operations    = {
-			[1]   = {
-				list      = "input",
-				is_put    = true,
-				put_func  = put_func,
-				--data      = data[0] or nil,
-			},
-			[2]   = {
-				list      = "result",
-				is_take   = true,
-				take_func = take_func,
-				--data      = data[2] or nil
-			},
-			[3]   = {
-				list      = "input",
-				is_take   = true,
-				take_func = take_func,
-				--data      = data[2] or nil
-			},
-		},
-	}
-	self:handle_appliance(my_data)
-end

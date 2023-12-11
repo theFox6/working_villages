@@ -97,7 +97,7 @@ working_villages.register_job("working_villages:job_watercarrier", {
 				if not success then
 					assert(target ~= nil)
 					working_villages.failed_pos_record(target)
-					self:set_displayed_action("looking at the unreachable snow")
+					self:set_displayed_action("looking at the unreachable liquid")
 					self:delay(100)
 				else
 					local plant_data = liquids.get_liquid(minetest.get_node(target).name);

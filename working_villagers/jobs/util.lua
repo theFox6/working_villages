@@ -392,7 +392,7 @@ function func.is_claycrafter(pos)
   or node.name=="claycrafter:claycrafter_active" then
     return true;
   end
-  --local is_fakerytable = minetest.get_item_group(node.name, "table");
+  --local is_fakerytable = minetest.get_item_group(node.name, "claycrafter");
   --if (is_fakerytable~=0) then
   --  return true;
   --end
@@ -409,12 +409,57 @@ function func.is_recycler(pos)
   or node.name=="uncraft:uncrafttable" then
     return true;
   end
-  --local is_fakerytable = minetest.get_item_group(node.name, "table");
+  --local is_fakerytable = minetest.get_item_group(node.name, "recycler");
   --if (is_fakerytable~=0) then
   --  return true;
   --end
   --return false;
   return false
+end
+
+function func.is_craft_table(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="crafting_bench:workbench"
+  or node.name=="craft_table:simple" then
+    return true;
+  end
+  local is_chest = minetest.get_item_group(node.name, "craft_table");
+  if (is_chest~=0) then
+    return true;
+  end
+  return false;
+end
+
+-- modulo like in other languages
+function func.mod(x, m)
+	assert(x ~= nil)
+	assert(m ~= nil)
+	local r = x % m
+	--if r < 0 then
+	--	r = r+m
+	--end
+	r = r % m
+	assert(0 <= r)
+	assert(r <  m)
+	return r
+end
+
+function func.is_dyemixer(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="mcg_dyemixer:dye_mixer" then
+    return true;
+  end
+  local is_chest = minetest.get_item_group(node.name, "dyemixer");
+  if (is_chest~=0) then
+    return true;
+  end
+  return false;
 end
 
 return func

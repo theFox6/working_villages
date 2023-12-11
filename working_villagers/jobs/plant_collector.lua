@@ -104,12 +104,8 @@ working_villages.register_job("working_villages:job_herbcollector", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				--self:go_to(destination)
 				self:set_displayed_action("collecting some plants")
 				local success, ret = self:go_to(destination)
-        --local herb_data = herbs.get_herb(minetest.get_node(target).name);
-        --herbs.get_herb(minetest.get_node(target).name);
-				--self:dig(target,true)
 				if not success then
 					assert(target ~= nil)
 					working_villages.failed_pos_record(target)

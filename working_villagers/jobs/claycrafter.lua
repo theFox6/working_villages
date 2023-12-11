@@ -149,8 +149,8 @@ working_villages.register_job("working_villages:job_claycrafter", {
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(
-			take_func, -- take unlocked + locks
-			put_func   -- put not(unlocked or fuel)
+			take_func,
+			put_func
 		)
 		self:handle_job_pos()
 
@@ -173,11 +173,11 @@ working_villages.register_job("working_villages:job_claycrafter", {
 				local target_def = minetest.get_node(target)
 				local plant_data = claycrafters.get_claycrafter(target_def.name);
 				if plant_data then
-					self:set_displayed_action("operating the furnace")
+					self:set_displayed_action("operating the claycrafter")
 					self:handle_claycrafter(
 					        target,
-						take_func2, -- take everything
-						put_unlocked, -- put what we need to furnace
+						take_func2,
+						put_unlocked,
 						put_lock
 					)
 					--self.job_data.manipulated_chest   = false;
@@ -192,40 +192,3 @@ working_villages.register_job("working_villages:job_claycrafter", {
 })
 
 working_villages.claycrafters = claycrafters
-
-function working_villages.villager:handle_claycrafter(furnace_pos, take_func, put_func, put_fuel, data)
-	assert(furnace_pos ~= nil)
-	assert(take_func   ~= nil)
-	assert( put_func   ~= nil)
-	assert( put_fuel   ~= nil)
-	assert(data        == nil
-	or     #data       == 3)
-	local my_data = {
-		appliance_id  = 'my_claycrafter',
-		appliance_pos = furnace_pos,
-		is_appliance  = func.is_claycrafter,
-		operations    = {
-			[1]   = {
-				list      = "fuel",
-				is_put    = true,
-				put_func  = put_fuel,
-			},
-			[2]   = {
-				list      = "src",
-				is_put    = true,
-				put_func  = put_func,
-			},
-			[3]   = {
-				list      = "dst",
-				is_take   = true,
-				take_func = take_func,
-			},
-			[4]   = {
-				list      = "vessels",
-				is_take   = true,
-				take_func = take_func,
-			},
-		},
-	}
-	self:handle_appliance(my_data)
-end

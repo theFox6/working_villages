@@ -62,20 +62,6 @@ local function find_dirt_node(self)
     			return false;
   		end
 
---  if data.collect_only_top then
---    -- prevent to collect plant part, which can continue to grow
---    local pos_below = {x=pos.x, y=pos.y-1, z=pos.z}
---    local node_below = minetest.get_node(pos_below);
---    if (node_below.name~=node.name) then
---      return false;
---    end
---    local pos_above = {x=pos.x, y=pos.y+1, z=pos.z}
---    local node_above = minetest.get_node(pos_above);
---    if (node_above.name==node.name) then
---      return false;
---    end
---  end
-
   		return true;
 	end
 end
@@ -135,8 +121,6 @@ working_villages.register_job("working_villages:job_landscaper", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-        --local herb_data = dirts.get_dirt(minetest.get_node(target).name);
-        --dirts.get_dirt(minetest.get_node(target).name);
 				self:set_displayed_action("digging some dirt")
 				-- We may not be able to reach the log
 				local success, ret = self:go_to(destination)

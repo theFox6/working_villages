@@ -10,6 +10,7 @@ local guard_tools = {
 	["default:sword_stone"] = 1,
 	["default:sword_bronze"] = 1,
 	["default:sword_diamond"] = 1,
+	-- TODO armor, other weapons
 }
 working_villages.register_job("working_villages:job_guard", {
 	description      = "guard (working_villages)",
@@ -75,6 +76,11 @@ working_villages.register_job("working_villages:job_guard", {
 			-- once we get the global village table operational, we can probably just iterate the buildings
 			-- then build on that logic for the "burglar" who will play a vital role in transporting goods between the bots
 		elseif guard_mode == "wandering" then
+			-- TODO need a mode to search for culprit when alarm is sounded
+			-- TODO need a function to check every nook and cranny while patrolling... as opposed to:
+			-- TODO jailer-patrol where he doesn't go in doors/offices
+			-- TODO need a function to monitor an area (ie guard post or guard tower)
+			-- TODO need combat logic
 			log.verbose("%s is wandering", self.inventory_name)
 			--TODO: walk randomly
 			self:count_timer("guard:change_dir")

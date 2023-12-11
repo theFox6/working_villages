@@ -1,7 +1,6 @@
 
 local func = working_villages.require("jobs/util")
 
--- limited support to two replant definitions
 local furnaces = {
 	names = {
 		["default:furnace"]={},
@@ -15,6 +14,7 @@ local bakables = {
 		["default:coal_lump"] = 99,
 		["bucket:bucket_lava"] = 99,
 		["default:lava_source"] = 99,
+		-- burn all your stuff
 		--["default:jungletree"] = 99,
 		--["default:acacia_tree"] = 99,
 		--["default:tree"] = 99,
@@ -39,6 +39,7 @@ local bakables = {
 	},
   -- more priority definitions
 	names = {
+		-- TODO farming mod support => separate jobs for baker and smelter
 		["farming:flour"] = 99,
 		["default:cobble"] = 99,
 		["default:mossycobble"] = 99,
