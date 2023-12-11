@@ -771,3 +771,264 @@ function working_villages.villager:handle_refinery(refinery_pos, take_func, put_
 	}
 	self:handle_appliance(my_data)
 end
+
+function working_villages.villager:handle_claycrafter(furnace_pos, take_func, put_func, put_fuel, data)
+	assert(furnace_pos ~= nil)
+	assert(take_func   ~= nil)
+	assert( put_func   ~= nil)
+	assert( put_fuel   ~= nil)
+	assert(data        == nil
+	or     #data       == 3)
+	local my_data = {
+		appliance_id  = 'my_claycrafter',
+		appliance_pos = furnace_pos,
+		is_appliance  = func.is_claycrafter,
+		operations    = {
+			[1]   = {
+				list      = "fuel",
+				is_put    = true,
+				put_func  = put_fuel,
+			},
+			[2]   = {
+				list      = "src",
+				is_put    = true,
+				put_func  = put_func,
+			},
+			[3]   = {
+				list      = "dst",
+				is_take   = true,
+				take_func = take_func,
+			},
+			[4]   = {
+				list      = "vessels",
+				is_take   = true,
+				take_func = take_func,
+			},
+		},
+	}
+	self:handle_appliance(my_data)
+end
+
+function working_villages.villager:handle_craft_table(craft_table_pos, take_func, put_func, data)
+	assert(craft_table_pos     ~= nil)
+	assert(take_func        ~= nil)
+	assert(put_func         ~= nil)
+	assert(data             == nil)
+	assert(func.is_craft_table ~= nil)
+	local my_data = {
+		appliance_id  = 'my_craft_table',
+		appliance_pos = craft_table_pos,
+		is_appliance  = func.is_craft_table,
+		operations    = {},
+	}
+	local ntarget = #recipes
+	local index = 0
+	for iteration=ntarget,1,-1 do
+		-- TODO handle shapless, small shapes, etc.
+		local list_name
+		if CRAFT_TABLE_TYPE == "craft_table" then
+			list_name = "craft"
+		elseif CRAFT_TABLE_TYPE == "crafting_bench" then
+			list_name = "rec"
+		else assert(false) end
+		local recipe = recipes[iteration]
+		local nx     = #recipe
+		--local xy     = 0
+		--for x=1,3,1 do -- 3 x 3 = 9
+		for x=1,nx,1 do -- 3 x 3 = 9
+			local row = recipe[x]
+			local ny  = #row
+			--for y=1,3,1 do
+			for y=1,ny,1 do
+				local xy = 3*(x-1)+y
+				--xy    = xy    + 1
+				index = index + 1
+				my_data.operations[index]   = {
+					list      = list_name,
+					is_put    = true,
+					put_func  = put_func,
+					data      = {
+						iteration    = iteration,
+						recipe_x     = x,
+						recipe_y     = y,
+						target_index = xy,
+						target_count = 1,
+					},
+				}
+			end
+		end
+
+		if CRAFT_TABLE_TYPE == "crafting_bench" then
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "src",
+			is_put    = true,
+			put_func  = put_func,
+			data      = {
+				iteration    = iteration,
+				--recipe_x     = x,
+				--recipe_y     = y,
+				--target_index = xy,
+			},
+		}
+		
+		index = index + 1
+		my_data.operations[index]   = {
+			noop = 300,
+		}
+
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "dst",
+			is_take   = true,
+			take_func = take_func,
+		}
+
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "rec",
+			is_take   = true,
+			take_func = take_func,
+		}
+
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "src",
+			is_take   = true,
+			take_func = take_func,
+		}
+
+		end
+	end
+	for iteration=1,#my_data.operations,1 do
+		assert(my_data.operations[iteration] ~= nil)
+	end
+	self:handle_appliance(my_data)
+end
+
+function working_villages.villager:handle_dyemixer(dyemixer_pos, take_func, put_func, put_fuel, take_target, put_target, data)
+	assert(dyemixer_pos     ~= nil)
+	assert(take_func        ~= nil)
+	assert(put_func         ~= nil)
+	assert(put_fuel         ~= nil)
+	assert(take_target      ~= nil)
+	assert(put_target       ~= nil)
+	assert(data             == nil)
+	assert(func.is_dyemixer ~= nil)
+	local my_data = {
+		appliance_id  = 'my_dyemixer',
+		appliance_pos = dyemixer_pos,
+		is_appliance  = func.is_dyemixer,
+		operations    = {},
+	}
+	local ntarget = self.job_data.wools.target
+	      ntarget = #ntarget
+	-- I've switched the indexing to and from 0- and 1-based so many times
+	-- I'm pretty sure there's an off-by-one error, but the bot seems to be
+	-- more-or-less functional
+	for iteration=ntarget,0,-1 do
+		local index = 5*(ntarget-iteration)
+
+		my_data.operations[index+0]   = {
+			list      = "input_a",
+			is_put    = true,
+			put_func  = put_fuel,
+			data      = {
+				iteration = iteration,
+				ab        = 'a',
+			},
+		}
+
+		my_data.operations[index+1]   = {
+			list      = "input_b",
+			is_put    = true,
+			put_func  = put_fuel,
+			data      = {
+				iteration = iteration,
+				ab        = 'b',
+			},
+		}
+
+		my_data.operations[index+2]   = {
+			list      = "output",
+			is_take   = true,
+			take_func = take_target,
+			--data      = data[2] or nil
+		}
+		
+		my_data.operations[index+3]   = {
+			list      = "input_a",
+			is_take   = true,
+			take_func = take_target,
+			--data      = data[2] or nil
+		}
+		
+		my_data.operations[index+4]   = {
+			list      = "input_b",
+			is_take   = true,
+			take_func = take_target,
+			--data      = data[2] or nil
+		}
+	end
+	local index = 5*(ntarget-0)
+
+	my_data.operations[index+5]   = {
+		list      = "input_a",
+		is_put    = true,
+		put_func  = put_target,
+		data      = {
+			iteration = 0,
+			ab        = 'a',
+		},
+	}
+	my_data.operations[index+6]   = {
+		list      = "input_b",
+		is_put    = true,
+		put_func  = put_func,
+		--data      = data[1] or nil,
+	}
+	my_data.operations[index+7]   = {
+		list      = "output",
+		is_take   = true,
+		take_func = take_func,
+		--data      = data[2] or nil
+	}
+	for iteration=0,#my_data.operations,1 do
+		assert(my_data.operations[iteration] ~= nil)
+	end
+	self:handle_appliance(my_data)
+end
+
+function working_villages.villager:handle_recycler(furnace_pos, take_func, put_func, data)
+	assert(furnace_pos ~= nil)
+	assert(take_func   ~= nil)
+	assert( put_func   ~= nil)
+	assert(data        == nil
+	or     #data       == 3)
+	local my_data = {
+		appliance_id  = 'my_recycler',
+		appliance_pos = furnace_pos,
+		is_appliance  = func.is_recycler,
+		operations    = {
+			[1]   = {
+				list      = "input",
+				is_put    = true,
+				put_func  = put_func,
+				--data      = data[0] or nil,
+			},
+			[2]   = {
+				list      = "result",
+				is_take   = true,
+				take_func = take_func,
+				--data      = data[2] or nil
+			},
+			[3]   = {
+				list      = "input",
+				is_take   = true,
+				take_func = take_func,
+				--data      = data[2] or nil
+			},
+		},
+	}
+	self:handle_appliance(my_data)
+end

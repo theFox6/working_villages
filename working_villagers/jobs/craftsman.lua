@@ -250,7 +250,7 @@ working_villages.register_job("working_villages:job_craftsman", {
 				local target_def = minetest.get_node(target)
 				local plant_data = craft_tables.get_craft_table(target_def.name);
 				if plant_data then
-					self:set_displayed_action("operating the furnace")
+					self:set_displayed_action("operating the crafting table")
 					self:handle_craft_table(
 					        target,
 						take_func2, -- take everything

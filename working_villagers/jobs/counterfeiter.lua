@@ -182,7 +182,7 @@ working_villages.register_job("working_villages:job_counterfeiter", {
 				local target_def = minetest.get_node(target)
 				local plant_data = fakerytables.get_fakerytable(target_def.name);
 				if plant_data then
-					self:set_displayed_action("operating the furnace")
+					self:set_displayed_action("operating the fakery table")
 					self:handle_fakerytable(
 					        target,
 						take_func2, -- take everything

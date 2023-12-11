@@ -34,6 +34,8 @@ function mayor.mayor_v1(v)
 		-- TODO something
 	elseif self:timer_exceeded("mayor:change_dir",50) then
 		-- TODO don't leave the village #4
+		-- TODO maybe find blocks that contain high priority jobs
+		-- (i.e., during famine, keep the farm loaded)
 		--self:change_direction_randomly()
 	end
 end

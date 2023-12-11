@@ -270,7 +270,7 @@ working_villages.register_job("working_villages:job_dyemixer", {
 					local target_def = minetest.get_node(target)
 					local plant_data = dyemixers.get_dyemixer(target_def.name);
 					if plant_data then
-						self:set_displayed_action("operating the furnace")
+						self:set_displayed_action("operating the dyemixer")
 						self:handle_dyemixer(
 						        target,
 							take_func2, -- take everything
