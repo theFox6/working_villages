@@ -160,13 +160,38 @@ working_villages.register_job("working_villages:job_waffle", {
 						assert(plant_name == "waffles:waffle_maker_open")
 
 						-- dig the waffle from the wafflemaker (left-click)
-						success, ret = self:dig(target,true)
-						if not success then
-							assert(target ~= nil)
-							working_villages.failed_pos_record(target)
-							self:set_displayed_action("confused as to why retrieval failed at (x="..target.x..', y='..target.y..', z='..target.z..')')
-							self:delay(100)
+						--success, ret = self:dig(target,true)
+						--if not success then
+						--	assert(target ~= nil)
+						--	working_villages.failed_pos_record(target)
+						--	self:set_displayed_action("confused as to why retrieval failed at (x="..target.x..', y='..target.y..', z='..target.z..')')
+						--	self:delay(100)
+						--end
+    						local wield_item = nil
+						--log.action("using %s",item_name)
+						--self:set_displayed_action("using "..item_name)
+						--if true then
+						local node          = minetest.get_node(target)
+						assert(node ~= nil)
+						local pointed_thing = {under=target, above=target, type="node",}
+						local puncher       = self
+						minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
+						--minetest.node_punch(target, node, puncher, pointed_thing)
+    						--if wield_item:get_count() == self:get_wielded_item():get_count() then
+		    				--	-- TODO separate failed_pos registries: adding more leaves might work
+						--	working_villages.failed_pos_record(target)
+						--	log.error("something wrong composting %s",item_name)
+						--	self:set_displayed_action("something wrong composting "..item_name)
+    						--end
+						--[[
+						else -- TODO #50
+    						local def = wield_item:get_definition() -- minetest.registered_items[item_name]
+    						local on_use = def.on_use
+    						local new_stack = on_use(wield_item, self, pointed_thing)
+    						self:set_wield_item_stack(new_stack)
 						end
+						--]]
+						for _=0,10 do coroutine.yield() end --wait 10 steps
 					end
 				end
 			end

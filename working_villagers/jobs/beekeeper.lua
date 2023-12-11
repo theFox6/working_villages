@@ -66,11 +66,11 @@ end
 local searching_range = {x = 10, y = 3, z = 10}
 
 local function put_func(_,stack)
-	return not bee.is_bee(stack:get_name())
+	return not bees.is_bee(stack:get_name())
 end
 local function take_func(villager,stack)
 	local item_name = stack:get_name()
-	if not bee.is_bee(item_name) then return false end
+	if not bees.is_bee(item_name) then return false end
 	local inv = villager:get_inventory()
 	local itemstack = ItemStack(item_name)
 	itemstack:set_count(99)
@@ -78,7 +78,7 @@ local function take_func(villager,stack)
 end
 
 local function put_bee(_,stack)
-	return bee.is_bee(stack:get_name())
+	return bees.is_bee(stack:get_name())
 end
 
 working_villages.register_job("working_villages:job_beekeeper", {

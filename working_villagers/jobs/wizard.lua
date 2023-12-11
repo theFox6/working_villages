@@ -181,7 +181,7 @@ working_villages.register_job("working_villages:job_wizard", {
 						return
 					end
 					self:set_displayed_action("attempting spell")
-					local pointed_thing = {under=target, type="node",}
+					local pointed_thing = {under=target, above=target, type="node",}
 					local new_stack = on_use(stack, user, pointed_thing)
 					self:set_wield_item_stack(new_stack)
 					-- TODO record position failure

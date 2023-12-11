@@ -139,7 +139,7 @@ working_villages.register_job("working_villages:job_composter", {
 					assert(node ~= nil)
 					local plant_data    = composter_nodes.get_composter(node.name)
 					assert(plant_data ~= nil)
-					local pointed_thing = {under=target, type="node",}
+					local pointed_thing = {under=target, above=target, type="node",}
 					local puncher       = self
 					-- if filled, then punch with shovel
 					-- else punch with compostable

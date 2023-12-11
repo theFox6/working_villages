@@ -140,7 +140,7 @@ working_villages.register_job("working_villages:job_snowcone", {
 					local flavor = meta:get_string("flavor")
 					self:move_main_to_wield(function(name)
 						if flavor ~= nil then -- use same flavor that's already in the matchine
-							return item:match("^snowcone:bucket_syrup_"..flavor)
+							return name:match("^snowcone:bucket_syrup_"..flavor)
 						end
 						-- use any flavor
   						return snowcone_refills[name] ~= nil
