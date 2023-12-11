@@ -133,7 +133,7 @@ working_villages.register_job("working_villages:job_composter", {
     assert(item_name ~= nil)
 					log.action("composting %s",item_name)
 					self:set_displayed_action("composting "..item_name)
-if true then
+--if true then
 minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
 					--minetest.node_punch(target, node, puncher, pointed_thing)
     if wield_item:get_count() == self:get_wielded_item():get_count() then
@@ -142,12 +142,14 @@ minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thi
 					log.error("something wrong composting %s",item_name)
 					self:set_displayed_action("something wrong composting "..item_name)
     end
-else -- TODO #50
+--else -- TODO #50
+--[[
     local def = wield_item:get_definition() -- minetest.registered_items[item_name]
     local on_use = def.on_use
     local new_stack = on_use(wield_item, self, pointed_thing)
     self:set_wield_item_stack(new_stack)
-end
+--]]
+--end
 					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
 
@@ -161,7 +163,7 @@ end
     assert(item_name ~= nil)
 					log.action("using %s",item_name)
 					self:set_displayed_action("using "..item_name)
-if true then
+--if true then
 minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thing)
 					--minetest.node_punch(target, node, puncher, pointed_thing)
     if wield_item:get_count() == self:get_wielded_item():get_count() then
@@ -170,12 +172,14 @@ minetest.registered_nodes[node.name].on_punch(target, node, puncher, pointed_thi
 					log.error("something wrong composting %s",item_name)
 					self:set_displayed_action("something wrong composting "..item_name)
     end
-else -- TODO #50
+--else -- TODO #50
+--[[
     local def = wield_item:get_definition() -- minetest.registered_items[item_name]
     local on_use = def.on_use
     local new_stack = on_use(wield_item, self, pointed_thing)
     self:set_wield_item_stack(new_stack)
-end
+--]]
+--end
 					for _=0,10 do coroutine.yield() end --wait 10 steps
 				end
 			end
