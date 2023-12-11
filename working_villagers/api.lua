@@ -159,8 +159,8 @@ function working_villages.villager:get_near_players(range_distance,pos)
       end
       local data = {
         player  =object,
-	position=player_position,
-	distance=distance,
+        position=player_position,
+        distance=distance,
       }
       table.insert(result, data)
     end
@@ -174,7 +174,7 @@ function working_villages.villager:get_nearest_player_with_condition(range_dista
 
   local all_objects = minetest.get_objects_inside_radius(position, range_distance)
   for _, object in pairs(all_objects) do
-	  local inv = object:get_inventory()
+    local inv = object:get_inventory()
     if --object:is_player() and -- ehh, is there a reason why a thief shouldn't rob a non-player ?
        condition(inv)
     then
@@ -367,12 +367,10 @@ function working_villages.villager:move_main_to_wield(pred)
   return false
 end
 function working_villages.villager:get_wielded_item()
-	return self:get_wield_item_stack()
-  --local inv = self:get_inventory()
-  --return inv:get_stack("wield_item", 1)
+  return self:get_wield_item_stack()
 end
 function working_villages.villager:set_wielded_item(item)
-	return self:set_wield_item_stack(item)
+  return self:set_wield_item_stack(item)
 end
 
 -- working_villages.villager.is_named reports the villager is still named.
@@ -521,15 +519,15 @@ end
 
 local function walkable(node)
 	-- copied from pathfinder
-		--if string.find(node.name,"doors:") then
-		--	return false
-		--else
-			if minetest.registered_nodes[node.name]~= nil then
-				return minetest.registered_nodes[node.name].walkable
-			else
-				return true
-			end
-		--end
+	--if string.find(node.name,"doors:") then
+	--	return false
+	--else
+	if minetest.registered_nodes[node.name]~= nil then
+		return minetest.registered_nodes[node.name].walkable
+	else
+		return true
+	end
+	--end
 end
 --working_villages.villager.handle_obstacles(ignore_fence,ignore_doors)
 --if the villager hits a walkable he wil jump
@@ -566,7 +564,7 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
       and not(walkable(above_node)) then --not(minetest.registered_nodes[above_node.name].walkable) then
       if velocity.y == 0 then
         local nBox = minetest.registered_nodes[front_node.name]
-	if nBox ~= nil then nBox = nBox.node_box end
+        if nBox ~= nil then nBox = nBox.node_box end
         if (nBox == nil) then
           nBox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
         else
