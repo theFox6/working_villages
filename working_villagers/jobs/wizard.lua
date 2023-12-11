@@ -84,6 +84,7 @@ working_villages.register_job("working_villages:job_wizard", {
 	description			= "wizard (working_villages)",
 	long_description = "I look for all sorts of spellbooks and start brute forcing the magick key.",
 	inventory_image  = "default_paper.png^working_villages_builder.png",
+	-- TODO on_create handler to setup mana & hp
 	jobfunc = function(self)
 		self:handle_night()
 		--self:handle_chest2(take_func, put_func)

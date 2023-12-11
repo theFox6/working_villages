@@ -462,7 +462,7 @@ function func.is_dyemixer(pos)
   return false;
 end
 
-function util.take_everything(villager,stack)
+function func.take_everything(villager,stack)
   -- take everything from chest if room in inventory
   assert(villager ~= nil)
   assert(stack    ~= nil)
@@ -471,14 +471,14 @@ function util.take_everything(villager,stack)
   return (inv:room_for_item("main", stack))
 end
 
-function util.put_everything(villager,stack)
+function func.put_everything(villager,stack)
   -- put everything into chest
   assert(villager ~= nil)
   assert(stack    ~= nil)
   return true
 end
 
-function util.is_half_empty(villager)
+function func.is_half_empty(villager)
   -- some jobs don't work so well unless the villager has room in his inventory
   assert(villager ~= nil)
   local inv = villager:get_inventory()
