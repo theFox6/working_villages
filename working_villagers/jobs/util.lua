@@ -491,4 +491,21 @@ function func.is_half_empty(villager)
   return cnt >= sz / 2
 end
 
+function func.is_beehive(pos)
+  local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="church_candles:hive"
+  or node.name=="church_candles:hive_empty" then
+    return true;
+  end
+  --local is_fakerytable = minetest.get_item_group(node.name, "beehive");
+  --if (is_fakerytable~=0) then
+  --  return true;
+  --end
+  --return false;
+  return false
+end
+
 return func

@@ -1057,3 +1057,32 @@ function working_villages.use_item(self, stack)
 	for _=0,10 do coroutine.yield() end --wait 10 steps
 	return true, new_stack
 end
+
+function working_villages.villager:handle_beehive(furnace_pos, take_func, put_func, data)
+	assert(furnace_pos ~= nil)
+	assert(take_func   ~= nil)
+	assert( put_func   ~= nil)
+	assert(data        == nil
+	or     #data       == 3)
+	local my_data = {
+		appliance_id  = 'my_beehive',
+		appliance_pos = furnace_pos,
+		is_appliance  = func.is_beehive,
+		operations    = {
+			--[1]   = {
+			--	list      = "bees",
+			--	is_put    = true,
+			--	put_func  = put_func,
+			--	--data      = data[0] or nil,
+			--},
+			[1]   = {
+				list      = "honey",
+				is_take   = true,
+				take_func = take_func,
+				--data      = data[2] or nil
+			},
+		},
+	}
+	self:handle_appliance(my_data)
+end
+

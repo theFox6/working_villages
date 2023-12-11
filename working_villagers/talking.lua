@@ -41,6 +41,7 @@ forms.register_text_page("working_villages:trivia",
       return "That's it for now."
     end
 
+    -- return a random factoid
     local i = math.random(#trivia)
     return trivia[i]
 end)
@@ -67,6 +68,7 @@ forms.register_text_page("working_villages:workflow",
       return "It's hard to describe."
     end
 
+    -- return all the steps
     local msg = 'Steps:'
     for _, step in ipairs(workflow) do
       msg = msg..'\n\t- '..step
@@ -78,8 +80,11 @@ end)
 forms.put_link("working_villages:talking_menu", "working_villages:workflow",
 	"How do you do your job?")
 
--- TODO where do you live/work
+-- TODO where do you live/work -- how to get there
 -- TODO Who's your daddy and what does he do
--- TODO what do you need to do your job
+-- TODO what do you need to do your job -- ie in general & rn specifically
 -- TODO where is...
-
+-- TODO info about mod & server
+-- TODO procedurally generated garbage 
+-- TODO history of village/villager
+-- TODO lineage support via a separate mod
