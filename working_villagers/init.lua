@@ -94,6 +94,19 @@ end
 if minetest.get_modpath("composting") then
 	working_villages.require("jobs/composter")
 end
+if minetest.get_modpath("snowcone") then
+	working_villages.require("jobs/snowcone")
+end
+if minetest.get_modpath("waffles") then
+	working_villages.require("jobs/waffle")
+end
+if minetest.get_modpath("church_candles") then
+	working_villages.require("jobs/beekeeper")
+end
+-- TODO WIP
+--if minetest.get_modpath("wine") then
+--	working_villages.require("jobs/brewer")
+--end
 
 if working_villages.setting_enabled("spawn",false) then
   working_villages.require("spawn")

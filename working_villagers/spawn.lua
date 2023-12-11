@@ -445,7 +445,7 @@ minetest.register_abm({
 if minetest.get_modpath("composting") then
 working_villages.require("jobs/composter")
 
-local refinery_names = {}
+local composter_names = {}
 for name,_ in pairs(working_villages.composter_nodes.names) do
     composter_names[#composter_names + 1] = name
 end
@@ -461,4 +461,67 @@ minetest.register_abm({
     chance = 2048,
     catch_up = false,
     action = spawner("working_villages:job_composter"),
+})
+
+if minetest.get_modpath("snowcone") then
+working_villages.require("jobs/snowcone")
+
+local fruteria_names = {}
+for name,_ in pairs(working_villages.fruteria_nodes.names) do
+    fruteria_names[#fruteria_names + 1] = name
+end
+for name,_ in pairs(working_villages.fruteria_nodes.groups) do
+    fruteria_names[#fruteria_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn fruteria",
+    nodenames = fruteria_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_snowcone"),
+})
+
+if minetest.get_modpath("waffles") then
+working_villages.require("jobs/waffle")
+
+local wafflehaus_names = {}
+for name,_ in pairs(working_villages.wafflehaus_nodes.names) do
+    wafflehaus_names[#wafflehaus_names + 1] = name
+end
+for name,_ in pairs(working_villages.wafflehaus_nodes.groups) do
+    wafflehaus_names[#wafflehaus_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn breakfast",
+    nodenames = wafflehaus_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_waffle"),
+})
+
+if minetest.get_modpath("church_candles") then
+working_villages.require("jobs/beekeeper")
+
+local beehive_names = {}
+for name,_ in pairs(working_villages.beehive_nodes.names) do
+    beehive_names[#beehive_names + 1] = name
+end
+for name,_ in pairs(working_villages.beehive_nodes.groups) do
+    beehive_names[#beehive_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn beekeeper",
+    nodenames = beehive_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_beekeeper"),
 })

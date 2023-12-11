@@ -88,7 +88,7 @@ end
 
 working_villages.register_job("working_villages:job_snowcone", {
 	description			= "snowcone (working_villages)",
-	long_description = "I look for snowcone machines and start putting syrup on some shaved ice."
+	long_description = "I look for snowcone machines and start putting syrup on some shaved ice.",
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	trivia = {
 		"I'm part of the break basket infrastructure.",

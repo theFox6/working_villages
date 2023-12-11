@@ -91,7 +91,7 @@ end
 
 working_villages.register_job("working_villages:job_waffle", {
 	description			= "waffle (working_villages)",
-	long_description = "I look for waffle machines and start making mudkips and bekfast".
+	long_description = "I look for waffle machines and start making mudkips and bekfast.",
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	trivia = {
 		"I'm part of the break basket infrastructure.",
@@ -108,8 +108,6 @@ working_villages.register_job("working_villages:job_waffle", {
 		"Dig waffle from waffle maker",
 		"Periodically look away thoughtfully",
 	},
-	jobfunc = function(self)
-		self:handle_night()
 	jobfunc = function(self)
 		self:handle_night()
 		local stack  = self:get_wield_item_stack()
