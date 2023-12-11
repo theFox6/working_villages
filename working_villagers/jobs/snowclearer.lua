@@ -38,6 +38,19 @@ My job is for testing not for harvesting.\
 I must confess this job seems useless.\
 I'm doing anyway, clearing the snow away.",
 	inventory_image  = "default_paper.png^memorandum_letters.png",
+	trivia = {
+		"My job position is among the originals, upon which the rest are based.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		--"Equip my tool",
+		"Go to work",
+		"Search for snow",
+		"Go to snow",
+		"Dig snow",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

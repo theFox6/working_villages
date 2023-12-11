@@ -90,6 +90,20 @@ working_villages.register_job("working_villages:job_gardener", {
 	description			= "gardener (working_villages)",
 	long_description = "I look for dirt nodes and hoe them for the farmer.",
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
+	trivia = {
+		"I'm part of the pooper scooper crew!",
+                "I am part of the bread basket infrastructure",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Equip my tool",
+		"Go to work",
+		"Search for dirt near water",
+		"Go to dirt near water",
+		"Use tool on dirt near water",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		local stack  = self:get_wield_item_stack()
@@ -132,24 +146,8 @@ working_villages.register_job("working_villages:job_gardener", {
 					self:delay(100)
 				else
 					local plant_data = gardening_nodes.get_dirt(plant_name)
-					--self:dig(target,true)
-					--if plant_data and plant_data.replant then
-					--	for index, value in ipairs(plant_data.replant) do
-					--		self:place(value, vector.add(target, vector.new(0,index-1,0)))
-					--	end
-					--end
-					local name   = stack:get_name()
-					if name == nil then return end
-					local def    = minetest.registered_items[name]
-					if def == nil then return end
-					local on_use = def.on_use
-					if on_use == nil then return end
-					local user   = self
-					local pointed_thing = {under=target, type="node",}
-					local new_stack = on_use(stack, user, pointed_thing)
-					-- TODO register position failure ?
-					self:set_wield_item_stack(new_stack)
-					for _=0,10 do coroutine.yield() end --wait 10 steps
+					local flag, new_stack = working_villages.use_item(self, stack)
+					if flag then self:set_wield_item_stack(new_stack) end
 				end
 			end
 		elseif self:timer_exceeded("gardener:change_dir",50) then

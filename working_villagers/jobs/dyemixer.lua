@@ -224,6 +224,21 @@ working_villages.register_job("working_villages:job_dyemixer", {
 	description			= "dyemixer (working_villages)",
 	long_description = "I look for a dyemixer and start putting your wools into it.",
 	inventory_image	= "default_paper.png^working_villages_herb_collector.png",
+	trivia = {
+		"My job position was the first to craft recipes.",
+		"My job position was the first to manage multi-step recipes.",
+		"My job position contributed to the complexity and general applicability of our appliance-handling logic.",
+	},
+	workflow = {
+		"Fashion season!",
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for dyemixers",
+		"Go to dyemixer",
+		"Handle dyemixer",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		dyemixer_recipes.fashion_season(self)
 

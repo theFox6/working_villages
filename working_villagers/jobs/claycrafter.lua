@@ -141,6 +141,19 @@ working_villages.register_job("working_villages:job_claycrafter", {
 	description			= "claycrafter (working_villages)",
 	long_description = "I look for a clay crafter and start sieving dirt.",
 	inventory_image	= "default_paper.png^working_villages_builder.png",
+	trivia = {
+		"I'm part of the pooper scooper crew!",
+		"I am part of the bread basket infrastructure",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for claycrafters",
+		"Go to claycrafter",
+		"Handle claycrafter",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(
@@ -164,20 +177,28 @@ working_villages.register_job("working_villages:job_claycrafter", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local target_def = minetest.get_node(target)
-				local plant_data = claycrafters.get_claycrafter(target_def.name);
-				if plant_data then
-					self:set_displayed_action("operating the claycrafter")
-					self:handle_claycrafter(
-					        target,
-						func.take_everything,
-						put_unlocked,
-						put_lock
-					)
-					--self.job_data.manipulated_chest   = false;
-					--self.job_data.manipulated_furnace = false;
-					--self:set_displayed_action("waiting on furnace")
+				--self:go_to(destination)
+				local success, ret = self:go_to(destination)
+				if not success then
+					assert(target ~= nil)
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable claycrafter")
+					self:delay(100)
+				else
+					local target_def = minetest.get_node(target)
+					local plant_data = claycrafters.get_claycrafter(target_def.name);
+					if plant_data then
+						self:set_displayed_action("operating the claycrafter")
+						self:handle_claycrafter(
+					        	target,
+							func.take_everything,
+							put_unlocked,
+							put_lock
+						)
+						--self.job_data.manipulated_chest   = false;
+						--self.job_data.manipulated_furnace = false;
+						--self:set_displayed_action("waiting on furnace")
+					end
 				end
 			end
 		elseif self:timer_exceeded("claycrafter:change_dir",50) then

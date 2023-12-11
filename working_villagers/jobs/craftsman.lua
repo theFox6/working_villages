@@ -172,6 +172,19 @@ working_villages.register_job("working_villages:job_craftsman", {
 	description			= "craftsman (working_villages)",
 	long_description = "I look for a craft table and carry out trade-specific recipes.",
 	inventory_image	= "default_paper.png^working_villages_herb_collector.png",
+	trivia = {
+		"We've got big plans!",
+		"My job position contributed to the complexity and general applicability of our appliance-handling logic.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for crafting tables",
+		"Go to crafting table",
+		"Handle crafting table",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(

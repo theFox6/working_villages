@@ -81,6 +81,19 @@ working_villages.register_job("working_villages:job_herbcollector", {
 	description      = "herb collector (working_villages)",
 	long_description = "I look for all sorts of plants and collect them.",
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
+	trivia = {
+		"My job position is among the originals, upon which the rest are based.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		--"Equip my tool",
+		"Go to work",
+		"Search for herbs",
+		"Go to herbs",
+		"Collect (dig) herbs",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(nil, func.put_everything)

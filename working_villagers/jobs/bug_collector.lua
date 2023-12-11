@@ -77,6 +77,20 @@ working_villages.register_job("working_villages:job_bugcollector", {
 	description      = "bug collector (working_villages)",
 	long_description = "I look for all sorts of bugs and collect them.",
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
+	trivia = {
+		"Me and the herb collector are kinda the same.",
+	},
+	workflow = {
+		--"Wake up",
+		"Handle my chest",
+		"Equip my tool",
+		"Go to work",
+		"Search for bugs",
+		"Go to bugs",
+		-- TODO handle entity-type bugs
+		"Collect (dig) bugs",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		-- TODO more reasonable sleep schedule
 		-- need to be up at night for fireflies

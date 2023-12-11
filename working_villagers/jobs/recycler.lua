@@ -112,6 +112,20 @@ end
 working_villages.register_job("working_villages:job_recycler", {
 	description			= "recycler (working_villages)",
 	long_description = "I look for a recycler and save the planet with your junk.",
+	trivia = {
+		"I'm part of the pooper scooper crew!",
+		"I clean up after the military-industrial complex.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		--"Equip my tool",
+		"Go to work",
+		"Search for recyclers",
+		"Go to recycler",
+		"Handle recycler",
+		"Periodically look away thoughtfully",
+	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()

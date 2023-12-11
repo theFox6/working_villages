@@ -115,6 +115,20 @@ working_villages.register_job("working_villages:job_farmer", {
 	description			= "farmer (working_villages)",
 	long_description = "I look for farming plants to collect and replant them.",
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
+	trivia = {
+		"My job position is among the originals, upon which the rest are based.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		--"Equip my tool",
+		"Go to work",
+		"Search for plants",
+		"Go to plant",
+		"Dig plant",
+		"Replant",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

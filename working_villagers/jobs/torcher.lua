@@ -53,6 +53,13 @@ working_villages.register_job("working_villages:job_torcher", {
 	description      = "torcher (working_villages)",
 	long_description = "I'm following the nearest player enlightning his way by placing torches.",
 	inventory_image  = "default_paper.png^working_villages_torcher.png",
+	trivia = {
+		"My job position is among the originals, upon which the rest are based.",
+	},
+	workflow = {
+		"Follow player",
+		"Place torches",
+	},
 	jobfunc = function(self)
 		while (self.pause) do
 			coroutine.yield()

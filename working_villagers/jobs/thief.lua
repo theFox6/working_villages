@@ -138,6 +138,15 @@ working_villages.register_job("working_villages:job_thief", {
 	description      = "thief (working_villages)",
 	long_description = "I'm following the nearest player relieving him of his burdens.",
 	inventory_image  = "default_paper.png^working_villages_torcher.png",
+	trivia = {
+		"I help the village obtain more difficult items.",
+	},
+	workflow = {
+		"Handle my chest",
+		--"Go to work",
+		"Search for valuable players",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		-- crime doesn't sleep, so here's a hack to reset his internal state for handle_chest()
 		local inv_is_full = not self:get_inventory():room_for_item("main", ItemStack("working_villages:commanding_sceptre 1"))

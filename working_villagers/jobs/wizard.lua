@@ -84,6 +84,23 @@ working_villages.register_job("working_villages:job_wizard", {
 	description			= "wizard (working_villages)",
 	long_description = "I look for all sorts of spellbooks and start brute forcing the magick key.",
 	inventory_image  = "default_paper.png^working_villages_builder.png",
+	trivia = {
+                "My job position was the first to use tools.",
+		"My job position tests our fake player support.",
+		"My job position is something only this mod can do: handle a tedious task-type that other automation mods do not.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Equip my tool",
+		"Go to work",
+		"Search for spellbooks",
+		"Go to spellbooks",
+		"Use/dig the spellbooks",
+		"Periodically look away thoughtfully",
+	},
+	jobfunc = function(self)
+		self:handle_night()
 	-- TODO on_create handler to setup mana & hp
 	jobfunc = function(self)
 		self:handle_night()

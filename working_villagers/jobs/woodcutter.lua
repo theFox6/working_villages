@@ -68,6 +68,20 @@ working_villages.register_job("working_villages:job_woodcutter", {
 I might also chop down a house. Don't get angry please I'm not the best at my job.\
 When I find a sappling I'll plant it on some soil near a bright place so a new tree can grow from it.",
 	inventory_image  = "default_paper.png^working_villages_woodcutter.png",
+	trivia = {
+		"My job position is among the originals, upon which the rest are based.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Equip my tool",
+		"Go to work",
+		"Search for trees",
+		"Go to tree",
+		"Dig tree",
+		"Replant",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

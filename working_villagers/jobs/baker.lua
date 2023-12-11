@@ -177,6 +177,18 @@ end
 working_villages.register_job("working_villages:job_baker", {
 	description			= "baker (working_villages)",
 	long_description = "I look for a furnace and start putting the contents of your chest into it.",
+	trivia          = {
+		"My job position was the first to use appliances.",
+	},
+	workflow        = {
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for furnaces",
+		"Go to furnace",
+		"Handle furnace",
+		"Periodically look away thoughtfully",
+	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()

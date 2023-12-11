@@ -56,6 +56,13 @@ working_villages.register_job("working_villages:job_folow_player", {
   description      = "follower (working_villages)",
   long_description = "I'll just follow you wherever you go.",
   inventory_image  = "default_paper.png^memorandum_letters.png",
+  trivia = {
+    "My job position is among the originals, upon which the rest are based.",
+  },
+  workflow = {
+    "Equip my tool",
+    "Follow the player",
+  },
   jobfunc = function(v)
     local stack  = v:get_wield_item_stack()
     if stack:is_empty() then

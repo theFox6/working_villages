@@ -143,6 +143,18 @@ working_villages.register_job("working_villages:job_locksmith", {
 	description			= "locksmith (working_villages)",
 	long_description = "I look for a lock workshop and start putting locks on things from the chest.",
 	inventory_image	= "default_paper.png^working_villages_builder.png",
+	trivia = {
+		"We've got big plans!",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for lock workshops",
+		"Go to lock workshop",
+		"Handle lock workshop",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(

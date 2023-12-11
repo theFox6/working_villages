@@ -65,6 +65,24 @@ working_villages.register_job("working_villages:job_watercarrier", {
 	description			= "water carrier (working_villages)",
 	long_description = "I look for all sorts of liquids and collect them.",
 	inventory_image  = "default_paper.png^working_villages_builder.png",
+	trivia = {
+		"I'm a reverse griefer",
+                "I am part of the terraforming crew",
+		"I cleanup your messes, I'll have you know.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Equip my tool",
+		"Go to work",
+		"Search for liquid",
+		"Go to liquid",
+		"Remove liquid",
+		"Replace empty bucket with filled bucket",
+		"Periodically look away thoughtfully",
+	},
+	jobfunc = function(self)
+		self:handle_night()
 	jobfunc = function(self)
 		self:handle_night()
 		--self:handle_chest2(take_func, put_func)

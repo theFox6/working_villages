@@ -150,6 +150,24 @@ working_villages.register_job("working_villages:job_counterfeiter", {
 	description			= "counterfeiter (working_villages)",
 	long_description = "I look for a fakery table and start making novelties.",
 	inventory_image	= "default_paper.png^working_villages_builder.png",
+	trivia = {
+		"Best prices in town!",
+		"Great value!",
+		"Tatti lay low",
+		"I make novelties",
+		"No refunds!",
+		"All sales final!",
+		"These are quality goods!",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for forgery tables",
+		"Go to forgery table",
+		"Handle forgery table",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(

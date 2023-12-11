@@ -62,3 +62,10 @@ schematics
 - workshops
 - farms & factories
 - graveyard (bone collector => (burglar =>) graveyard => resurrector
+
+
+
+
+nomads
+- jumpdrive
+- flying ships

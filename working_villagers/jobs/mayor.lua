@@ -44,6 +44,14 @@ working_villages.register_job("working_villages:job_mayor", {
   description      = "mayor (working_villages)",
   long_description = "I keep this place running in the absence of players.",
   inventory_image  = "default_paper.png^memorandum_letters.png",
+  trivia = {
+    "My job position is the first white-collar position: I switch between the two common bot idioms",
+  },
+  workflow = {
+    "Equip my tool",
+    "Follow the player to the place",
+    "Keep the place running",
+  },
   jobfunc = function(v)
     local stack  = v:get_wield_item_stack()
     if stack:is_empty() then

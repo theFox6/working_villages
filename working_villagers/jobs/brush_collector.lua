@@ -78,8 +78,22 @@ working_villages.register_job("working_villages:job_brushcollector", {
 	description      = "brush collector (working_villages)",
 	long_description = "I look for all sorts of brush and collect it.",
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
+	trivia = {
+		"Me and the herb collector are kinda the same.",
+		"I just pick up a few things that the herb collector and wood cutter leave behind.",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for brush",
+		"Go to brush",
+		"Collect (dig) brush",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
+		-- TODO wield item ?
 		self:handle_chest(nil, func.put_everything)
 		self:handle_job_pos()
 

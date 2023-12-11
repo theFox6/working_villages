@@ -82,6 +82,20 @@ working_villages.register_job("working_villages:job_gem_miner", {
 	description      = "gem miner (working_villages)",
 	long_description = "I look for fancy rocks and collect them.",
 	inventory_image  = "default_paper.png^working_villages_builder.png",
+	trivia = {
+		"I'm a griefer",
+                "I am part of the terraforming crew",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Equip my tool",
+		"Go to work",
+		"Search for ore",
+		"Go to ore",
+		"Dig ore",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

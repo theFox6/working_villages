@@ -83,6 +83,20 @@ working_villages.register_job("working_villages:job_composter", {
 	description			= "composter (working_villages)",
 	long_description = "I look for composters and start making soil for the farmer",
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
+	trivia = {
+		"I'm part of the pooper scooper crew!",
+		"I am part of the bread basket infrastructure",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Go to work",
+		"Search for composters",
+		"Go to composter",
+		"Punch composter with biodegradable item",
+		"Punch composter with shovel",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		--if stack:is_empty() then
@@ -130,6 +144,7 @@ working_villages.register_job("working_villages:job_composter", {
 					-- else punch with compostable
 					--
 
+					-- TODO we can probably check the meta instead of brute-forcing the job tasks
 	
 					if --node.name == "composting:composter" and
 					self:move_main_to_wield(is_compostable) then

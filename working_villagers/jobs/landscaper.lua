@@ -94,6 +94,20 @@ working_villages.register_job("working_villages:job_landscaper", {
 	description      = "landscaper (working_villages)",
 	long_description = "I look for all sorts of dirt and collect it.",
 	inventory_image  = "default_paper.png^working_villages_builder.png",
+	trivia = {
+		"I'm a griefer",
+                "I am part of the terraforming crew",
+	},
+	workflow = {
+		"Wake up",
+		"Handle my chest",
+		"Equip my tool",
+		"Go to work",
+		"Search for dirt",
+		"Go to dirt",
+		"Dig dirt",
+		"Periodically look away thoughtfully",
+	},
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

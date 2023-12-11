@@ -1032,3 +1032,27 @@ function working_villages.villager:handle_recycler(furnace_pos, take_func, put_f
 	}
 	self:handle_appliance(my_data)
 end
+
+function working_villages.use_item(self, stack)
+	-- return Tuple[whether successful, new stack]
+	assert(self  ~= nil)
+	assert(stack ~= nil)
+
+	local name   = stack:get_name()
+	if name == nil then return false, nil end
+
+	local def    = minetest.registered_items[name]
+	if def == nil then return false, nil end
+
+	local on_use = def.on_use
+	if on_use == nil then return false, nil end
+
+	local user          = self
+	local pointed_thing = {under=target, above=target, type="node",}
+	local new_stack     = on_use(stack, user, pointed_thing)
+
+	-- TODO register position failure ?
+	
+	for _=0,10 do coroutine.yield() end --wait 10 steps
+	return true, new_stack
+end
