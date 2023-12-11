@@ -34,6 +34,7 @@ working_villages.require("storage")
 
 --base
 working_villages.require("api")
+working_villages.require("fake_player")
 working_villages.require("register")
 working_villages.require("commanding_sceptre")
 

@@ -493,24 +493,6 @@ function working_villages.villager:handle_job_pos()
 	end
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- data = {
 --   appliance_id  = <some_key>,
 --   appliance_pos = {x=<x>, y=<y>, z=<z>}
@@ -548,8 +530,8 @@ function working_villages.villager:handle_appliance(data)
 		self:delay(100)
 	else
 		self:manipulate_appliance(appliance_pos, data)
-		--end
 		-- TODO check whether appliance is ready/inactive
+		-- this logic would be job-specific
 		self.job_data.manipulated_appliance[app_id] = true;
 	end
 end
@@ -599,7 +581,7 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 	for _, operation in ipairs(operations) do
 		assert(operation ~= nil)
 		if operation.noop then
-			for _=0,operation.noop do coroutine.yield() end --wait 10 steps
+			for _=0,operation.noop do coroutine.yield() end -- some appliances take time to produce results
 		else
 			local app_list_name = operation.list
 			assert(app_list_name ~= nil)
@@ -609,9 +591,6 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 			local size = vil_inv:get_size("main");
 			for index = 1,size do
 				local stack = vil_inv:get_stack("main", index);
---if not stack:is_empty() then
---	log.error("Villager %s deciding whether to move %s from inventory to appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
---end
 				if (not stack:is_empty()) and (operation.put_func(self, stack, operation.data)) then
 					local appliance_meta = minetest.get_meta(appliance_pos);
 					local appliance_inv = appliance_meta:get_inventory();
@@ -626,9 +605,6 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 							appliance_inv:set_stack(app_list_name, i, new_stack);
 		vil_inv:set_stack("main", index, stack);
 							-- TODO check if success ?
-						--else
-							--leftover = stack:get_count()
-							--leftover = stack
 							if(target_def.on_metadata_inventory_put ~= nil) then -- active furnace doesn't have this
 								target_def.on_metadata_inventory_put(appliance_pos, app_list_name, index, new_stack, placer) -- index should be 0 ?
 							end
@@ -659,9 +635,6 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 				appliance_meta = minetest.get_meta(appliance_pos);
 				appliance_inv = appliance_meta:get_inventory();
 				local stack = appliance_inv:get_stack(app_list_name, index);
---if not stack:is_empty() then
---	log.error("Villager %s deciding whether to move %s to inventory from appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
---end
 				if (not stack:is_empty()) and (operation.take_func(self, stack, operation.data)) then
 					--if(target_def.allow_metadata_inventory_take ~= nil) and target_def.allow_metadata_inventory_take(furnace_pos, "fuel", index, stack, placer) then -- extra sanity check... I don't know why it doesn't work
 					local leftover = vil_inv:add_item("main", stack);

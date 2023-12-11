@@ -1,4 +1,4 @@
-burglar         -- move stuff between villagers' chests
+burglar/courier -- move stuff between villagers' chests
 trash collector -- simple item pickup
 blacksmith      -- toolrepair
   => village can produce high level items
@@ -17,9 +17,6 @@ pooping villagers
 - deliver poop to fuel maker
 - make use of bucket mod if no toilet available
 
-grass mats + fancy beds
-- villagers accept different sleeping accomodations
-
 skills
 - NPCs have skills which can increase in level
 => can pay high level NPCs to do basic tasks
@@ -35,3 +32,6 @@ rangers      -- long range, short range & homing
 tank         -- high HP, low damage
 healer       -- annoying support role
 resurrector  -- respawns dead entities based on bones meta
+pathmaker    -- makes a path for the gank-squad
+demolition   -- explosives expert
+captain      -- operates jumpdrive + space cannon TODO build a death star TODO reasonable handling of very large explosions
