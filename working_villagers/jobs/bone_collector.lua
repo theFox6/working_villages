@@ -7,7 +7,7 @@ local bones = {
 	},
   -- less priority definitions
 	groups = {
-		["boness"]={}, -- I made these up
+		["bones"]={}, -- I made these up
 	},
 }
 
