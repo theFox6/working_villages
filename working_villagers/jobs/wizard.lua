@@ -106,8 +106,6 @@ working_villages.register_job("working_villages:job_wizard", {
 		"Use/dig the spellbooks",
 		"Periodically look away thoughtfully",
 	},
-	jobfunc = function(self)
-		self:handle_night()
 	-- TODO on_create handler to setup mana & hp
 	jobfunc = function(self)
 		self:handle_night()

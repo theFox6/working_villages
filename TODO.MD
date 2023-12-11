@@ -69,3 +69,4 @@ schematics
 nomads
 - jumpdrive
 - flying ships
+- on move node aware nodes => throne for mayor => mods can use the API or players can use the node

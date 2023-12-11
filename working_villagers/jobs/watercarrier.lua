@@ -84,8 +84,6 @@ working_villages.register_job("working_villages:job_watercarrier", {
 	},
 	jobfunc = function(self)
 		self:handle_night()
-	jobfunc = function(self)
-		self:handle_night()
 		--self:handle_chest2(take_func, put_func)
 		self:handle_chest(take_func, put_func)
 		local stack  = self:get_wield_item_stack()
