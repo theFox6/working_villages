@@ -84,7 +84,7 @@ forms.register_text_page("working_villages:age",
   function(villager)
     assert(villager ~= nil)
 
-    local dc0 = self.day_count
+    local dc0 = villager.day_count
     if dc0 == nil then
       return "I don't know."
     end
