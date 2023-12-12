@@ -1,6 +1,14 @@
 local dyemixer_recipes = {}
 local S = minetest.get_translator("working_villages")
 
+local colors = {
+	"red",     "blue",      "cyan",  "grey",   "pink",   "black",
+	"brown",   "green",     "white", "orange", "violet", "yellow",
+	"magenta", "dark_grey", "dark_green",
+}
+dyemixer_recipes.colors = colors
+
+
 -- TODO write a dependency management system
 function dyemixer_recipes.update_color_plan(self, target_color)
 	assert(self ~= nil)

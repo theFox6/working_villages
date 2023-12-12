@@ -2,6 +2,8 @@
 
 local log = working_villages.require("log")
 local cmnp = modutil.require("check_prefix","venus")
+local colors = working_villages.require("jobs/dyemixer_recipes").colors
+assert(#colors > 0)
 
 working_villages.animation_frames = {
   STAND     = { x=  0, y= 79, },
@@ -1016,6 +1018,25 @@ function working_villages.register_villager(product_name, def)
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
       create_inventory(self)
 
+      -- birthday
+      self.dob = minetest.get_day_count()
+      self.tod = minetest.get_timeofday()
+      self.day_count = minetest.get_day_count()
+
+      -- favorite color
+      self.fave_color = colors[math.random(#colors)]
+      assert(self.fave_color ~= nil)
+
+      -- randomized name
+      if minetest.get_modpath("getname") then
+        -- TODO get gender
+        --getname.masculineName()
+        --getname.feminineName()
+	self.nametag = getname.genderlessName()
+	-- TODO family names
+	-- TODO now that we've got a "username," we can register with HB-type mods
+      end
+
       -- attach dummy item to new villager.
       minetest.add_entity(self.object:get_pos(), "working_villages:dummy_item")
     else
@@ -1030,11 +1051,11 @@ function working_villages.register_villager(product_name, def)
       self.job_data = data["job_data"]
       self.state_info = data["state_info"]
       self.pos_data = data["pos_data"]
-      self.dob = minetest.get_day_count()
-      self.tod = minetest.get_timeofday()
-      self.day_count = minetest.get_day_count()
-      -- TODO favorite color
-      -- TODO 
+      -- personality
+      self.dob = data["dob"]
+      self.tod = data["tod"]
+      self.day_count = data["day_count"]
+      self.fave_color = data["fave_color"]
 
       local inventory = create_inventory(self)
       for list_name, list in pairs(data["inventory"]) do

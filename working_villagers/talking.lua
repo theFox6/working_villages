@@ -122,6 +122,19 @@ end)
 forms.put_link("working_villages:talking_menu", "working_villages:current_time",
 	"What time is it?")
 
+forms.register_text_page("working_villages:fave_color",
+  function(villager)
+    assert(villager ~= nil)
+    local color = villager.fave_color
+    if color == nil then
+      return "I don't have a preference."
+    end
+    return "My favorite color is "..color
+end)
+
+forms.put_link("working_villages:talking_menu", "working_villages:fave_color",
+	"What's your favorite color?")
+
 -- TODO where do you live/work -- how to get there
 -- TODO Who's your daddy and what does he do
 -- TODO what do you need to do your job -- ie in general & rn specifically

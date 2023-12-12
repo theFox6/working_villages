@@ -75,3 +75,6 @@ some appliances don't set a facedir, requiring specific facings for the huts
 
 appliance-handling bots' find_node() methods should find all nodes and distinguish between active/inactive nodes
 so e.g., composter, wafflemaker, etc., can juggle multiple appliances
+
+
+deduplicate strings -- job tasks have cross-cutting features and the associated strings should be in one place

@@ -214,12 +214,6 @@ local function take_target(villager,stack)--,data,iteration)
 	return (inv:room_for_item("main", stack))
 end
 
-local colors = {
-	"red",     "blue",      "cyan",  "grey",   "pink",   "black",
-	"brown",   "green",     "white", "orange", "violet", "yellow",
-	"magenta", "dark_grey", "dark_green",
-}
-
 
 working_villages.register_job("working_villages:job_dyemixer", {
 	description			= "dyemixer (working_villages)",
