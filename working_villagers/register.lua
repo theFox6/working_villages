@@ -1,3 +1,4 @@
+-- TODO more textures
 working_villages.register_villager("working_villages:villager_male", {
 	hp_max     = 30,
 	weight     = 20,

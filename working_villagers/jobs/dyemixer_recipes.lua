@@ -1,5 +1,6 @@
 local dyemixer_recipes = {}
 local S = minetest.get_translator("working_villages")
+local log = working_villages.require("log")
 
 local colors = {
 	"red",     "blue",      "cyan",  "grey",   "pink",   "black",

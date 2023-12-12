@@ -27,7 +27,10 @@ forms.register_text_page("working_villages:trivia",
   function(villager)
     assert(villager ~= nil)
 
-    local trivia = villager.trivia
+    local job = villager:get_job()
+    if not job then return "I don't know." end
+
+    local trivia = job.trivia
     if trivia == nil then
       return "That's all, my friend."
     end
@@ -54,7 +57,10 @@ forms.register_text_page("working_villages:workflow",
   function(villager)
     assert(villager ~= nil)
 
-    local workflow = villager.workflow
+    local job = villager:get_job()
+    if not job then return "I don't know." end
+
+    local workflow = job.workflow
     if workflow == nil then
       return "I just do it."
     end

@@ -1109,6 +1109,11 @@ function working_villages.register_villager(product_name, def)
       ["job_data"] = self.job_data,
       ["state_info"] = self.state_info,
       ["pos_data"] = self.pos_data,
+
+      ["dob"] = self.dob,
+      ["tod"] = self.tod,
+      ["day_count"] = self.day_count,
+      ["fave_color"] = self.fave_color,
     }
 
     -- set lists.
