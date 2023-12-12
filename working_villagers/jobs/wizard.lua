@@ -150,11 +150,11 @@ working_villages.register_job("working_villages:job_wizard", {
 				else
 					self:set_displayed_action("checking for spells in book")
 	--				-- TODO check HP+MP, and eat+sleep if necessary
-					local name   = stack:get_name()
-					--local def    = minetest.registered_items[name]
-					local def = stack:get_definition() -- minetest.registered_items[item_name]
-					local on_use = def.on_use
-					local user   = self
+--					local name   = stack:get_name()
+--					--local def    = minetest.registered_items[name]
+--					local def = stack:get_definition() -- minetest.registered_items[item_name]
+--					local on_use = def.on_use
+--					local user   = self
 					--local playername = user.nametag
 					local playername = self:get_player_name()
 					assert(playername ~= nil)
@@ -181,12 +181,15 @@ working_villages.register_job("working_villages:job_wizard", {
 						return
 					end
 					self:set_displayed_action("attempting spell")
-					local pointed_thing = {under=target, above=target, type="node",}
-					local new_stack = on_use(stack, user, pointed_thing)
-					self:set_wield_item_stack(new_stack)
-					-- TODO record position failure
-					for _=0,10 do coroutine.yield() end --wait 10 steps
-					-- TODO record successes so he's useful
+--					local pointed_thing = {under=target, above=target, type="node",}
+--					local new_stack = on_use(stack, user, pointed_thing)
+--					self:set_wield_item_stack(new_stack)
+--					-- TODO record position failure
+--					for _=0,10 do coroutine.yield() end --wait 10 steps
+--					-- TODO record successes so he's useful
+
+					local flag, new_stack = working_villages.use_item(self, stack, target)
+					if flag then self:set_wield_item_stack(new_stack) end
 				end
 			end
 		elseif self:timer_exceeded("wizard:change_dir",50) then

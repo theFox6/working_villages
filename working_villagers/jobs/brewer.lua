@@ -245,6 +245,7 @@ working_villages.fermentables = fermentables
 
 -- TODO ok this is a bit more complex than I remember.
 -- looks like this is a cross between the craftsman and the baker
+-- I think handle_appliance() can handle this without modification
 -- src, src_b, dst
 
 ---- wine mod adds tequila by default

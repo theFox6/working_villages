@@ -1,7 +1,9 @@
 -- TODO under development
+-- PoC for on_rightclick
 
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local log = working_villages.require("log")
 
 -- limited support to two replant definitions
 local fruteria_nodes = {
@@ -106,10 +108,9 @@ working_villages.register_job("working_villages:job_snowcone", {
 	},
 	jobfunc = function(self)
 		self:handle_night()
-		local stack  = self:get_wield_item_stack()
-		if stack:is_empty() then
+		--if stack:is_empty() then
 			self:handle_chest(take_func, put_func)
-		end
+		--end
 		--if stack:is_empty() then
 		--	self:move_main_to_wield(function(name)
   		--		return snowcone_refills[name] ~= nil
@@ -135,17 +136,6 @@ working_villages.register_job("working_villages:job_snowcone", {
 				local plant_name = minetest.get_node(target).name
 
 
-				local meta = minetest.get_meta(target)
-				if stack:is_empty() then
-					local flavor = meta:get_string("flavor")
-					self:move_main_to_wield(function(name)
-						if flavor ~= nil then -- use same flavor that's already in the matchine
-							return name:match("^snowcone:bucket_syrup_"..flavor)
-						end
-						-- use any flavor
-  						return snowcone_refills[name] ~= nil
-					end)
-				end
 
 
 				self:set_displayed_action("making some snowcones")
@@ -156,31 +146,71 @@ working_villages.register_job("working_villages:job_snowcone", {
 					self:set_displayed_action("looking at the unreachable snowcone machine")
 					self:delay(100)
 				else
+					local meta = minetest.get_meta(target)
+					local flavor = meta:get_string("flavor")
 					local level = meta:get_int("level")
-					if level == 0 then -- refill the machine
-						local plant_data = fruteria_nodes.get_fruiteria(plant_name)
-						local flag, new_stack = working_villages.use_item(self, stack)
-						if flag then self:set_wield_item_stack(new_stack) end
-					else -- make snowcones
-				
-						local vil_inv = self:get_inventory();
 
-						-- from villager to chest
-						--if put_func then
-						local size = vil_inv:get_size("main");
-						for index = 1,size do
-							stack = vil_inv:get_stack("main", index);
-							if (not stack:is_empty()) then --and (put_func(self, stack, data)) then
-								--local chest_meta = minetest.get_meta(chest_pos);
-								--local chest_inv = chest_meta:get_inventory();
-								--local leftover = chest_inv:add_item("main", stack);
-								--vil_inv:set_stack("main", index, leftover);
-								--for _=0,10 do coroutine.yield() end --wait 10 steps
-								flag, new_stack = working_villages.use_item(self, stack)
-								if flag then vil_inv_set:stack("main", index, new_stack) end
+					if level + 16 <= 64 then
+						--if level == 0 then -- refill the machine
+						self:set_displayed_action("refilling snowcone machine")
+						log.action("refilling snowcone machine")
+						self:move_main_to_wield(function(name)
+							if flavor ~= nil then -- use same flavor that's already in the machine
+								return name:match("^snowcone:bucket_syrup_"..flavor)
 							end
+							-- use any flavor
+  							return snowcone_refills[name] ~= nil
+						end)
+						
+						local stack  = self:get_wield_item_stack()
+						local name   = stack:get_name()
+						if name:match("^snowcone:bucket_syrup_") then
+						--local flag, new_stack = working_villages.use_item(self, stack, target)
+						local new_stack, flag = working_villages.place_item(self, stack, target)
+						--local flag, new_stack = working_villages.punch_node(self, stack, target)
+						if flag then
+							stack:clear() -- testing, take(1)
+							self:set_wield_item_stack(new_stack)
+							self:set_displayed_action("refilled snowcone machine, new stack: "..new_stack:get_name())
+							log.action("refilled snowcone machine, new stack: "..new_stack:get_name())
+						else
+							self:set_displayed_action("problem refilling snowcone machine, old stack: "..stack:get_name())
+							log.action("problem refilling snowcone machine, old stack: "..stack:get_name())
 						end
-						--end
+						end
+					end
+						
+
+					--else -- make snowcones
+					self:set_displayed_action("making snowcone")
+					log.action("making snowcone")
+					
+					self:move_main_to_wield(function(name)
+						return snowcone_demands[name] ~= nil
+					end)
+
+					local stack = self:get_wield_item_stack()
+					if level > 0 and stack:get_name() == "snowcone:raw" then
+					--local flag, new_stack = working_villages.use_item(self, stack, target)
+					local new_stack, flag = working_villages.place_item(self, stack, target)
+					--local flag, new_stack = working_villages.punch_node(self, stack, target)
+					if flag then
+						-- place_item() when level is 0 ==> unknown item. name is empty string ?
+						if new_stack ~= nil then
+						if not new_stack:is_empty() then
+						self:set_wield_item_stack(new_stack)
+						else -- TODO ?
+						end
+						self:set_displayed_action("made snowcone, new stack: "..new_stack:get_name())
+						log.action("made snowcone, new stack: "..new_stack:get_name())
+						else
+						self:set_displayed_action("made snowcone, but new stack is nil")
+						log.action("made snowcone, but new stack is nil")
+						end
+					else
+						self:set_displayed_action("problem making snowcone, old stack: "..stack:get_name())
+						log.action("problem making snowcone, old stack: "..stack:get_name())
+					end
 					end
 				end
 			end

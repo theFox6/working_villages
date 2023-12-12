@@ -108,9 +108,9 @@ working_villages.register_job("working_villages:job_gardener", {
 	jobfunc = function(self)
 		self:handle_night()
 		local stack  = self:get_wield_item_stack()
-		if stack:is_empty() then
+		--if stack:is_empty() then
 			self:handle_chest(take_func, put_func)
-		end
+		--end
 		if stack:is_empty() then
 			self:move_main_to_wield(function(name)
   				return gardening_tools[name] ~= nil
@@ -147,7 +147,7 @@ working_villages.register_job("working_villages:job_gardener", {
 					self:delay(100)
 				else
 					local plant_data = gardening_nodes.get_dirt(plant_name)
-					local flag, new_stack = working_villages.use_item(self, stack)
+					local flag, new_stack = working_villages.use_item(self, stack, target)
 					if flag then self:set_wield_item_stack(new_stack) end
 				end
 			end
