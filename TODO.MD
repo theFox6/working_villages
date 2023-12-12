@@ -70,3 +70,8 @@ nomads
 - jumpdrive
 - flying ships
 - on move node aware nodes => throne for mayor => mods can use the API or players can use the node
+
+some appliances don't set a facedir, requiring specific facings for the huts
+
+appliance-handling bots' find_node() methods should find all nodes and distinguish between active/inactive nodes
+so e.g., composter, wafflemaker, etc., can juggle multiple appliances

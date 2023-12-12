@@ -95,6 +95,8 @@ working_villages.register_job("working_villages:job_wizard", {
 		"theFox6 is basically the Silver Fox of this universe.",
 		"`engrave` and `pencil_redo` are my inspiration.",
 		"My core will be combined with a derivative of the follower's core to create combat mages with the same mana, HP mechanisms and spells as the player",
+		"It's actually quite easy to read a node's meta... for me, at least.",
+		"I know something you don't know.",
 	},
 	workflow = {
 		"Wake up",

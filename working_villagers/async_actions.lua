@@ -1034,15 +1034,18 @@ function working_villages.villager:handle_recycler(furnace_pos, take_func, put_f
 	self:handle_appliance(my_data)
 end
 
-function working_villages.use_item(self, stack)
+function working_villages.use_item(self, stack, target)
+	-- invokes the argument stack's on_use()
 	-- return Tuple[whether successful, new stack]
-	assert(self  ~= nil)
-	assert(stack ~= nil)
+	assert(self   ~= nil)
+	assert(stack  ~= nil)
+	assert(target ~= nil)
 
-	local name   = stack:get_name()
-	if name == nil then return false, nil end
+	--local name   = stack:get_name()
+	--if name == nil then return false, nil end
 
-	local def    = minetest.registered_items[name]
+	--local def    = minetest.registered_items[name]
+	local def = stack:get_definition()
 	if def == nil then return false, nil end
 
 	local on_use = def.on_use
@@ -1056,6 +1059,66 @@ function working_villages.use_item(self, stack)
 	
 	for _=0,10 do coroutine.yield() end --wait 10 steps
 	return true, new_stack
+end
+
+function working_villages.place_item(self, stack, target, param2)
+	assert(self   ~= nil)
+	assert(stack  ~= nil)
+	assert(target ~= nil)
+
+	local placer             = self
+	local pointed_thing      = {under=target, above=target, type="node",}
+	--[[
+	-- first attempt:
+	local new_stack, success = minetest.item_place(stack, placer, pointed_thing, param2)
+	return new_stack, success
+	]]
+	local def                = stack:get_definition()
+	--if def == nil then return nil, false end -- testing
+
+	local on_place           = def.on_place
+	if on_place ~= nil then
+		local new_stack = on_place(stack, placer, pointed_thing, param2)
+		return new_stack, true
+	end
+
+	local node       = minetest.get_node(target)
+	local target_def = minetest.registered_nodes[node.name]
+	--if target_def == nil then return nil, false end -- testing
+	local on_rightclick = target_def.on_rightclick
+	if on_rightclick ~= nil then
+		local new_stack = on_rightclick(target, node, placer, stack, pointed_thing)
+		return new_stack, true
+	end
+	assert(false) -- testing
+	return nil, false
+end
+
+function working_villages.punch_node(self, stack, target)
+	assert(self   ~= nil)
+	assert(stack  ~= nil)
+	assert(target ~= nil)
+
+	local puncher            = self
+	local pointed_thing      = {under=target, above=target, type="node",}
+	local node               = minetest.get_node(target)
+	--[[
+	-- first attempt:
+	local new_stack          = minetest.node_punch(target, node, puncher, pointed_thing)
+	return true, new_stack
+	]]
+	--local def                = stack:get_definition()
+	--if def == nil then return false, nil
+
+	local target_def = minetest.registered_nodes[node.name]
+	--if target_def == nil then return false, nil end -- testing
+	local on_punch = target_def.on_punch
+	if on_punch ~= nil then
+		local new_stack = on_punch(target, node, puncher, pointed_thing)
+		return true, new_stack
+	end
+	assert(false) -- testing
+	return false, nil
 end
 
 function working_villages.villager:handle_beehive(furnace_pos, take_func, put_func, data)
@@ -1085,4 +1148,3 @@ function working_villages.villager:handle_beehive(furnace_pos, take_func, put_fu
 	}
 	self:handle_appliance(my_data)
 end
-

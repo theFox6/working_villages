@@ -96,6 +96,10 @@ working_villages.register_job("working_villages:job_waffle", {
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	trivia = {
 		"I'm part of the break basket infrastructure.",
+		"My job is the first to punch-operate appliance nodes",
+		"Derivatives of my job core will press your buttons!",
+		"It's actually quite easy to read a node's meta... for me, at least.",
+		"I know something you don't know.",
 	},
 	workflow = {
 		"Wake up",
@@ -104,9 +108,12 @@ working_villages.register_job("working_villages:job_waffle", {
 		"Go to work",
 		"Search for waffle makers",
 		"Go to waffle maker",
-		"Use waffle batter on waffle maker",
+		"Wait if there are waffles cooking",
+		"Open the wafflemaker",
+		"Punch any waffles from the wafflemaker",
+		"Use batter in the wafflemaker",
+		"Close the wafflemaker",
 		"Wait until waffle maker opens",
-		"Dig waffle from waffle maker",
 		"Periodically look away thoughtfully",
 	},
 	jobfunc = function(self)

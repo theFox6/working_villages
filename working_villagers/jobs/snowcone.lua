@@ -93,6 +93,9 @@ working_villages.register_job("working_villages:job_snowcone", {
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	trivia = {
 		"I'm part of the break basket infrastructure.",
+		"It's actually quite easy to read a node's meta... for me, at least.",
+		"I know something you don't know.",
+		"My job is the first to rightclick-operate appliances.",
 	},
 	workflow = {
 		"Wake up",
@@ -101,7 +104,7 @@ working_villages.register_job("working_villages:job_snowcone", {
 		"Search for snow cone makers",
 		"Go to snow cone maker",
 		"Equip my tool",
-		"Refill snow cone maker",
+		"Refill snow cone maker if necessary",
 		"Use \"raw\" snow cone on snow cone maker",
 		"Periodically look away thoughtfully",
 	},
@@ -133,8 +136,6 @@ working_villages.register_job("working_villages:job_snowcone", {
 					destination = target
 				end
 				local plant_name = minetest.get_node(target).name
-
-
 
 
 				self:set_displayed_action("making some snowcones")

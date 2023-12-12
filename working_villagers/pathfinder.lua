@@ -80,6 +80,7 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 	if string.find(node.name, "mobs:fence") then -- #42
 		return nil
 	end
+	-- TODO can we route via climbable by playing with this logic ?
 	if walkable(node) then
 		repeat
 			height = height + 1
