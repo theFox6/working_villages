@@ -1030,6 +1030,11 @@ function working_villages.register_villager(product_name, def)
       self.job_data = data["job_data"]
       self.state_info = data["state_info"]
       self.pos_data = data["pos_data"]
+      self.dob = minetest.get_day_count()
+      self.tod = minetest.get_timeofday()
+      self.day_count = minetest.get_day_count()
+      -- TODO favorite color
+      -- TODO 
 
       local inventory = create_inventory(self)
       for list_name, list in pairs(data["inventory"]) do

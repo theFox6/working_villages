@@ -80,6 +80,48 @@ end)
 forms.put_link("working_villages:talking_menu", "working_villages:workflow",
 	"How do you do your job?")
 
+forms.register_text_page("working_villages:age",
+  function(villager)
+    assert(villager ~= nil)
+
+    local dc0 = self.day_count
+    if dc0 == nil then
+      return "I don't know."
+    end
+    local dcf = minetest.get_day_count()
+    local ddc = dcf - dc0
+    -- TODO weeks/months/years
+    return "I am "..ddc.." days old."
+end)
+
+forms.put_link("working_villages:talking_menu", "working_villages:age",
+	"How old are you?")
+
+forms.register_text_page("working_villages:current_time",
+  function(villager)
+    assert(villager ~= nil)
+
+    local midnight = 0.00
+    local midmorn  = 0.25
+    local midday   = 0.50
+    local mideve   = 0.75
+    local diff     = 0.25 / 2
+
+    local tod = minetest.get_timeofday()
+    if     midnight  - diff <= tod and tod <= midnight  + diff then
+	return "It's the middle of the night."
+    elseif midmorn - diff <= tod and tod <= midmorn + diff then
+	return "It's morning."
+    elseif midday  - diff <= tod and tod <= midday  + diff then
+	return "It's midday."
+    elseif mideve - diff  <= tod and tod <= mideve + diff then
+	return "It's evening."
+    end
+end)
+
+forms.put_link("working_villages:talking_menu", "working_villages:current_time",
+	"What time is it?")
+
 -- TODO where do you live/work -- how to get there
 -- TODO Who's your daddy and what does he do
 -- TODO what do you need to do your job -- ie in general & rn specifically
@@ -88,3 +130,5 @@ forms.put_link("working_villages:talking_menu", "working_villages:workflow",
 -- TODO procedurally generated garbage 
 -- TODO history of village/villager
 -- TODO lineage support via a separate mod
+-- TODO tell about the land / biome
+-- TODO tell about the weather
