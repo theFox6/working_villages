@@ -1,4 +1,3 @@
--- TODO under development
 -- PoC for on_rightclick
 
 local func = working_villages.require("jobs/util")
@@ -165,18 +164,18 @@ working_villages.register_job("working_villages:job_snowcone", {
 						local stack  = self:get_wield_item_stack()
 						local name   = stack:get_name()
 						if name:match("^snowcone:bucket_syrup_") then
-						--local flag, new_stack = working_villages.use_item(self, stack, target)
-						local new_stack, flag = working_villages.place_item(self, stack, target)
-						--local flag, new_stack = working_villages.punch_node(self, stack, target)
-						if flag then
-							stack:clear() -- testing, take(1)
-							self:set_wield_item_stack(new_stack)
-							self:set_displayed_action("refilled snowcone machine, new stack: "..new_stack:get_name())
-							log.action("refilled snowcone machine, new stack: "..new_stack:get_name())
-						else
-							self:set_displayed_action("problem refilling snowcone machine, old stack: "..stack:get_name())
-							log.action("problem refilling snowcone machine, old stack: "..stack:get_name())
-						end
+							--local flag, new_stack = working_villages.use_item(self, stack, target)
+							local new_stack, flag = working_villages.place_item(self, stack, target)
+							--local flag, new_stack = working_villages.punch_node(self, stack, target)
+							if flag then
+								stack:clear() -- testing, take(1)
+								self:set_wield_item_stack(new_stack)
+								self:set_displayed_action("refilled snowcone machine, new stack: "..new_stack:get_name())
+								log.action("refilled snowcone machine, new stack: "..new_stack:get_name())
+							else
+								self:set_displayed_action("problem refilling snowcone machine, old stack: "..stack:get_name())
+								log.action("problem refilling snowcone machine, old stack: "..stack:get_name())
+							end
 						end
 					end
 						
@@ -191,26 +190,26 @@ working_villages.register_job("working_villages:job_snowcone", {
 
 					local stack = self:get_wield_item_stack()
 					if level > 0 and stack:get_name() == "snowcone:raw" then
-					--local flag, new_stack = working_villages.use_item(self, stack, target)
-					local new_stack, flag = working_villages.place_item(self, stack, target)
-					--local flag, new_stack = working_villages.punch_node(self, stack, target)
-					if flag then
-						-- place_item() when level is 0 ==> unknown item. name is empty string ?
-						if new_stack ~= nil then
-						if not new_stack:is_empty() then
-						self:set_wield_item_stack(new_stack)
-						else -- TODO ?
-						end
-						self:set_displayed_action("made snowcone, new stack: "..new_stack:get_name())
-						log.action("made snowcone, new stack: "..new_stack:get_name())
+						--local flag, new_stack = working_villages.use_item(self, stack, target)
+						local new_stack, flag = working_villages.place_item(self, stack, target)
+						--local flag, new_stack = working_villages.punch_node(self, stack, target)
+						if flag then
+							-- place_item() when level is 0 ==> unknown item. name is empty string ?
+							if new_stack ~= nil then
+								if not new_stack:is_empty() then
+									self:set_wield_item_stack(new_stack)
+								else -- TODO ?
+								end
+								self:set_displayed_action("made snowcone, new stack: "..new_stack:get_name())
+								log.action("made snowcone, new stack: "..new_stack:get_name())
+							else
+								self:set_displayed_action("made snowcone, but new stack is nil")
+								log.action("made snowcone, but new stack is nil")
+							end
 						else
-						self:set_displayed_action("made snowcone, but new stack is nil")
-						log.action("made snowcone, but new stack is nil")
+							self:set_displayed_action("problem making snowcone, old stack: "..stack:get_name())
+							log.action("problem making snowcone, old stack: "..stack:get_name())
 						end
-					else
-						self:set_displayed_action("problem making snowcone, old stack: "..stack:get_name())
-						log.action("problem making snowcone, old stack: "..stack:get_name())
-					end
 					end
 				end
 			end

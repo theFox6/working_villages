@@ -1,4 +1,3 @@
--- TODO under development
 -- PoC for on_punch + on_rightclick
 
 local func = working_villages.require("jobs/util")
@@ -155,33 +154,35 @@ working_villages.register_job("working_villages:job_waffle", {
 
 					if self.job_data.waiting_for_waffles == 1 then
 						if plant_name == "waffles:waffle_maker" then
-						local meta   = minetest.get_meta(target)
-						local cooked = meta:get_float("cooked")
-						if cooked ~= nil and cooked > -1 and cooked <= 0.2 then
-							-- not ready
-							coroutine.yield()
-						else
+							local meta   = minetest.get_meta(target)
+							local cooked = meta:get_float("cooked")
+							if cooked ~= nil and cooked > -1 and cooked <= 0.2 then
+								-- not ready
+								coroutine.yield()
+							else
 
-						self:set_displayed_action("opening waffle maker")
-						log.action("opening waffle maker")
-						self:move_main_to_wield(function(name)
-  							return waffle_demands[name] ~= nil
-						end)
-						local stack  = self:get_wield_item_stack()
+								self:set_displayed_action("opening waffle maker")
+								log.action("opening waffle maker")
+								self:move_main_to_wield(function(name)
+  									return waffle_demands[name] ~= nil
+								end)
+								local stack  = self:get_wield_item_stack()
 	
-						-- right-click to open
-						--local flag, new_stack = working_villages.use_item(self, stack, target)
-						local new_stack, flag = working_villages.place_item(self, stack, target)
-						--local flag, new_stack = working_villages.punch_node(self, stack, target)
-						if flag then
-							self:set_wield_item_stack(new_stack)
-							self:set_displayed_action("opened waffle maker, new stack:"..new_stack:get_name())
-							log.action("opened waffle maker, new stack: "..new_stack:get_name())
-						else
-							self:set_displayed_action("problem opening waffle maker, old stack:"..stack:get_name())
-							log.action("problem opening waffle maker, old stack: "..stack:get_name())
-						end
-						end
+								-- right-click to open
+								--local flag, new_stack = working_villages.use_item(self, stack, target)
+								local new_stack, flag = working_villages.place_item(self, stack, target)
+								--local flag, new_stack = working_villages.punch_node(self, stack, target)
+								if flag then
+									-- TODO this is doubling items
+									--self:set_wield_item_stack(new_stack)
+									--self:add_item_to_main(new_stack)
+									self:set_displayed_action("opened waffle maker, new stack:"..new_stack:get_name().." "..new_stack:get_count())
+									log.action("opened waffle maker, new stack: "..new_stack:get_name().." "..new_stack:get_count())
+								else
+									self:set_displayed_action("problem opening waffle maker, old stack:"..stack:get_name())
+									log.action("problem opening waffle maker, old stack: "..stack:get_name())
+								end
+							end
 						end
 
 						self.job_data.waiting_for_waffles = 2
@@ -189,37 +190,38 @@ working_villages.register_job("working_villages:job_waffle", {
 					elseif self.job_data.waiting_for_waffles == 2 then
 						if plant_name == "waffles:waffle_maker_open" then
 
-						local meta   = minetest.get_meta(target)
-						local cooked = meta:get_float("cooked")
-						if cooked ~= nil and cooked > -1 and cooked <= 0.2 then
-							-- not ready
-							coroutine.yield()
-						else
-
-						self:set_displayed_action("emptying waffle maker")
-						log.action("emptying waffle maker")
-
-						self:move_main_to_wield(function(name)
-  							return waffle_demands[name] ~= nil
-						end)
-						local stack  = self:get_wield_item_stack()
-
-						-- left-click to take waffle
-						local flag, new_stack = working_villages.punch_node(self, stack, target)
-						if flag then
-							if new_stack ~= nil then
-							self:set_displayed_action("emptied waffle maker, new stack: "..new_stack:get_name())
-							log.action("emptied waffle maker, new stack: "..new_stack:get_name())
+							local meta   = minetest.get_meta(target)
+							local cooked = meta:get_float("cooked")
+							if cooked ~= nil and cooked > -1 and cooked <= 0.2 then
+								-- not ready
+								coroutine.yield()
 							else
-							self:set_displayed_action("emptied waffle maker, but new stack is nil")
-							log.action("emptied waffle maker, but new stack is nil")
+
+								self:set_displayed_action("emptying waffle maker")
+								log.action("emptying waffle maker")
+
+								self:move_main_to_wield(function(name)
+  									return waffle_demands[name] ~= nil
+								end)
+								local stack  = self:get_wield_item_stack()
+
+								-- left-click to take waffle
+								local flag, new_stack = working_villages.punch_node(self, stack, target)
+								if flag then
+									if new_stack ~= nil then
+										self:set_displayed_action("emptied waffle maker, new stack: "..new_stack:get_name().." "..new_stack:get_count())
+										log.action("emptied waffle maker, new stack: "..new_stack:get_name().." "..new_stack:get_count())
+									else
+										self:set_displayed_action("emptied waffle maker, but new stack is nil")
+										log.action("emptied waffle maker, but new stack is nil")
+									end
+									--self:set_wield_item_stack(new_stack)
+									self:add_item_to_main(new_stack)
+								else
+									self:set_displayed_action("problem emptying waffle maker, old stack: "..stack:get_name())
+									log.action("problem emptying waffle maker, old stack: "..stack:get_name())
+								end
 							end
-							self:set_wield_item_stack(new_stack)
-						else
-							self:set_displayed_action("problem emptying waffle maker, old stack: "..stack:get_name())
-							log.action("problem emptying waffle maker, old stack: "..stack:get_name())
-						end
-						end
 						end
 
 						self.job_data.waiting_for_waffles = 3
@@ -227,27 +229,27 @@ working_villages.register_job("working_villages:job_waffle", {
 					elseif self.job_data.waiting_for_waffles == 3 then
 						if plant_name == "waffles:waffle_maker_open" then
 
-						self:set_displayed_action("placing waffle batter")
-						log.action("placing waffle batter")
+							self:set_displayed_action("placing waffle batter")
+							log.action("placing waffle batter")
 
-						self:move_main_to_wield(function(name)
-  							return waffle_demands[name] ~= nil
-						end)
-						local stack  = self:get_wield_item_stack()
-						if stack:get_name() == "waffles:waffle_batter" then
+							self:move_main_to_wield(function(name)
+  								return waffle_demands[name] ~= nil
+							end)
+							local stack  = self:get_wield_item_stack()
+							if stack:get_name() == "waffles:waffle_batter" then
 
-						-- right-click to place waffle batter
-						--local flag, new_stack = working_villages.use_item(self, stack, target)
-						local new_stack, flag = working_villages.place_item(self, stack, target)
-						if flag then
-							self:set_wield_item_stack(new_stack)
-							self:set_displayed_action("placed waffle batter, new stack: "..new_stack:get_name())
-							log.action("placed waffle batter, new stack: "..new_stack:get_name())
-						else
-							self:set_displayed_action("problem placing waffle batter, old stack: "..stack:get_name())
-							log.action("problem placing waffle batter, old stack: "..stack:get_name())
-						end
-						end
+								-- right-click to place waffle batter
+								--local flag, new_stack = working_villages.use_item(self, stack, target)
+								local new_stack, flag = working_villages.place_item(self, stack, target)
+								if flag then
+									self:set_wield_item_stack(new_stack)
+									self:set_displayed_action("placed waffle batter, new stack: "..new_stack:get_name().." "..new_stack:get_count())
+									log.action("placed waffle batter, new stack: "..new_stack:get_name().." "..new_stack:get_count())
+								else
+									self:set_displayed_action("problem placing waffle batter, old stack: "..stack:get_name())
+									log.action("problem placing waffle batter, old stack: "..stack:get_name())
+								end
+							end
 						end
 						
 						self.job_data.waiting_for_waffles = 4
@@ -255,27 +257,30 @@ working_villages.register_job("working_villages:job_waffle", {
 					elseif self.job_data.waiting_for_waffles == 4 then
 						if plant_name == "waffles:waffle_maker_open" then
 
-						self:set_displayed_action("closing waffle maker")
-						log.action("closing waffle maker")
+							self:set_displayed_action("closing waffle maker")
+							log.action("closing waffle maker")
 
-						-- TODO remove wield stack real quick
-						self:move_main_to_wield(function(name)
-  							return waffle_demands[name] == nil
-						end)
-						local stack  = self:get_wield_item_stack()
+							-- TODO remove wield stack real quick
+							self:move_main_to_wield(function(name)
+  								return waffle_demands[name] == nil
+							end)
+							local stack  = self:get_wield_item_stack()
+							if stack:get_name() ~= "waffles:waffle_batter" then
 
-						-- right-click to close waffle maker
-						--local flag, new_stack = working_villages.use_item(self, stack, target)
-						local new_stack, flag = working_villages.place_item(self, stack, target)
-						if flag then
-							--self:set_wield_item_stack(new_stack)
-							self:add_item_to_main(new_stack)
-							self:set_displayed_action("closed waffle maker, new stack: "..new_stack:get_name())
-							log.action("closed waffle maker, new stack: "..new_stack:get_name())
-						else
-							self:set_displayed_action("problem closing waffle maker, old stack: "..stack:get_name())
-							log.action("problem closing waffle maker, old stack: "..stack:get_name())
-						end
+								-- right-click to close waffle maker
+								--local flag, new_stack = working_villages.use_item(self, stack, target)
+								local new_stack, flag = working_villages.place_item(self, stack, target)
+								if flag then
+									-- TODO this may also be double items
+									--self:set_wield_item_stack(new_stack)
+									--self:add_item_to_main(new_stack)
+									self:set_displayed_action("closed waffle maker, new stack: "..new_stack:get_name().." "..new_stack:get_count())
+									log.action("closed waffle maker, new stack: "..new_stack:get_name().." "..new_stack:get_count())
+								else
+									self:set_displayed_action("problem closing waffle maker, old stack: "..stack:get_name())
+									log.action("problem closing waffle maker, old stack: "..stack:get_name())
+								end
+							end
 						end
 
 						-- TODO check result first
