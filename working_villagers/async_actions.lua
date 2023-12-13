@@ -844,7 +844,8 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 			local ny  = #row
 			--for y=1,3,1 do
 			for y=1,ny,1 do
-				local xy = 3*(x-1)+y
+				--local xy = 3*(x-1)+y
+				local xy = 3*(y-1)+x
 				--xy    = xy    + 1
 				index = index + 1
 				my_data.operations[index]   = {
@@ -853,8 +854,11 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 					put_func  = put_func,
 					data      = {
 						iteration    = iteration,
-						recipe_x     = x,
-						recipe_y     = y,
+						-- TODO
+						target_x     = x,
+						target_y     = y,
+						--recipe_x     = x,
+						--recipe_y     = y,
 						target_index = xy,
 						target_count = 1,
 					},
@@ -1173,46 +1177,54 @@ function working_villages.villager:handle_fermenting_barrel(craft_table_pos, tak
 	local water  = meta:get_int("water") or 0
 	local status = meta:get_float("status") or 0
 
+
+	if water < 100 then
+	index = index + 1
+	my_data.operations[index]   = {
+		list      = "src_b",
+		is_put    = true,
+		put_func  = put_fuel,
+		--data      = {
+		--	iteration    = iteration,
+		--},
+	}
+	end
+
+	index = index + 1
+	my_data.operations[index]   = {
+		list      = "src_b",
+		is_take   = true,
+		take_func = take_fuel,
+	}
+
+	if status >= 100 then
+	index = index + 1
+	my_data.operations[index]   = {
+		list      = "src",
+		is_take   = true,
+		take_func = take_func,
+	}
+	end
+
+	if status > 0 then
+		self:handle_appliance(my_data)
+		return
+	end
+
 	for iteration=ntarget,1,-1 do
 
-		if water < 100 then
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "src_b",
-			is_put    = true,
-			put_func  = put_fuel,
-			data      = {
-				iteration    = iteration,
-			},
-		}
-		end
-
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "src_b",
-			is_take   = true,
-			take_func = take_fuel,
-		}
-
-		if status >= 100 then
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "src",
-			is_take   = true,
-			take_func = take_func,
-		}
-		end
-
 		local recipe = recipes[iteration]
+		if recipe ~= nil then
 		local nx     = #recipe
-		local xy     = 0
+		--local xy     = 0
 		for x=1,nx,1 do -- 2 X 2 = 4
 			local row = recipe[x]
 			local ny  = #row
 			--for y=1,3,1 do
 			for y=1,ny,1 do
 				--local xy = 2*(x-1)+y
-				xy    = xy    + 1
+				local xy = 2*(y-1)+x
+				--xy    = xy    + 1
 				index = index + 1
 				my_data.operations[index]   = {
 					list      = 'src',
@@ -1220,8 +1232,8 @@ function working_villages.villager:handle_fermenting_barrel(craft_table_pos, tak
 					put_func  = put_func,
 					data      = {
 						iteration    = iteration,
-						recipe_x     = x,
-						recipe_y     = y,
+						target_x     = x,
+						target_y     = y,
 						target_index = xy,
 						target_count = 1,
 					},
@@ -1243,10 +1255,10 @@ function working_villages.villager:handle_fermenting_barrel(craft_table_pos, tak
 		--	},
 		--}
 	
-		--index = index + 1
-		--my_data.operations[index]   = {
-		--	noop = 300,
-		--}
+		index = index + 1
+		my_data.operations[index]   = { -- there's a bit of a delay before the `status` changes`
+			noop = 10,
+		}
 
 		index = index + 1
 		my_data.operations[index]   = {
@@ -1254,7 +1266,7 @@ function working_villages.villager:handle_fermenting_barrel(craft_table_pos, tak
 			is_take   = true,
 			take_func = take_func,
 		}
-
+	end -- nil check
 	end
 	for iteration=1,#my_data.operations,1 do
 		assert(my_data.operations[iteration] ~= nil)
