@@ -51,7 +51,7 @@ function craft_tables.recipe_requires(recipe, item_name, target_x, target_y)
 	or target_y ~= nil then
 		assert(target_x ~= nil)
 		assert(target_y ~= nil)
-		print(dump(recipe))
+		--print(dump(recipe))
 		if recipe[target_y][target_x] == item_name then return 1 end
 		return 0
 	end
