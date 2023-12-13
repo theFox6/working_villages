@@ -60,6 +60,7 @@ local function walkable(node)
 		end
 end
 
+-- TODO #9
 local function check_clearance(cpos, x, z, height) --TODO: this is unused
 	for i = 1, height do
 		local n_name = minetest.get_node({x = cpos.x + x, y = cpos.y + i, z = cpos.z + z}).name
@@ -81,6 +82,7 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 		return nil
 	end
 	-- TODO can we route via climbable by playing with this logic ?
+	-- TODO #9: `1` should not be hard-coded
 	if walkable(node) then
 		repeat
 			height = height + 1

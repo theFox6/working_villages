@@ -109,6 +109,9 @@ end
 if minetest.get_modpath("wine") then
 	working_villages.require("jobs/brewer")
 end
+if minetest.get_modpath("smartrenting") then
+	working_villages.require("jobs/landlord")
+end
 
 if working_villages.setting_enabled("spawn",false) then
   working_villages.require("spawn")

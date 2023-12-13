@@ -18,6 +18,22 @@ distribution    -- knows, in general, which supplies and how much are needed by 
 merchant        -- sets prices based on supply and demand of the village
                    sells goods and services to player
 
+librarian       -- copy books, etc.
+vendor          -- configure vending machines to acquire goods needed by the village
+landlord        -- configure rentals to acquire goods needed by the village
+
+- trasher:
+  - needs to drop the item now
+- librarian:
+  - need to decide where to keep:
+    - unwritten books
+    - copies
+    - originals
+  - otherwise, copying meta is trivial
+- landlord
+  - needs to properly handle buying/selling
+- vendor
+
 handle deaths
 - drop items
 - spawn bones with meta

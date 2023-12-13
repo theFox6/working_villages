@@ -13,56 +13,36 @@ local hoppers = {
 	},
 }
 
-local bakables = {
+local trashables = {
   -- more priority definitions
 	names = {
 		["pooper:poop_turd"] = 99,
-		["3darmor:boot_wood"] = 99, -- TODO
+		["3d_armor:boot_wood"] = 99, -- TODO
 	},
   -- less priority definitions
 	groups = {
 		["boot"]=99,
 	},
 }
-function bakables.get_bakable(item_name)
+function trashables.get_trashable(item_name)
   -- check more priority definitions
-	for key, value in pairs(bakables.names) do
+	for key, value in pairs(trashables.names) do
 		if item_name==key then
 			return value
 		end
 	end
   -- check less priority definitions
-	for key, value in pairs(bakables.groups) do
+	for key, value in pairs(trashables.groups) do
 		if minetest.get_item_group(item_name, key) > 0 then
 			return value;
 		end
 	end
 	return nil
 end
-function bakables.is_bakable(item_name)
-  local data = bakables.get_bakable(item_name);
+function trashables.is_trashable(item_name)
+  local data = trashables.get_trashable(item_name);
   return data ~= nil
 end
-function bakables.get_cookable(item_name)
-  -- check more priority definitions
-	for key, value in pairs(bakables.names) do
-		if item_name==key then
-			return value
-		end
-	end
-  -- check less priority definitions
-	for key, value in pairs(bakables.groups) do
-		if minetest.get_item_group(item_name, key) > 0 then
-			return value;
-		end
-	end
-	return nil
-end
-function bakables.is_cookable(item_name)
-  local data = bakables.get_cookable(item_name);
-  return data ~= nil
-end
-
 
 
 
@@ -92,21 +72,18 @@ end
 local searching_range = {x = 10, y = 3, z = 10}
 
 local function put_func(_,stack)
-	return not bakables.is_bakable(stack:get_name())
+	return not trashables.is_trashable(stack:get_name())
 end
 local function take_func(villager,stack)
 	local item_name = stack:get_name()
-	if not bakables.is_bakable(item_name) then return false end
+	if not trashables.is_trashable(item_name) then return false end
 	local inv = villager:get_inventory()
 	local itemstack = ItemStack(item_name)
-	itemstack:set_count(bakables.get_bakable(item_name))
+	itemstack:set_count(trashables.get_trashable(item_name))
 	return (not inv:contains_item("main", itemstack))
 end
 
 
-local function put_cookable(_,stack)
-	return bakables.is_cookable(stack:get_name())
-end
 
 working_villages.register_job("working_villages:job_trasher", {
 	description = S("trasher (working_villages)"),
@@ -159,16 +136,8 @@ working_villages.register_job("working_villages:job_trasher", {
 					local plant_data = hoppers.get_hopper(target_def.name);
 					if plant_data then
 						self:set_displayed_action("operating the hopper")
+
 						-- TODO drop items near hopper
-						self:handle_hopper(
-					        	target,
-						    	func.take_everything, -- take everything
-						 	put_cookable, -- put what we need to hopper
-							put_fuel
-						)
-						--self.job_data.manipulated_chest   = false;
-						--self.job_data.manipulated_hopper = false;
-						--self:set_displayed_action("waiting on hopper")
 					end
 				end
 			end
@@ -178,4 +147,4 @@ working_villages.register_job("working_villages:job_trasher", {
 	end,
 })
 
-working_villages.bakables = bakables
+working_villages.trashables = trashables

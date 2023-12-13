@@ -13,12 +13,14 @@ local furnaces = {
 --     if it sells what we need
 --       do buy
 --   if we own the vendor
---       ...
+--       re-configure it to buy what we need (if necessary)
 -- if vendor is unconfigured
 --   if we own the vendor
 --     configure it to buy what we need
+--     => player can deposit eg gold to get eg food
 --   if we don't own the vendor
 --     configure it to sell what we need
+--     => villager can deposit eg food to get eg gold
 
 local bakables = {
 	fuel_names = {

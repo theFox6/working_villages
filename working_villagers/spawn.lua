@@ -546,3 +546,24 @@ minetest.register_abm({
     catch_up = false,
     action = spawner("working_villages:job_trasher"),
 })
+
+if minetest.get_modpath("smartrenting") then
+working_villages.require("jobs/landlord")
+
+local rental_names = {}
+for name,_ in pairs(working_villages.rental_nodes.names) do
+    rental_names[#rental_names + 1] = name
+end
+for name,_ in pairs(working_villages.rental_nodes.groups) do
+    rental_names[#rental_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn landlord",
+    nodenames = rental_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_landlord"),
+})

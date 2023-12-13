@@ -1,6 +1,8 @@
 building_sign.register_schematic("simple_hut.we")
 building_sign.register_schematic("fancy_hut.we")
 
+-- TODO the .we files have are leaking usernames
+
 if  minetest.get_modpath("fancy_vend") 
 and minetest.get_modpath("smartrenting") then
 	building_sign.register_schematic("vendor_stall.we")
@@ -61,6 +63,11 @@ and minetest.get_modpath("homedecor_misc")
 and minetest.get_modpath("homedecor_office")
 and minetest.get_modpath("homedecor_kitchen")
 and minetest.get_modpath("generic_flags") then
+	-- TODO it's missing the rumala sahib
+	-- TODO parshad
+	-- TODO other gulaks
+	-- TODO holy books should probably be distinct from generic books
+	-- TODO display_lib doesn't like being used in schematics, so I need to look into how to properly handle the nil font error in it
 	building_sign.register_schematic("gurudwara_v1.we")
 end
 
