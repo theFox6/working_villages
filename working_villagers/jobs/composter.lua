@@ -1,7 +1,7 @@
-
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
 local log = working_villages.require("log")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local composter_nodes = {
@@ -81,22 +81,19 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_composter", {
-	description			= "composter (working_villages)",
-	long_description = "I look for composters and start making soil for the farmer",
+	description			= S("composter (working_villages)"),
+	long_description = S("I look for composters and start making soil for the farmer"),
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
-	trivia = {
-		"I'm part of the pooper scooper crew!",
-		"I am part of the bread basket infrastructure",
-	},
+	trivia = trivia.get_trivia({}, {trivia.waste_management, trivia.bread_basket, trivia.appliances, trivia.punchy,},
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for composters",
-		"Go to composter",
-		"Punch composter with biodegradable item",
-		"Punch composter with shovel",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for composters"),
+		S("Go to composter"),
+		S("Punch composter with biodegradable item"),
+		S("Punch composter with shovel"),
+		S("Periodically look away thoughtfully"),
 	},
 	jobfunc = function(self)
 		self:handle_night()
@@ -146,6 +143,8 @@ working_villages.register_job("working_villages:job_composter", {
 					--
 
 					-- TODO we can probably check the meta instead of brute-forcing the job tasks
+					
+					-- TODO use new on-punch api
 	
 					if --node.name == "composting:composter" and
 					self:move_main_to_wield(is_compostable) then

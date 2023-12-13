@@ -3,6 +3,7 @@ local log = working_villages.require("log")
 local co_command = working_villages.require("job_coroutines").commands
 local follower = working_villages.require("jobs/follow_player")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- "demands" to take from player
 local taxable_items = {
@@ -136,18 +137,16 @@ end
 
 -- copied from the torcher
 working_villages.register_job("working_villages:job_thief", {
-	description      = "thief (working_villages)",
-	long_description = "I'm following the nearest player relieving him of his burdens.",
-	inventory_image  = "default_paper.png^working_villages_torcher.png",
-	trivia = {
-		"I help the village obtain more difficult items.",
-	},
+	description      = S("thief (working_villages)"),
+	long_description = S("I'm following the nearest player relieving him of his burdens."),
+	trivia = trivia.get_trivia({}, {trivia.special,}),
 	workflow = {
-		"Handle my chest",
-		--"Go to work",
-		"Search for valuable players",
-		"Periodically look away thoughtfully",
+		S("Handle my chest"),
+		--S("Go to work"),
+		S("Search for valuable players"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_torcher.png",
 	jobfunc = function(self)
 		-- crime doesn't sleep, so here's a hack to reset his internal state for handle_chest()
 		local inv_is_full = not self:get_inventory():room_for_item("main", ItemStack("working_villages:commanding_sceptre 1"))

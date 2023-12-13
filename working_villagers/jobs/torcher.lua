@@ -3,6 +3,7 @@ local log = working_villages.require("log")
 local co_command = working_villages.require("job_coroutines").commands
 local follower = working_villages.require("jobs/follow_player")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local torcher = {}
 
@@ -51,16 +52,14 @@ function torcher.place_torch_at(v,pos)
 end
 
 working_villages.register_job("working_villages:job_torcher", {
-	description      = "torcher (working_villages)",
-	long_description = "I'm following the nearest player enlightning his way by placing torches.",
-	inventory_image  = "default_paper.png^working_villages_torcher.png",
-	trivia = {
-		"My job position is among the originals, upon which the rest are based.",
-	},
+	description      = S("torcher (working_villages)"),
+	long_description = S("I'm following the nearest player enlightning his way by placing torches."),
+	trivia = trivia.get_trivia({}, {trivia.og,}),
 	workflow = {
-		"Follow player",
-		"Place torches",
+		S("Follow player"),
+		S("Place torches"),
 	},
+	inventory_image  = "default_paper.png^working_villages_torcher.png",
 	jobfunc = function(self)
 		while (self.pause) do
 			coroutine.yield()

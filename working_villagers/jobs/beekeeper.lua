@@ -1,6 +1,6 @@
-
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local beehives = {
@@ -82,20 +82,19 @@ local function put_bee(_,stack)
 end
 
 working_villages.register_job("working_villages:job_beekeeper", {
-	description			= "beekeeper (working_villages)",
-	long_description = "I look for a beehive and start taking that sweet, sweet honey.",
-	trivia = {
-		"I'm part of the bread basket infrastructure.",
-		"I'm the reason the herb collector has a no-raze (responsible foraging) option.",
-	},
+	description = S("beekeeper (working_villages)"),
+	long_description = S("I look for a beehive and start taking that sweet, sweet honey."),
+	trivia = trivia.get_trivia({
+		S("I'm the reason the herb collector has a no-raze (responsible foraging) option."),
+	}, {trivia.break_basket,trivia.appliances,})
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for beehives",
-		"Go to beehive",
-		"Handle beehive",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for beehives"),
+		S("Go to beehive"),
+		S("Handle beehive"),
+		S("Periodically look away thoughtfully"),
 	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)

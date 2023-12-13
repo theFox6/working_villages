@@ -1,5 +1,7 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
+
 local function find_snow(self)
 	return function(p)
 		if minetest.is_protected(p, self:get_player_name()) then return false end
@@ -8,6 +10,7 @@ local function find_snow(self)
 		return minetest.get_node(p).name == "default:snow"
 	end
 end
+
 local searching_range = {x = 10, y = 3, z = 10}
 
 local landscaping_demands = {
@@ -33,25 +36,23 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_snowclearer", {
-	description      = "snowclearer (working_villages)",
-	long_description = "I clear away snow you know.\
+	description      = S("snowclearer (working_villages)"),
+	long_description = S("I clear away snow you know.\
 My job is for testing not for harvesting.\
 I must confess this job seems useless.\
-I'm doing anyway, clearing the snow away.",
-	inventory_image  = "default_paper.png^memorandum_letters.png",
-	trivia = {
-		"My job position is among the originals, upon which the rest are based.",
-	},
+I'm doing anyway, clearing the snow away."),
+	trivia = trivia.get_trivia({}, {trivia.og, trivia.griefers,}),{
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		--"Equip my tool",
-		"Go to work",
-		"Search for snow",
-		"Go to snow",
-		"Dig snow",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		--S("Equip my tool"),
+		S("Go to work"),
+		S("Search for snow"),
+		S("Go to snow"),
+		S("Dig snow"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^memorandum_letters.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

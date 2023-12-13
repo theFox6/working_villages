@@ -1,6 +1,6 @@
-
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local refineries = {
@@ -67,20 +67,17 @@ local function put_cookable(_,stack)
 end
 
 working_villages.register_job("working_villages:job_biofuel", {
-	description			= "biofuel (working_villages)",
-	long_description = "I look for a refinery and start putting the contents of your chest into it.",
-	trivia = {
-		"I'm part of the pooper scooper crew!",
-		"I fuel the military-industrial complex.",
-	},
+	description = S("biofuel (working_villages)"),
+	long_description = S("I look for a refinery and start putting the contents of your chest into it."),
+	trivia = trivia.get_trivia({}, {trivia.waste_management, trivia.power_management, trivia.appliances}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for refineries",
-		"Go to refinery",
-		"Handle refinery",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for refineries"),
+		S("Go to refinery"),
+		S("Handle refinery"),
+		S("Periodically look away thoughtfully"),
 	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)

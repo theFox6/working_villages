@@ -5,6 +5,7 @@ CRAFT_TABLE_TYPE = "crafting_bench"
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
 local log = working_villages.require("log")
+local trivia = working_villages.require("jobs/trivia")
 
 local craft_tables
 if CRAFT_TABLE_TYPE == "craft_table" then
@@ -170,21 +171,20 @@ local function put_craftingsupplies(villager,stack,data)
 end
 
 working_villages.register_job("working_villages:job_craftsman", {
-	description			= "craftsman (working_villages)",
-	long_description = "I look for a craft table and carry out trade-specific recipes.",
+	description = S("craftsman (working_villages)"),
+	long_description = S("I look for a craft table and carry out trade-specific recipes."),
 	inventory_image	= "default_paper.png^working_villages_herb_collector.png",
-	trivia = {
-		"We've got big plans!",
+	trivia = trivia.get_trivia({
 		"My job position contributed to the complexity and general applicability of our appliance-handling logic.",
-	},
+	}, {trivia.unfinished, trivia.appliances,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for crafting tables",
-		"Go to crafting table",
-		"Handle crafting table",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for crafting tables"),
+		S("Go to crafting table"),
+		S("Handle crafting table"),
+		S("Periodically look away thoughtfully"),
 	},
 	jobfunc = function(self)
 		self:handle_night()

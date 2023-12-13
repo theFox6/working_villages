@@ -1,6 +1,6 @@
-
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local furnaces = {
 	names = {
@@ -176,19 +176,19 @@ local function put_cookable(_,stack)
 end
 
 working_villages.register_job("working_villages:job_baker", {
-	description			= "baker (working_villages)",
-	long_description = "I look for a furnace and start putting the contents of your chest into it.",
-	trivia          = {
+	description = S("baker (working_villages)"),
+	long_description = S("I look for a furnace and start putting the contents of your chest into it."),
+	trivia          = trivia.get_trivia({
 		"My job position was the first to use appliances.",
-	},
+	}, {trivia.appliances,}), -- trivia.bread_basket
 	workflow        = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for furnaces",
-		"Go to furnace",
-		"Handle furnace",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for furnaces"),
+		S("Go to furnace"),
+		S("Handle furnace"),
+		S("Periodically look away thoughtfully"),
 	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)

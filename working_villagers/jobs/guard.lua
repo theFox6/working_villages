@@ -1,5 +1,6 @@
 local log = working_villages.require("log")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 local co_command = working_villages.require("job_coroutines").commands
 
 --modes: stationary,escort,patrol,wandering
@@ -14,17 +15,15 @@ local guard_tools = {
 	-- TODO armor, other weapons
 }
 working_villages.register_job("working_villages:job_guard", {
-	description      = "guard (working_villages)",
-	long_description = "I'm here on guard defending against all those whom I see as enemies.",
-	inventory_image  = "default_paper.png^memorandum_letters.png", --TODO: sword/bow/shield
-	trivia = {
-                "We've got big plans!",
-	},
+	description      = S("guard (working_villages)"),
+	long_description = S("I'm here on guard defending against all those whom I see as enemies."),
+	trivia = trivia.get_trivia({}, {trivia.og, trivia.unfinished, trivia.first_responder,}),
 	workflow = {
-		"Equip my tool",
-		"Go to work",
-		--"Periodically look away thoughtfully",
+		S("Equip my tool"),
+		S("Go to work"),
+		--S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^memorandum_letters.png", --TODO: sword/bow/shield
 	-- TODO guard should wield a sword (and shield if appropriate mod is loaded)
 	jobfunc = function(self)
 		local stack  = self:get_wield_item_stack()

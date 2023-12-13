@@ -1,6 +1,7 @@
 
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local liquids = {
@@ -63,25 +64,23 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_watercarrier", {
-	description			= "water carrier (working_villages)",
-	long_description = "I look for all sorts of liquids and collect them.",
-	inventory_image  = "default_paper.png^working_villages_builder.png",
-	trivia = {
+	description = S("water carrier (working_villages)"),
+	long_description = S("I look for all sorts of liquids and collect them."),
+	trivia = trivia.get_trivia({
 		"I'm a reverse griefer",
-                "I am part of the terraforming crew",
-		"I cleanup your messes, I'll have you know.",
-	},
+	}, {trivia.griefers, trivia.waste_management,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for liquid",
-		"Go to liquid",
-		"Remove liquid",
-		"Replace empty bucket with filled bucket",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for liquid"),
+		S("Go to liquid"),
+		S("Remove liquid"),
+		S("Replace empty bucket with filled bucket"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()
 		--self:handle_chest2(take_func, put_func)

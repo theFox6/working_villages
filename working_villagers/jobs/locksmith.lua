@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local lockworkshops = {
 	names = {
@@ -141,21 +142,19 @@ local function put_unlocked(_,stack)
 end
 
 working_villages.register_job("working_villages:job_locksmith", {
-	description			= "locksmith (working_villages)",
-	long_description = "I look for a lock workshop and start putting locks on things from the chest.",
-	inventory_image	= "default_paper.png^working_villages_builder.png",
-	trivia = {
-		"We've got big plans!",
-	},
+	description = S("locksmith (working_villages)"),
+	long_description = S("I look for a lock workshop and start putting locks on things from the chest."),
+	trivia = trivia.get_trivia({}, {trivia.appliances,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for lock workshops",
-		"Go to lock workshop",
-		"Handle lock workshop",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for lock workshops"),
+		S("Go to lock workshop"),
+		S("Handle lock workshop"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(

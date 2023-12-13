@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local bugs = {
   -- more priority definitions
@@ -75,24 +76,23 @@ end
 
 -- copied from the plant/herb collector
 working_villages.register_job("working_villages:job_bugcollector", {
-	description      = "bug collector (working_villages)",
-	long_description = "I look for all sorts of bugs and collect them.",
-	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
-	trivia = {
-		"Me and the herb collector are kinda the same.",
-	},
+	description      = S("bug collector (working_villages)"),
+	long_description = S("I look for all sorts of bugs and collect them."),
+	trivia = trivia.get_trivia({}, {trivia.herb_collector,}),
 	workflow = {
-		--"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for bugs",
-		"Go to bugs",
+		--S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for bugs"),
+		S("Go to bugs"),
 		-- TODO handle entity-type bugs
-		"Collect (dig) bugs",
-		"Periodically look away thoughtfully",
+		S("Collect (dig) bugs"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
+		-- TODO night-shift version of handle_night
 		-- TODO more reasonable sleep schedule
 		-- need to be up at night for fireflies
 		-- and also during the day for butterflies

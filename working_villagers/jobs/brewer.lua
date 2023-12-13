@@ -2,6 +2,7 @@
 
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local fermenting_barrels = {
 	names = {
@@ -180,8 +181,21 @@ local function put_cookable(_,stack)
 end
 
 working_villages.register_job("working_villages:job_brewer", {
-	description			= "brewer (working_villages)",
-	long_description = "I look for a barrel and start preserving the farming surplus.",
+	description = S("brewer (working_villages)"),
+	long_description = S("I look for a barrel and start preserving the farming surplus."),
+	-- TODO
+	trivia = trivia.get_trivia({}, {trivia.herb_collector, trivia.waste_management, trivia.first_responder,trivia.appliances,}),
+	-- TODO
+	workflow = {
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for bones"),
+		S("Go to bones"),
+		S("Collect (dig) bones"),
+		S("Periodically look away thoughtfully"),
+	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()

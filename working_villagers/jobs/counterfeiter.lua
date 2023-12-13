@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local fakerytables = {
 	names = {
@@ -148,26 +149,26 @@ local function put_cheap_replacement(_,stack)
 end
 
 working_villages.register_job("working_villages:job_counterfeiter", {
-	description			= "counterfeiter (working_villages)",
-	long_description = "I look for a fakery table and start making novelties.",
+	description = S("counterfeiter (working_villages)"),
+	long_description = S("I look for a fakery table and start making novelties."),
 	inventory_image	= "default_paper.png^working_villages_builder.png",
-	trivia = {
-		"Best prices in town!",
-		"Great value!",
-		"Tatti lay low",
-		"I make novelties",
-		"No refunds!",
-		"All sales final!",
-		"These are quality goods!",
-	},
+	trivia = trivia.get_trivia({
+		S("Best prices in town!"),
+		S("Great value!"),
+		S("Tatti lay low"),
+		S("I make novelties"),
+		S("No refunds!"),
+		S("All sales final!"),
+		S("These are quality goods!"),
+	}, {trivia.appliances,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for forgery tables",
-		"Go to forgery table",
-		"Handle forgery table",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for forgery tables"),
+		S("Go to forgery table"),
+		S("Handle forgery table"),
+		S("Periodically look away thoughtfully"),
 	},
 	jobfunc = function(self)
 		self:handle_night()

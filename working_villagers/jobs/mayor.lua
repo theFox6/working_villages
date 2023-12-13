@@ -1,5 +1,8 @@
+-- TODO this guy should relinquish his sceptre to the appropriate player upon request.
+
 local follower = working_villages.require("jobs/follow_player")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 local mayor    = {}
 
 local follower_tools = {
@@ -42,17 +45,17 @@ function mayor.mayor_v1(v)
 end
 
 working_villages.register_job("working_villages:job_mayor", {
-  description      = "mayor (working_villages)",
-  long_description = "I keep this place running in the absence of players.",
-  inventory_image  = "default_paper.png^memorandum_letters.png",
-  trivia = {
+  description      = S("mayor (working_villages)"),
+  long_description = S("I keep this place running in the absence of players."),
+  trivia = trivia.get_trivia({
     "My job position is the first white-collar position: I switch between the two common bot idioms",
-  },
+  }, {trivia.unfinished,}),
   workflow = {
-    "Equip my tool",
-    "Follow the player to the place",
-    "Keep the place running",
+    S("Equip my tool"),
+    S("Follow the player to the place"),
+    S("Keep the place running"),
   },
+  inventory_image  = "default_paper.png^memorandum_letters.png",
   jobfunc = function(v)
     local stack  = v:get_wield_item_stack()
     if stack:is_empty() then

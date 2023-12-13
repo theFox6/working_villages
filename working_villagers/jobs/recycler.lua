@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local recyclers = {
 	names = {
@@ -111,21 +112,18 @@ local function put_recyclables(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_recycler", {
-	description			= "recycler (working_villages)",
-	long_description = "I look for a recycler and save the planet with your junk.",
-	trivia = {
-		"I'm part of the pooper scooper crew!",
-		"I clean up after the military-industrial complex.",
-	},
+	description = S("recycler (working_villages)"),
+	long_description = S("I look for a recycler and save the planet with your junk."),
+	trivia = trivia.get_trivia({}, {trivia.waste_management, trivia.appliances, trivia.special,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		--"Equip my tool",
-		"Go to work",
-		"Search for recyclers",
-		"Go to recycler",
-		"Handle recycler",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		--S("Equip my tool"),
+		S("Go to work"),
+		S("Search for recyclers"),
+		S("Go to recycler"),
+		S("Handle recycler"),
+		S("Periodically look away thoughtfully"),
 	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)

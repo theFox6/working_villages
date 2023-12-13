@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local herbs = {
   -- more priority definitions
@@ -79,22 +80,20 @@ local searching_range = {x = 10, y = 5, z = 10}
 
 
 working_villages.register_job("working_villages:job_herbcollector", {
-	description      = "herb collector (working_villages)",
-	long_description = "I look for all sorts of plants and collect them.",
-	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
-	trivia = {
-		"My job position is among the originals, upon which the rest are based.",
-	},
+	description      = S("herb collector (working_villages)"),
+	long_description = S("I look for all sorts of plants and collect them."),
+	trivia = trivia.get_trivia({}, {trivia.og,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		--"Equip my tool",
-		"Go to work",
-		"Search for herbs",
-		"Go to herbs",
-		"Collect (dig) herbs",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		--S("Equip my tool"),
+		S("Go to work"),
+		S("Search for herbs"),
+		S("Go to herbs"),
+		S("Collect (dig) herbs"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(nil, func.put_everything)

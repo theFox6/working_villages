@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 local co_command = working_villages.require("job_coroutines").commands
 
 local function find_building(p)
@@ -22,11 +23,23 @@ end
 local searching_range = {x = 10, y = 6, z = 10}
 
 working_villages.register_job("working_villages:job_builder", {
-	description      = "builder (working_villages)",
-	long_description = "I look for the nearest building marker with a started building site. "..
+	description      = S("builder (working_villages)"),
+	long_description = S("I look for the nearest building marker with a started building site. "..
 "There I'll help building up the building.\
 If I have the materials of course. Also I'll look for building markers within a 10 block radius. "..
-"And I ignore paused building sites.",
+"And I ignore paused building sites."),
+	trivia = trivia.get_trivia({}, {trivia.og, trivia.construction, trivia.griefer,}),
+	workflow = {
+		--S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for bugs"),
+		S("Go to bugs"),
+		-- TODO handle entity-type bugs
+		S("Collect (dig) bugs"),
+		S("Periodically look away thoughtfully"),
+	},
 	inventory_image  = "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()

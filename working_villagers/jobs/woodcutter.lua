@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local function find_tree(self)
 	return function(p)
@@ -64,25 +65,23 @@ end
 local searching_range = {x = 10, y = 10, z = 10, h = 5}
 
 working_villages.register_job("working_villages:job_woodcutter", {
-	description      = "woodcutter (working_villages)",
-	long_description = "I look for any Tree trunks around and chop them down.\
+	description      = S("woodcutter (working_villages)"),
+	long_description = S("I look for any Tree trunks around and chop them down.\
 I might also chop down a house. Don't get angry please I'm not the best at my job.\
-When I find a sappling I'll plant it on some soil near a bright place so a new tree can grow from it.",
-	inventory_image  = "default_paper.png^working_villages_woodcutter.png",
-	trivia = {
-		"My job position is among the originals, upon which the rest are based.",
-	},
+When I find a sappling I'll plant it on some soil near a bright place so a new tree can grow from it."),
+	trivia = trivia.get_trivia({}, { trivia.og, }),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for trees",
-		"Go to tree",
-		"Dig tree",
-		"Replant",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for trees"),
+		S("Go to tree"),
+		S("Dig tree"),
+		S("Replant"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_woodcutter.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

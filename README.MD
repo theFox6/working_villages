@@ -38,6 +38,13 @@ The plan is to make villagers build up their own villages.
 * starfleet
   * need some way for flyingships-like mods to notify villagers that all their location data just got teleported
 
+* expose job functions to create meta-jobs that switch between jobs, eg
+  * for a pioneer AI that finds a good spot, inits the area, and switches to mayor tasks)
+  * for a manager-type that can jump in to help team members
+* maybe make a recipe to convert other mod's building signs to ours and vice-versa
+* egg-registering integration
+
+
 ## implemented Features
 no crafting recipes yet (you will have to use creative)
 features:

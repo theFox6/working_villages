@@ -78,3 +78,59 @@ so e.g., composter, wafflemaker, etc., can juggle multiple appliances
 
 
 deduplicate strings -- job tasks have cross-cutting features and the associated strings should be in one place
+
+night shift
+
+
+
+
+## Planned Features
+* villages
+  * built up by the villagers
+* villagers
+  * trading and building up an economy
+  * working / doing their jobs
+* jobs
+  * miner, farmer, woodcutter and many more
+
+* realism
+  * villagers experience hunger, stamina and other effects
+  * villagers use tools, integrated with tool ranks
+  * drop inv, bones on death
+* more realism
+  * integration with getname
+  * mobs_redo-like offspring and lineage-tracking
+  * => randomly generated stories
+  * generation of histories & other heirlooms
+  * => randomly generated villages with high rank items with cool backstories
+* more jobs
+  * blacksmith: repairs tools
+  * craftsmen:  higher level crafts needed for builder, salesmen and military
+    * build on a single craftsman AI, but limited to certain recipes for simplying automation
+      => mineables go to the mason
+      => choppables go to the carpenter
+      this will help regulate how much of each material goes to each recipe,
+      which make it easier to build a pipeline from raw resources to an overpriced retail front
+      combined with toolranks and tool repair, we might be able to make products worth buying
+* clothing, armor, upgrades
+  * I think the mods add inv lists to the player for these, so likewise can be done to the villagers
+* starfleet
+  * need some way for flyingships-like mods to notify villagers that all their location data just got teleported
+
+* expose job functions to create meta-jobs that switch between jobs, eg
+  * for a pioneer AI that finds a good spot, inits the area, and switches to mayor tasks)
+  * for a manager-type that can jump in to help team members
+* maybe make a recipe to convert other mod's building signs to ours and vice-versa
+* egg-registering integration
+
+
+## implemented Features
+no crafting recipes yet (you will have to use creative)
+features:
+* building markers
+  * for building houses and saving the houses details
+  * save the position of the door and the bed
+  * some jobs will let the villagers return home at night
+  * at home the villagers will go to bed
+* spawn-eggs for villagers
+  * female and male

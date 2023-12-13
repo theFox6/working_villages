@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local bones = {
   -- more priority definitions
@@ -72,22 +73,18 @@ end
 
 -- copied from the plant/herb collector
 working_villages.register_job("working_villages:job_bonecollector", {
-	description      = "bone collector (working_villages)",
-	long_description = "I am the undertaker.",
-	trivia = {
-		"Me and the herb collector are kinda the same.",
-		"I've seen things...",
-		"I clean up after the military-industrial complex.",
-	},
+	description = S("bone collector (working_villages)"),
+	long_description = S("I am the undertaker."),
+	trivia = trivia.get_trivia({}, {trivia.herb_collector, trivia.waste_management, trivia.first_responder,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for bones",
-		"Go to bones",
-		"Collect (dig) bones",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for bones"),
+		S("Go to bones"),
+		S("Collect (dig) bones"),
+		S("Periodically look away thoughtfully"),
 	},
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)

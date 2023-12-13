@@ -1,6 +1,6 @@
-
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local farming_plants = {
@@ -113,23 +113,21 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_farmer", {
-	description			= "farmer (working_villages)",
-	long_description = "I look for farming plants to collect and replant them.",
-	inventory_image	= "default_paper.png^working_villages_farmer.png",
-	trivia = {
-		"My job position is among the originals, upon which the rest are based.",
-	},
+	description = S("farmer (working_villages)"),
+	long_description = S("I look for farming plants to collect and replant them."),
+	trivia = trivia.get_trivia({ }, {trivia.og, trivia.bread_basket,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		--"Equip my tool",
-		"Go to work",
-		"Search for plants",
-		"Go to plant",
-		"Dig plant",
-		"Replant",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		--S("Equip my tool"),
+		S("Go to work"),
+		S("Search for plants"),
+		S("Go to plant"),
+		S("Dig plant"),
+		S("Replant"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

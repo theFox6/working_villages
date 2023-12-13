@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local gems = {
   -- more priority definitions
@@ -80,23 +81,20 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_gem_miner", {
-	description      = "gem miner (working_villages)",
-	long_description = "I look for fancy rocks and collect them.",
-	inventory_image  = "default_paper.png^working_villages_builder.png",
-	trivia = {
-		"I'm a griefer",
-                "I am part of the terraforming crew",
-	},
+	description      = S("gem miner (working_villages)"),
+	long_description = S("I look for fancy rocks and collect them."),
+	trivia = trivia.get_trivia({}, {trivia.griefers,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for ore",
-		"Go to ore",
-		"Dig ore",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for ore"),
+		S("Go to ore"),
+		S("Dig ore"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)

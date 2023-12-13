@@ -2,6 +2,7 @@ local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
 local dyemixer_recipes = working_villages.require("jobs/dyemixer_recipes")
 local log = working_villages.require("log")
+local trivia = working_villages.require("jobs/trivia")
 
 local dyemixers = {
 	names = {
@@ -216,23 +217,23 @@ end
 
 
 working_villages.register_job("working_villages:job_dyemixer", {
-	description			= "dyemixer (working_villages)",
-	long_description = "I look for a dyemixer and start putting your wools into it.",
+	description = S("dyemixer (working_villages)"),
+	long_description = S("I look for a dyemixer and start putting your wools into it."),
 	inventory_image	= "default_paper.png^working_villages_herb_collector.png",
-	trivia = {
-		"My job position was the first to craft recipes.",
-		"My job position was the first to manage multi-step recipes.",
-		"My job position contributed to the complexity and general applicability of our appliance-handling logic.",
-	},
+	trivia = trivia.get_trivia({
+		S("My job position was the first to craft recipes."),
+		S("My job position was the first to manage multi-step recipes."),
+		S("My job position contributed to the complexity and general applicability of our appliance-handling logic."),
+	}, {trivia.appliances,}),
 	workflow = {
-		"Fashion season!",
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for dyemixers",
-		"Go to dyemixer",
-		"Handle dyemixer",
-		"Periodically look away thoughtfully",
+		S("Fashion season!"),
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for dyemixers"),
+		S("Go to dyemixer"),
+		S("Handle dyemixer"),
+		S("Periodically look away thoughtfully"),
 	},
 	jobfunc = function(self)
 		dyemixer_recipes.fashion_season(self)

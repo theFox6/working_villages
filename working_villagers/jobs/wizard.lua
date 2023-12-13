@@ -7,6 +7,7 @@
 
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local spellbooks = {
@@ -82,32 +83,28 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_wizard", {
-	description			= "wizard (working_villages)",
-	long_description = "I look for all sorts of spellbooks and start brute forcing the magick key.",
-	inventory_image  = "default_paper.png^working_villages_builder.png",
-	trivia = {
+	description = S("wizard (working_villages)"),
+	long_description = S("I look for all sorts of spellbooks and start brute forcing the magick key."),
+	trivia = trivia.get_trivia({
                 "My job position was the first to use tools.",
 		"My job position tests our fake player support.",
 		"My job position is something only this mod can do: handle a tedious task-type that other automation mods do not.",
 		"I teach kids about security models.",
 		"What's the magick word? ...seriously, I'm asking.",
-		"We've got big plans!",
-		"theFox6 is basically the Silver Fox of this universe.",
 		"`engrave` and `pencil_redo` are my inspiration.",
 		"My core will be combined with a derivative of the follower's core to create combat mages with the same mana, HP mechanisms and spells as the player",
-		"It's actually quite easy to read a node's meta... for me, at least.",
-		"I know something you don't know.",
-	},
+	}, {trivia.unfinished, trivia.meta,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for spellbooks",
-		"Go to spellbooks",
-		"Use/dig the spellbooks",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for spellbooks"),
+		S("Go to spellbooks"),
+		S("Use/dig the spellbooks"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_builder.png",
 	-- TODO on_create handler to setup mana & hp
 	jobfunc = function(self)
 		self:handle_night()

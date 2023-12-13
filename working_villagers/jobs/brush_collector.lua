@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local shrubs = {
   -- more priority definitions
@@ -76,22 +77,21 @@ local searching_range = {x = 10, y = 5, z = 10}
 
 -- copied from the plant/herb collector
 working_villages.register_job("working_villages:job_brushcollector", {
-	description      = "brush collector (working_villages)",
-	long_description = "I look for all sorts of brush and collect it.",
-	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
-	trivia = {
-		"Me and the herb collector are kinda the same.",
+	description      = S("brush collector (working_villages)"),
+	long_description = S("I look for all sorts of brush and collect it."),
+	trivia = trivia.get_trivia({
 		"I just pick up a few things that the herb collector and wood cutter leave behind.",
-	},
+	}, {trivia.herb_collector,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for brush",
-		"Go to brush",
-		"Collect (dig) brush",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for brush"),
+		S("Go to brush"),
+		S("Collect (dig) brush"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
 		self:handle_night()
 		-- TODO wield item ?

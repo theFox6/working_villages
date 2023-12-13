@@ -3,6 +3,7 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
 local log = working_villages.require("log")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local wafflehaus_nodes = {
@@ -91,31 +92,28 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_waffle", {
-	description			= "waffle (working_villages)",
-	long_description = "I look for waffle machines and start making mudkips and bekfast.",
-	inventory_image	= "default_paper.png^working_villages_farmer.png",
-	trivia = {
-		"I'm part of the break basket infrastructure.",
+	description = S("waffle (working_villages)"),
+	long_description = S("I look for waffle machines and start making mudkips and bekfast."),
+	trivia = trivia.get_trivia({
 		"My job is the first to punch-operate appliance nodes",
 		"Derivatives of my job core will press your buttons!",
-		"It's actually quite easy to read a node's meta... for me, at least.",
-		"I know something you don't know.",
-	},
+	}, {trivia.bread_basket, trivia.punchy, trivia.meta,})
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for waffle makers",
-		"Go to waffle maker",
-		"Wait if there are waffles cooking",
-		"Open the wafflemaker",
-		"Punch any waffles from the wafflemaker",
-		"Use batter in the wafflemaker",
-		"Close the wafflemaker",
-		"Wait until waffle maker opens",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for waffle makers"),
+		S("Go to waffle maker"),
+		S("Wait if there are waffles cooking"),
+		S("Open the wafflemaker"),
+		S("Punch any waffles from the wafflemaker"),
+		S("Use batter in the wafflemaker"),
+		S("Close the wafflemaker"),
+		S("Wait until waffle maker opens"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	jobfunc = function(self)
 		self:handle_night()
 		local stack  = self:get_wield_item_stack()

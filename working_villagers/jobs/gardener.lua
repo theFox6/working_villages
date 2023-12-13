@@ -1,10 +1,8 @@
 -- TODO he uses the tool till it breaks... it would be better if he takes it back to his chest
 
-
-
-
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local gardening_nodes = {
@@ -88,23 +86,20 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_gardener", {
-	description			= "gardener (working_villages)",
-	long_description = "I look for dirt nodes and hoe them for the farmer.",
-	inventory_image	= "default_paper.png^working_villages_farmer.png",
-	trivia = {
-		"I'm part of the pooper scooper crew!",
-                "I am part of the bread basket infrastructure",
-	},
+	description = S("gardener (working_villages)"),
+	long_description = S("I look for dirt nodes and hoe them for the farmer."),
+  	trivia = trivia.get_trivia({}, {trivia.waste_management, trivia.bread_basket, trivia.griefers, trivia.construction, }),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Equip my tool",
-		"Go to work",
-		"Search for dirt near water",
-		"Go to dirt near water",
-		"Use tool on dirt near water",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for dirt near water"),
+		S("Go to dirt near water"),
+		S("Use tool on dirt near water"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	jobfunc = function(self)
 		self:handle_night()
 		local stack  = self:get_wield_item_stack()

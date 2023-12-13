@@ -1,5 +1,6 @@
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 local claycrafters = {
 	names = {
@@ -139,22 +140,19 @@ local function put_unlocked(_,stack)
 end
 
 working_villages.register_job("working_villages:job_claycrafter", {
-	description			= "claycrafter (working_villages)",
-	long_description = "I look for a clay crafter and start sieving dirt.",
-	inventory_image	= "default_paper.png^working_villages_builder.png",
-	trivia = {
-		"I'm part of the pooper scooper crew!",
-		"I am part of the bread basket infrastructure",
-	},
+	description			= S("claycrafter (working_villages)"),
+	long_description = S("I look for a clay crafter and start sieving dirt."),
+	trivia = trivia.get_trivia({}, {trivia.waste_management, trivia.bread_basket, trivia.appliances,}),
 	workflow = {
-		"Wake up",
-		"Handle my chest",
-		"Go to work",
-		"Search for claycrafters",
-		"Go to claycrafter",
-		"Handle claycrafter",
-		"Periodically look away thoughtfully",
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Go to work"),
+		S("Search for claycrafters"),
+		S("Go to claycrafter"),
+		S("Handle claycrafter"),
+		S("Periodically look away thoughtfully"),
 	},
+	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(
