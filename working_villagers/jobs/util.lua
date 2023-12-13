@@ -508,4 +508,19 @@ function func.is_beehive(pos)
   return false
 end
 
+function func.is_fermenting_barrel(pos)
+	local node = minetest.get_node(pos)
+  if (node==nil) then
+    return false;
+  end
+  if node.name=="wine:wine_barrel" then
+    return true;
+  end
+  --local is_chest = minetest.get_item_group(node.name, "barrel");
+  --if (is_chest~=0) then
+  --  return true;
+  --end
+  return false;
+end
+
 return func

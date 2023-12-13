@@ -811,10 +811,12 @@ function working_villages.villager:handle_claycrafter(furnace_pos, take_func, pu
 end
 
 function working_villages.villager:handle_craft_table(craft_table_pos, take_func, put_func, data)
+	-- TODO if self:player_name() is nil then craft_table crashes
 	assert(craft_table_pos     ~= nil)
 	assert(take_func        ~= nil)
 	assert(put_func         ~= nil)
-	assert(data             == nil)
+	assert(data             ~= nil)
+	assert(data.recipes     ~= nil)
 	assert(func.is_craft_table ~= nil)
 	local my_data = {
 		appliance_id  = 'my_craft_table',
@@ -822,6 +824,7 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 		is_appliance  = func.is_craft_table,
 		operations    = {},
 	}
+	local recipes = data.recipes
 	local ntarget = #recipes
 	local index = 0
 	for iteration=ntarget,1,-1 do
@@ -1148,3 +1151,116 @@ function working_villages.villager:handle_beehive(furnace_pos, take_func, put_fu
 	}
 	self:handle_appliance(my_data)
 end
+
+function working_villages.villager:handle_fermenting_barrel(craft_table_pos, take_func, put_func, take_fuel, put_fuel, data)
+	assert(craft_table_pos     ~= nil)
+	assert(take_func        ~= nil)
+	assert(put_func         ~= nil)
+	assert(data             ~= nil)
+	assert(data.recipes     ~= nil)
+	assert(func.is_craft_table ~= nil)
+	local my_data = {
+		appliance_id  = 'my_fermenting_barrel',
+		appliance_pos = craft_table_pos,
+		is_appliance  = func.is_fermenting_barrel,
+		operations    = {},
+	}
+	local recipes = data.recipes
+	local ntarget = #recipes
+	local index   = 0
+
+	local meta   = minetest.get_meta(craft_table_pos) --; if not meta then return end
+	local water  = meta:get_int("water") or 0
+	local status = meta:get_float("status") or 0
+
+	for iteration=ntarget,1,-1 do
+
+		if water < 100 then
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "src_b",
+			is_put    = true,
+			put_func  = put_fuel,
+			data      = {
+				iteration    = iteration,
+			},
+		}
+		end
+
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "src_b",
+			is_take   = true,
+			take_func = take_fuel,
+		}
+
+		if status >= 100 then
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "src",
+			is_take   = true,
+			take_func = take_func,
+		}
+		end
+
+		local recipe = recipes[iteration]
+		local nx     = #recipe
+		local xy     = 0
+		for x=1,nx,1 do -- 2 X 2 = 4
+			local row = recipe[x]
+			local ny  = #row
+			--for y=1,3,1 do
+			for y=1,ny,1 do
+				--local xy = 2*(x-1)+y
+				xy    = xy    + 1
+				index = index + 1
+				my_data.operations[index]   = {
+					list      = 'src',
+					is_put    = true,
+					put_func  = put_func,
+					data      = {
+						iteration    = iteration,
+						recipe_x     = x,
+						recipe_y     = y,
+						target_index = xy,
+						target_count = 1,
+					},
+				}
+			end
+		end
+
+
+		--index = index + 1
+		--my_data.operations[index]   = {
+		--	list      = "src",
+		--	is_put    = true,
+		--	put_func  = put_func,
+		--	data      = {
+		--		iteration    = iteration,
+		--		--recipe_x     = x,
+		--		--recipe_y     = y,
+		--		--target_index = xy,
+		--	},
+		--}
+	
+		--index = index + 1
+		--my_data.operations[index]   = {
+		--	noop = 300,
+		--}
+
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "dst",
+			is_take   = true,
+			take_func = take_func,
+		}
+
+	end
+	for iteration=1,#my_data.operations,1 do
+		assert(my_data.operations[iteration] ~= nil)
+	end
+	self:handle_appliance(my_data)
+end
+
+
+

@@ -1,8 +1,69 @@
 -- TODO under development
+-- TODO ok this is a bit more complex than I remember.
+-- looks like this is a cross between the craftsman and the baker
+-- I think handle_appliance() can handle this without modification
+-- src, src_b, dst
 
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
 local trivia = working_villages.require("jobs/trivia")
+
+local recipes = {
+	[1] = { {"default:apple",}, },
+--	[1] = {
+--		{"wine:agave_syrup", "wine:blue_agave",},
+--		{"vessels:drinking_glass"},
+--	},
+--	[2] = { {"wine:blue_agave",}, },
+--	[3] = { {"default:apple",}, },
+--	[4] = { {"default:papyrus",}, },
+--	[5] = { {"xdecor:honey",}, },
+--	[6] = { {"church_candles:honey",}, }, -- TODO only add this if `church_candles`+`iadecor` are present
+--	[7] = { {"mobs:honey",}, },
+--	[8] = { {"mobs:glass_milk", "farming:wheat"}, },
+--	[9] = { {"farming:wheat",}, },
+--	[10] = { {"farming:grapes",}, }, -- TODO patch `wine` to distingish between white wine, red wine and blush processes, as well as more types of fortified wines
+--	-- TODO patch farming to include grape varietals, such as reisling in cold climates
+--	-- TODO okay this needs to be in a WSET/sommelier mod
+--	-- geez, imagine a full-blown food safety mod
+--	[11] = { {"farming:barley",}, },
+--	[12] = { {"farming:rice",}, },
+--	[13] = { {"farming:corn",}, },
+--	[14] = { {"farming:baked_potato",}, },
+--	[15] = { {"wine:glass_rum", "farming:coffee_beans"}, },
+--	[16] = { {"wine:glass_wine", "farming:sugar"}, },
+--	[17] = {
+--		{"default:apple", "farming:sugar",},
+--		{"vessels:drinking_glass"},
+--	},
+--	[18] = {
+--		{"farming:carrot", "farming:sugar",},
+--		{"vessels:drinking_glass"},
+--	},
+--	--[19] = { {"farming:blackberry 2", "farming:sugar", "vessels:drinking_glass"}, },
+--	[19] = {
+--		{"farming:blackberry", "farming:blackberry",},
+--		{"farming:sugar", "vessels:drinking_glass"},
+--	},
+--	[20] = { {"ethereal_orange",}, },
+--	[21] = {
+--		{"wine:glass_cointreau", "wine:glass_tequila",},
+--		{"ethereal:lemon"},
+--	},
+--	[22] = { {"mcl_core:apple",}, },
+--	[23] = { {"mcl_core:reeds",}, },
+--	[24] = { {"mcl_farming:wheat_item",}, },
+--	[25] = { {"mcl_farming:potato_item_baked",}, },
+--	[26] = {
+--		{"mcl_core:apple", "mcl_core:sugar",},
+--		{"vessels:drinking_glass"},
+--	},
+--	[27] = {
+--		{"mcl_farming:carrot_item", "mcl_core:sugar",},
+--		{"vessels:drinking_glass"},
+--	},
+}
+
 
 local fermenting_barrels = {
 	names = {
@@ -13,105 +74,41 @@ local fermenting_barrels = {
 local fermentables = {
 	-- filled buckets
 	bucket_names = {
-		"bucket:bucket_water" = 99,
-		"bucket:bucket_river_water" = 99,
-		"wooden_bucket:bucket_wood_water" = 99,
-		"wooden_bucket:bucket_wood_river_water" = 99,
-		"bucket_wooden:bucket_water" = 99,
-		"bucket_wooden:bucket_river_water" = 99,
-		"mcl_buckets:bucket_water" = 99,
-		"farming:glass_water" = 99,
-		"default:water_source" = 99,
-		"default:river_water_source" = 99,
-		"mcl_core:water_source" = 99,
-		"bucket:bucket_water_uni_gold" = 99,
-		"bucket:bucket_water_uni_mese" = 99,
-		"bucket:bucket_water_uni_wood" = 99,
-		"bucket:bucket_water_uni_steel" = 99,
-		"bucket:bucket_water_uni_stone" = 99,
-		"bucket:bucket_water_uni_bronze" = 99,
-		"bucket:bucket_water_uni_diamond" = 99,
-		"bucket:bucket_water_river_gold" = 99,
-		"bucket:bucket_water_river_mese" = 99,
-		"bucket:bucket_water_river_wood" = 99,
-		"bucket:bucket_water_river_steel" = 99,
-		"bucket:bucket_water_river_stone" = 99,
-		"bucket:bucket_water_river_bronze" = 99,
-		"bucket:bucket_water_river_diamond" = 99,
-		"mesecraft_bucket:bucket_water" = 99,
-		"mesecraft_bucket:bucket_river_water" = 99,
+		["bucket:bucket_water"] = 99,
+		["bucket:bucket_river_water"] = 99,
+		["wooden_bucket:bucket_wood_water"] = 99,
+		["wooden_bucket:bucket_wood_river_water"] = 99,
+		["bucket_wooden:bucket_water"] = 99,
+		["bucket_wooden:bucket_river_water"] = 99,
+		["mcl_buckets:bucket_water"] = 99,
+		["farming:glass_water"] = 99,
+		["default:water_source"] = 99,
+		["default:river_water_source"] = 99,
+		["mcl_core:water_source"] = 99,
+		["bucket:bucket_water_uni_gold"] = 99,
+		["bucket:bucket_water_uni_mese"] = 99,
+		["bucket:bucket_water_uni_wood"] = 99,
+		["bucket:bucket_water_uni_steel"] = 99,
+		["bucket:bucket_water_uni_stone"] = 99,
+		["bucket:bucket_water_uni_bronze"] = 99,
+		["bucket:bucket_water_uni_diamond"] = 99,
+		["bucket:bucket_water_river_gold"] = 99,
+		["bucket:bucket_water_river_mese"] = 99,
+		["bucket:bucket_water_river_wood"] = 99,
+		["bucket:bucket_water_river_steel"] = 99,
+		["bucket:bucket_water_river_stone"] = 99,
+		["bucket:bucket_water_river_bronze"] = 99,
+		["bucket:bucket_water_river_diamond"] = 99,
+		["mesecraft_bucket:bucket_water"] = 99,
+		["mesecraft_bucket:bucket_river_water"] = 99,
 	},
 	bucket_groups = {
 		--["bucket"]=99,
 	},
 	-- fermentables
-  -- more priority definitions
-	names = {
-		["farming:flour"] = 99,
-		["default:cobble"] = 99,
-		["default:mossycobble"] = 99,
-		["default:desert_cobble"] = 99,
-		["default:clay_lump"] = 99,
-		["default:iron_lump"] = 99,
-		["default:copper_lump"] = 99,
-		["default:tin_lump"] = 99,
-		["default:gold_lump"] = 99,
-		["vessels:glass_fragments"] = 99,
-		["default:obsidian_shard"] = 99,
-	},
-  -- less priority definitions
-	groups = {
-		--["food"]=99,
-	},
 }
-function fermentables.get_fermentable(item_name)
-	for key, value in pairs(fermentables.bucket_names) do
-		if item_name==key then
-			return value
-		end
-	end
-  -- check more priority definitions
-	for key, value in pairs(fermentables.names) do
-		if item_name==key then
-			return value
-		end
-	end
-	for key, value in pairs(fermentables.bucket_groups) do
-		if minetest.get_item_group(item_name, key) > 0 then
-			return value;
-		end
-	end
-  -- check less priority definitions
-	for key, value in pairs(fermentables.groups) do
-		if minetest.get_item_group(item_name, key) > 0 then
-			return value;
-		end
-	end
-	return nil
-end
-function fermentables.is_fermentable(item_name)
-  local data = fermentables.get_fermentable(item_name);
-  return data ~= nil
-end
-function fermentables.get_cookable(item_name)
-  -- check more priority definitions
-	for key, value in pairs(fermentables.names) do
-		if item_name==key then
-			return value
-		end
-	end
-  -- check less priority definitions
-	for key, value in pairs(fermentables.groups) do
-		if minetest.get_item_group(item_name, key) > 0 then
-			return value;
-		end
-	end
-	return nil
-end
-function fermentables.is_cookable(item_name)
-  local data = fermentables.get_cookable(item_name);
-  return data ~= nil
-end
+
+
 function fermentables.get_bucket(item_name)
   -- check more priority definitions
 	for key, value in pairs(fermentables.bucket_names) do
@@ -158,33 +155,145 @@ local function find_fermenting_barrel_node(pos)
 	return data ~= nil
 end
 
-local searching_range = {x = 10, y = 3, z = 10}
 
-local function put_func(_,stack)
-	return not fermentables.is_fermentable(stack:get_name())
+
+
+
+
+
+-- TODO dedup
+function recipe_requires(recipe, item_name, target_x, target_y)
+	if type(recipe) ~= "table" then
+		assert(type(recipe) == "string")
+		if recipe == item_name then return 1 end
+		return 0
+	end
+
+	if target_x ~= nil
+	or target_y ~= nil then
+		assert(target_x ~= nil)
+		assert(target_y ~= nil)
+		return recipe[target_y][target_x] == item_name
+	end
+	assert(target_x == nil)
+	assert(target_y == nil)
+
+	local count = 0
+	for _,dep in pairs(recipe) do
+		count = count + recipe_requires(dep, item_name, nil, nil)
+	end
+	return count
 end
-local function take_func(villager,stack)
+
+-- called by take_func for all iterations
+function fermentables.get_craftingsupplies(self, item_name, iteration, target_x, target_y)
+	assert(item_name ~= nil)
+	assert(iteration ~= nil)
+	local recipe = recipes[iteration]
+	assert(recipe ~= nil)
+	local count = recipe_requires(recipe, item_name, target_x, target_y)
+	if count == 0 then return nil end
+	return count
+end
+-- called by put_func for all iterations
+function fermentables.is_craftingsupplies(self, item_name, iteration, target_x, target_y)
+	assert(item_name ~= nil)
+	assert(iteration ~= nil)
+	-- TODO 
+  local data = fermentables.get_craftingsupplies(self, item_name, iteration, target_x, target_y);
+  return data ~= nil
+end
+
+local function put_func(villager,stack,data)
+	assert(villager  ~= nil)
+	assert(stack     ~= nil)
+
+	local target_x
+	if data == nil then target_x = nil else target_x = data.target_x end
+	local target_y
+	if data == nil then target_y = nil else target_y = data.target_y end
+
+	if data ~= nil and data.iteration ~= nil then
+		return not fermentables.is_craftingsupplies(villager,stack:get_name(), data.iteration, target_x, target_y)
+	end
+
+	local ntarget = #recipes
+	for iteration=1,ntarget,1 do
+		if fermentables.is_craftingsupplies(villager,stack:get_name(), iteration, target_x, target_y) then
+			return false
+		end
+	end
+	return true;
+end
+local function take_func(villager,stack,data)
+	assert(villager  ~= nil)
+	assert(stack     ~= nil)
+	assert(data      == nil)
 	local item_name = stack:get_name()
-	if not fermentables.is_fermentable(item_name) then return false end
-	local inv = villager:get_inventory()
-	local itemstack = ItemStack(item_name)
-	itemstack:set_count(fermentables.get_fermentable(item_name))
-	return (not inv:contains_item("main", itemstack))
+	local ntarget = #recipes
+	for iteration=1,ntarget,1 do
+		if fermentables.is_craftingsupplies(villager,item_name, iteration, nil, nil) then
+			local inv = villager:get_inventory()
+			local itemstack = ItemStack(item_name)
+			local count = fermentables.get_craftingsupplies(villager,item_name, iteration, nil, nil)
+			assert(count ~= nil)
+			assert(count ~= 0)
+			-- TODO allow to specify number of copies to make
+			itemstack:set_count(fermentables.get_craftingsupplies(villager,item_name, iteration, nil, nil))
+			if (not inv:contains_item("main", itemstack)) then
+				return true
+			end
+		end
+	end
+	return false
 end
+
+local function put_craftingsupplies(villager,stack,data)
+	assert(villager  ~= nil)
+	assert(stack     ~= nil)
+
+	local target_x
+	if data == nil then target_x = nil else target_x = data.target_x end
+	local target_y
+	if data == nil then target_y = nil else target_y = data.target_y end
+
+	-- TODO allow to specify number to put in each slot
+	
+	if data ~= nil and data.iteration ~= nil then
+		return fermentables.is_craftingsupplies(villager,stack:get_name(), data.iteration, target_x, target_y)
+	end
+
+	local ntarget = #recipes
+	for iteration=1,ntarget,1 do
+		if fermentables.is_craftingsupplies(villager,stack:get_name(), iteration, target_x, target_y) then
+			return true
+		end
+	end
+	return false
+end
+
+
+local searching_range = {x = 10, y = 3, z = 10}
 
 local function put_bucket(_,stack)
 	return fermentables.is_bucket(stack:get_name())
 end
 
-local function put_cookable(_,stack)
-	return fermentables.is_cookable(stack:get_name())
+local function take_bucket(villager,stack,data)
+	assert(villager  ~= nil)
+	assert(stack     ~= nil)
+	assert(data      == nil)
+	local item_name = stack:get_name()
+	--return item_name == "bucket:bucket_empty"
+	return not fermentables.is_bucket(stack:get_name())
 end
+
 
 working_villages.register_job("working_villages:job_brewer", {
 	description = S("brewer (working_villages)"),
 	long_description = S("I look for a barrel and start preserving the farming surplus."),
 	-- TODO
-	trivia = trivia.get_trivia({}, {trivia.herb_collector, trivia.waste_management, trivia.first_responder,trivia.appliances,}),
+	trivia = trivia.get_trivia({}, {trivia.bread_basket, trivia.appliances, trivia.meta,}),
 	-- TODO
 	workflow = {
 		S("Wake up"),
@@ -234,8 +343,10 @@ working_villages.register_job("working_villages:job_brewer", {
 						self:handle_fermenting_barrel(
 					        	target,
 						    	func.take_everything, -- take everything
-						 	put_cookable, -- put what we need to fermenting_barrel
-							put_bucket
+						 	put_craftingsupplies, -- put what we need to fermenting_barrel
+							take_bucket,
+							put_bucket,
+							{ recipes = recipes, }
 						)
 						--self.job_data.manipulated_chest   = false;
 						--self.job_data.manipulated_fermenting_barrel = false;
@@ -257,114 +368,4 @@ working_villages.fermentables = fermentables
 
 
 
--- TODO ok this is a bit more complex than I remember.
--- looks like this is a cross between the craftsman and the baker
--- I think handle_appliance() can handle this without modification
--- src, src_b, dst
 
----- wine mod adds tequila by default
---wine:add_item({
---	{
---		{"wine:agave_syrup", "wine:blue_agave", "vessels:drinking_glass"},
---		"wine:glass_sparkling_agave_juice"
---	},
---	{"wine:blue_agave", "wine:glass_tequila"}
---})
---
----- default game
---if minetest.get_modpath("default") then
---
---	wine:add_item({
---		{"default:apple", "wine:glass_cider"},
---		{"default:papyrus", "wine:glass_rum"}
---	})
---end
---
----- xdecor
---if minetest.get_modpath("xdecor") then
---
---	wine:add_item({ {"xdecor:honey", "wine:glass_mead"} })
---end
---
----- mobs_animal
---if minetest.get_modpath("mobs_animal")
---or minetest.get_modpath("xanadu") then
---
---	wine:add_item({
---		{"mobs:honey", "wine:glass_mead"},
---		{{"mobs:glass_milk", "farming:wheat"}, "wine:glass_kefir"}
---	})
---end
---
----- farming
---if minetest.get_modpath("farming") then
---
---	wine:add_item({ {"farming:wheat", "wine:glass_wheat_beer"} })
---
---	if farming.mod and (farming.mod == "redo" or farming.mod == "undo") then
---
---		-- mint julep recipe
---		minetest.register_craft({
---			output = "wine:glass_mint",
---			recipe = {
---				{"farming:mint_leaf", "farming:mint_leaf", "farming:mint_leaf"},
---				{"wine:glass_bourbon", "farming:sugar", ""}
---			}
---		})
---
---		wine:add_item({
---			{"farming:grapes", "wine:glass_wine"},
---			{"farming:barley", "wine:glass_beer"},
---			{"farming:rice", "wine:glass_sake"},
---			{"farming:corn", "wine:glass_bourbon"},
---			{"farming:baked_potato", "wine:glass_vodka"},
---			{{"wine:glass_rum", "farming:coffee_beans"}, "wine:glass_coffee_liquor"},
---			{{"wine:glass_wine", "farming:sugar"}, "wine:glass_champagne"},
---			{
---				{"default:apple", "farming:sugar", "vessels:drinking_glass"},
---				"wine:glass_sparkling_apple_juice"
---			},
---			{
---				{"farming:carrot", "farming:sugar", "vessels:drinking_glass"},
---				"wine:glass_sparkling_carrot_juice"
---			},
---			{
---				{"farming:blackberry 2", "farming:sugar", "vessels:drinking_glass"},
---				"wine:glass_sparkling_blackberry_juice"
---			}
---		})
---	end
---end
---
----- ethereal
---if minetest.get_modpath("ethereal") then
---
---	wine:add_item({ {"ethereal:orange", "wine:glass_cointreau"} })
---
---	-- margarita recipe
---	minetest.register_craft({
---		output = "wine:glass_margarita 2",
---		recipe = {
---			{"wine:glass_cointreau", "wine:glass_tequila", "ethereal:lemon"}
---		}
---	})
---end
---
----- mineclone2
---if minetest.get_modpath("mcl_core") then
---
---	wine:add_item({
---		{"mcl_core:apple", "wine:glass_cider"},
---		{"mcl_core:reeds", "wine:glass_rum"},
---		{"mcl_farming:wheat_item", "wine:glass_wheat_beer"},
---		{"mcl_farming:potato_item_baked", "wine:glass_vodka"},
---		{
---			{"mcl_core:apple", "mcl_core:sugar", "vessels:drinking_glass"},
---			"wine:glass_sparkling_apple_juice"
---		},
---		{
---			{"mcl_farming:carrot_item", "mcl_core:sugar", "vessels:drinking_glass"},
---			"wine:glass_sparkling_carrot_juice"
---		}
---	})
---end

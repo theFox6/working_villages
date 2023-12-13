@@ -223,7 +223,8 @@ working_villages.register_job("working_villages:job_craftsman", {
 						self:handle_craft_table(
 						        target,
 							func.take_everything, -- take everything
-							put_craftingsupplies
+							put_craftingsupplies,
+							{ recipes = recipes, }
 						)
 					end
 				end
