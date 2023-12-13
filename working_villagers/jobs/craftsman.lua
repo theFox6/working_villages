@@ -1,3 +1,5 @@
+-- TODO sometimes the recipe stacks get messed up and he makes the wrong thing
+
 --CRAFT_TABLE_TYPE = "craft_table"
 CRAFT_TABLE_TYPE = "crafting_bench"
 
