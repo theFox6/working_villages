@@ -103,6 +103,9 @@ end
 if minetest.get_modpath("church_candles") then
 	working_villages.require("jobs/beekeeper")
 end
+if minetest.get_modpath("hopper") then
+	working_villages.require("jobs/trasher")
+end
 -- TODO WIP
 --if minetest.get_modpath("wine") then
 --	working_villages.require("jobs/brewer")

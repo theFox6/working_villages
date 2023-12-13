@@ -525,3 +525,24 @@ minetest.register_abm({
     catch_up = false,
     action = spawner("working_villages:job_beekeeper"),
 })
+
+if minetest.get_modpath("hopper") then
+working_villages.require("jobs/trasher")
+
+local hopper_names = {}
+for name,_ in pairs(working_villages.hopper_nodes.names) do
+    hopper_names[#hopper_names + 1] = name
+end
+for name,_ in pairs(working_villages.hopper_nodes.groups) do
+    hopper_names[#hopper_names + 1] = "group:"..name
+end
+
+minetest.register_abm({
+    label = "Spawn trasher",
+    nodenames = hopper_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_trasher"),
+})

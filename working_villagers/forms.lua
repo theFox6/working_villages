@@ -214,14 +214,16 @@ forms.register_page("working_villages:job_change",{
 		if villager.nametag and villager.nametag~="" then
 			villager_name = "label[0,0;"..villager.nametag.."]"
 		end
-		return "size[8,6]"
+		--return "size[8,6]"
+		return "size[8,10]"
 			.. default.gui_bg
 			.. default.gui_bg_img
 			.. default.gui_slots
 			.. villager_name
 			.. "label[".. cp.x - 0.25 ..",".. cp.y ..";current job]"
 			.. "list[detached:".. villager.inventory_name ..";job;".. cp.x ..",".. cp.y + 0.5 ..";1,1;]"
-			.. "list[detached:working_villages:job_inv;main;0,2;8,4;]"
+			--.. "list[detached:working_villages:job_inv;main;0,2;8,4;]"
+			.. "list[detached:working_villages:job_inv;main;0,2;8,8;]"
 			.. "listring[]"
 			.. "button[6,".. cp.y + 0.5 ..";1,1;back;back]"
 	end,

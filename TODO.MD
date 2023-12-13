@@ -77,21 +77,12 @@ appliance-handling bots' find_node() methods should find all nodes and distingui
 so e.g., composter, wafflemaker, etc., can juggle multiple appliances
 
 
-deduplicate strings -- job tasks have cross-cutting features and the associated strings should be in one place
 
 night shift
 
 
 
 
-## Planned Features
-* villages
-  * built up by the villagers
-* villagers
-  * trading and building up an economy
-  * working / doing their jobs
-* jobs
-  * miner, farmer, woodcutter and many more
 
 * realism
   * villagers experience hunger, stamina and other effects
@@ -132,5 +123,8 @@ features:
   * save the position of the door and the bed
   * some jobs will let the villagers return home at night
   * at home the villagers will go to bed
-* spawn-eggs for villagers
-  * female and male
+
+
+
+catching-throwing game
+chooglee

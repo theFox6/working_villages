@@ -817,7 +817,7 @@ working_villages.job_inv = minetest.create_detached_inventory("working_villages:
     end
   end,
 })
-working_villages.job_inv:set_size("main", 32)
+working_villages.job_inv:set_size("main", 64)
 
 -- working_villages.register_job registers a definition of a new job.
 function working_villages.register_job(job_name, def)
@@ -831,6 +831,8 @@ function working_villages.register_job(job_name, def)
     groups          = {not_in_creative_inventory = 1}
   })
 
+  --local new_size = math.max(working_villages.job_inv:get_size("main"), #working_villages.registered_jobs)
+  --working_villages.job_inv:set_size("main", new_size)
   --working_villages.job_inv:set_size("main", #working_villages.registered_jobs)
   working_villages.job_inv:add_item("main", ItemStack(name))
 end
@@ -977,6 +979,7 @@ function working_villages.register_villager(product_name, def)
     inventory:set_size("main", 16)
     inventory:set_size("job",  1)
     inventory:set_size("wield_item", 1)
+    -- TODO armor, clothes, upgrades
 
     return inventory
   end

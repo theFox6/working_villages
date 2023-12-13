@@ -64,12 +64,19 @@ trivia.unfinished = {
 	S("It's on the back burner, Mr. Ramsey."),
 	S("One time I masqueraded this guy's gcc binaries with a wrapper that re-#define'd `return` to intermittently segfault."),
 	S("Owner and management not responsible for injury or death resulting from the use of this equipment."),
+	S("The code base is undergoing a rapid development cycle."),
 }
 
 trivia.default = {
 	S("This mod adds Villagers performing work."),
 	S("The plan is to make villagers build up their own villages."),
 	S("We're part of an experiment to procedurally generate organic maps for FPS platforms."),
+	S("Your contribution is appreciated."),
+	S("You can report bugs to `https://github.com/theFox6/working_villages/issues`."),
+	S("You can request features at `https://github.com/theFox6/working_villages/issues`."),
+	S("Thanks for taking the time to test this mod."),
+	S("Combinatorial explosion makes a lot of possible code paths, so feel free to enable/disable a bunch of mods."),
+	S("Your contribution is appreciated: `https://github.com/theFox6/working_villages/pulls`."),
 }
 
 -- for OG AIs
@@ -124,7 +131,7 @@ trivia.insert_all = function(dst, src)
 	assert(type(dst) == "table")
 	assert(type(src) == "table")
 	for _, elem in ipairs(src) do
-		table.insert(dst, src)
+		table.insert(dst, elem)
 	end
 end
 
@@ -139,10 +146,24 @@ end
 
 trivia.get_trivia = function(factoids, groups)
 	assert(type(factoids) == "table")
+
+	--for _,test in ipairs(factoids) do
+	--	print('test A: '..test)
+	--end
+
 	trivia.insert_all(factoids, trivia.default)
+
+	--for _,test in ipairs(factoids) do
+	--	print('test B: '..test)
+	--end
 
 	if type(groups) == "string" then
 		table.insert(factoids, groups)
+
+		--for _,test in ipairs(factoids) do
+		--	print('test C: '..test)
+		--end
+
 		return factoids -- inline support
 	end
 
@@ -151,6 +172,11 @@ trivia.get_trivia = function(factoids, groups)
 	for _, group in ipairs(groups) do
 		trivia.insert_all(factoids, group)
 	end
+
+	--for _,test in ipairs(factoids) do
+	--	print('test D: '..test)
+	--end
+
 	return factoids -- inline support
 end
 
