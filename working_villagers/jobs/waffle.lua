@@ -97,7 +97,7 @@ working_villages.register_job("working_villages:job_waffle", {
 	trivia = trivia.get_trivia({
 		"My job is the first to punch-operate appliance nodes",
 		"Derivatives of my job core will press your buttons!",
-	}, {trivia.bread_basket, trivia.punchy, trivia.meta,})
+	}, {trivia.bread_basket, trivia.punchy, trivia.meta,}),
 	workflow = {
 		S("Wake up"),
 		S("Handle my chest"),

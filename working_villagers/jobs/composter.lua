@@ -84,7 +84,7 @@ working_villages.register_job("working_villages:job_composter", {
 	description			= S("composter (working_villages)"),
 	long_description = S("I look for composters and start making soil for the farmer"),
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
-	trivia = trivia.get_trivia({}, {trivia.waste_management, trivia.bread_basket, trivia.appliances, trivia.punchy,},
+	trivia = trivia.get_trivia({}, {trivia.waste_management, trivia.bread_basket, trivia.appliances, trivia.punchy,}),
 	workflow = {
 		S("Wake up"),
 		S("Handle my chest"),

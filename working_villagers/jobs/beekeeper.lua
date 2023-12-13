@@ -86,7 +86,7 @@ working_villages.register_job("working_villages:job_beekeeper", {
 	long_description = S("I look for a beehive and start taking that sweet, sweet honey."),
 	trivia = trivia.get_trivia({
 		S("I'm the reason the herb collector has a no-raze (responsible foraging) option."),
-	}, {trivia.break_basket,trivia.appliances,})
+	}, {trivia.break_basket,trivia.appliances,}),
 	workflow = {
 		S("Wake up"),
 		S("Handle my chest"),

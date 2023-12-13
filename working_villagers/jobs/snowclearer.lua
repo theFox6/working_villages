@@ -41,7 +41,7 @@ working_villages.register_job("working_villages:job_snowclearer", {
 My job is for testing not for harvesting.\
 I must confess this job seems useless.\
 I'm doing anyway, clearing the snow away."),
-	trivia = trivia.get_trivia({}, {trivia.og, trivia.griefers,}),{
+	trivia = trivia.get_trivia({}, {trivia.og, trivia.griefers,}),
 	workflow = {
 		S("Wake up"),
 		S("Handle my chest"),
