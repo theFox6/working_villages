@@ -2,58 +2,25 @@ local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
 local trivia = working_villages.require("jobs/trivia")
 
-local furnaces = {
+local vendorkiosks = {
 	names = {
 		["fancy_vend:player_vendor"]={},
 	},
 }
 
--- if vendor is configured
---   if we don't own the vendor
---     if it sells what we need
---       do buy
---   if we own the vendor
---       re-configure it to buy what we need (if necessary)
--- if vendor is unconfigured
---   if we own the vendor
---     configure it to buy what we need
---     => player can deposit eg gold to get eg food
---   if we don't own the vendor
---     configure it to sell what we need
---     => villager can deposit eg food to get eg gold
 
-local bakables = {
-	fuel_names = {
+-- TODO
+local tradables = {
+	buyable_names = {
 		["default:coalblock"] = 99,
 		["default:coal_lump"] = 99,
 		["bucket:bucket_lava"] = 99,
 		["default:lava_source"] = 99,
-		-- burn all your stuff
-		--["default:jungletree"] = 99,
-		--["default:acacia_tree"] = 99,
-		--["default:tree"] = 99,
-		--["default:pine_tree"] = 99,
-		--["default:aspen_tree"] = 99,
-		--["default:cactus"] = 99,
-		--["default:acacia_bush_stem"] = 99,
-		--["default:bush_stem"] = 99,
-		--["default:pine_bush_stem"] = 99,
-		--["farming:straw"] = 99,
-		--["default:dry_shrub"] = 99,
-		--["default:dry_grass"] = 99,
-		--["default:marram_grass"] = 99,
-		--["default:grass"] = 99,
-		--["default:fern"] = 99,
 	},
-	fuel_groups = {
-		--["fuel"]=99,
-		--["tree"]=99,
-		--["wood"]=99,
-		--["leaves"]=99,
+	buyable_groups = {
 	},
   -- more priority definitions
-	names = {
-		-- TODO farming mod support => separate jobs for baker and smelter
+	sellable_names = {
 		["farming:flour"] = 99,
 		["default:cobble"] = 99,
 		["default:mossycobble"] = 99,
@@ -67,76 +34,76 @@ local bakables = {
 		["default:obsidian_shard"] = 99,
 	},
   -- less priority definitions
-	groups = {
+	sellable_groups = {
 		["ore"]=99,
 		["sand"]=99,
 	},
 }
-function bakables.get_bakable(item_name)
-	for key, value in pairs(bakables.fuel_names) do
+function tradables.get_tradable(item_name)
+	for key, value in pairs(tradables.buyable_names) do
 		if item_name==key then
 			return value
 		end
 	end
   -- check more priority definitions
-	for key, value in pairs(bakables.names) do
+	for key, value in pairs(tradables.sellable_names) do
 		if item_name==key then
 			return value
 		end
 	end
-	for key, value in pairs(bakables.fuel_groups) do
+	for key, value in pairs(tradables.buyable_groups) do
 		if minetest.get_item_group(item_name, key) > 0 then
 			return value;
 		end
 	end
   -- check less priority definitions
-	for key, value in pairs(bakables.groups) do
+	for key, value in pairs(tradables.sellable_groups) do
 		if minetest.get_item_group(item_name, key) > 0 then
 			return value;
 		end
 	end
 	return nil
 end
-function bakables.is_bakable(item_name)
-  local data = bakables.get_bakable(item_name);
+function tradables.is_tradable(item_name)
+  local data = tradables.get_tradable(item_name);
   return data ~= nil
 end
-function bakables.get_cookable(item_name)
+function tradables.get_sellable(item_name)
   -- check more priority definitions
-	for key, value in pairs(bakables.names) do
+	for key, value in pairs(tradables.sellable_names) do
 		if item_name==key then
 			return value
 		end
 	end
   -- check less priority definitions
-	for key, value in pairs(bakables.groups) do
+	for key, value in pairs(tradables.sellable_groups) do
 		if minetest.get_item_group(item_name, key) > 0 then
 			return value;
 		end
 	end
 	return nil
 end
-function bakables.is_cookable(item_name)
-  local data = bakables.get_cookable(item_name);
+function tradables.is_sellable(item_name)
+  local data = tradables.get_sellable(item_name);
   return data ~= nil
 end
-function bakables.get_fuel(item_name)
+function tradables.get_buyable(item_name)
   -- check more priority definitions
-	for key, value in pairs(bakables.fuel_names) do
+	for key, value in pairs(tradables.buyable_names) do
 		if item_name==key then
 			return value
 		end
 	end
   -- check less priority definitions
-	for key, value in pairs(bakables.fuel_groups) do
+	for key, value in pairs(tradables.buyable_groups) do
 		if minetest.get_item_group(item_name, key) > 0 then
 			return value;
 		end
 	end
 	return nil
 end
-function bakables.is_fuel(item_name)
-  local data = bakables.get_fuel(item_name);
+function tradables.is_buyable(item_name)
+  local data = tradables.get_buyable(item_name);
   return data ~= nil
 end
 
@@ -145,9 +112,9 @@ end
 
 
 
-function furnaces.get_furnace(item_name)
+function vendorkiosks.get_vendorkiosk(item_name)
 	-- check more priority definitions
-	for key, value in pairs(furnaces.names) do
+	for key, value in pairs(vendorkiosks.sellable_names) do
 		if item_name==key then
 			return value
 		end
@@ -155,69 +122,68 @@ function furnaces.get_furnace(item_name)
 	return nil
 end
 
-function furnaces.is_furnace(item_name)
-	local data = furnaces.get_furnace(item_name);
+function vendorkiosks.is_vendorkiosk(item_name)
+	local data = vendorkiosks.get_vendorkiosk(item_name);
 	return data ~= nil
 end
 
-local function find_furnace_node(pos)
+local function find_vendorkiosk_node(pos)
 	local node = minetest.get_node(pos);
-	local data = furnaces.get_furnace(node.name);
+	local data = vendorkiosks.get_vendorkiosk(node.name);
 	return data ~= nil
 end
 
 local searching_range = {x = 10, y = 3, z = 10}
 
 local function put_func(_,stack)
-	return not bakables.is_bakable(stack:get_name())
+	return not tradables.is_tradable(stack:get_name())
 end
 local function take_func(villager,stack)
 	local item_name = stack:get_name()
-	if not bakables.is_bakable(item_name) then return false end
+	if not tradables.is_tradable(item_name) then return false end
 	local inv = villager:get_inventory()
 	local itemstack = ItemStack(item_name)
-	itemstack:set_count(bakables.get_bakable(item_name))
+	itemstack:set_count(tradables.get_tradable(item_name))
 	return (not inv:contains_item("main", itemstack))
 end
 
-local function put_fuel(_,stack)
-	return bakables.is_fuel(stack:get_name())
+local function put_buyable(_,stack)
+	return tradables.is_buyable(stack:get_name())
 end
 
-local function put_cookable(_,stack)
-	return bakables.is_cookable(stack:get_name())
+local function put_sellable(_,stack)
+	return tradables.is_sellable(stack:get_name())
 end
 
-working_villages.register_job("working_villages:job_baker", {
-	description = S("baker (working_villages)"),
-	long_description = S("I look for a furnace and start putting the contents of your chest into it."),
+working_villages.register_job("working_villages:job_vendor", {
+	description = S("vendor (working_villages)"),
+	long_description = S("I look for a vendor kiosk and start putting the contents of your chest into it."),
 	trivia          = trivia.get_trivia({
-		"My job position was the first to use appliances.",
-	}, {trivia.appliances,}), -- trivia.bread_basket
+	}, {trivia.appliances,trivia.special,trivia.meta,}),
 	workflow        = {
 		S("Wake up"),
 		S("Handle my chest"),
 		S("Go to work"),
-		S("Search for furnaces"),
-		S("Go to furnace"),
-		S("Handle furnace"),
+		S("Search for vendor kiosks"),
+		S("Go to vendor kiosk"),
+		S("Handle vendor kiosk"),
 		S("Periodically look away thoughtfully"),
 	},
 	inventory_image	= "default_paper.png^working_villages_builder.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(
-			take_func, -- take cookable + fuel
-			put_func   -- put not(cookable or fuel)
+			take_func, -- take sellable + buyable
+			put_func   -- put not(sellable or buyable)
 		)
 		self:handle_job_pos()
 
-		self:count_timer("baker:search")
-		self:count_timer("baker:change_dir")
+		self:count_timer("vendor:search")
+		self:count_timer("vendor:change_dir")
 		self:handle_obstacles()
-		if self:timer_exceeded("baker:search",20) then
-			self:collect_nearest_item_by_condition(furnaces.is_furnace, searching_range)
-			local target = func.search_surrounding(self.object:get_pos(), find_furnace_node, searching_range)
+		if self:timer_exceeded("vendor:search",20) then
+			self:collect_nearest_item_by_condition(vendorkiosks.is_vendorkiosk, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_vendorkiosk_node, searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then
@@ -231,29 +197,33 @@ working_villages.register_job("working_villages:job_baker", {
 				local success, ret = self:go_to(destination)
 				if not success then
 					working_villages.failed_pos_record(target)
-					self:set_displayed_action("looking at the unreachable furnace")
+					self:set_displayed_action("looking at the unreachable vendor kiosk")
 					self:delay(100)
 				else
 					local target_def = minetest.get_node(target)
-					local plant_data = furnaces.get_furnace(target_def.name);
+					local plant_data = vendorkiosks.get_vendorkiosk(target_def.name);
 					if plant_data then
-						self:set_displayed_action("operating the furnace")
-						self:handle_furnace(
-					        	target,
-						    	func.take_everything, -- take everything
-						 	put_cookable, -- put what we need to furnace
-							put_fuel
-						)
-						--self.job_data.manipulated_chest   = false;
-						--self.job_data.manipulated_furnace = false;
-						--self:set_displayed_action("waiting on furnace")
+						self:set_displayed_action("operating the vendor kiosk")
+-- if vendor is configured
+--   if we don't own the vendor
+--     if it sells what we need
+--       do buy
+--   if we own the vendor
+--       re-configure it to buy what we need (if necessary)
+-- if vendor is unconfigured
+--   if we own the vendor
+--     configure it to buy what we need
+--     => player can deposit eg gold to get eg food
+--   if we don't own the vendor
+--     configure it to sell what we need
+--     => villager can deposit eg food to get eg gold
 					end
 				end
 			end
-		elseif self:timer_exceeded("baker:change_dir",50) then
+		elseif self:timer_exceeded("vendor:change_dir",50) then
 			self:change_direction_randomly()
 		end
 	end,
 })
 
-working_villages.bakables = bakables
+working_villages.tradables = tradables
