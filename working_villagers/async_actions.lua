@@ -621,7 +621,10 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 					--vil_inv:set_stack("main", index, leftover);
 					--end
 					log.info("Villager %s moves %s from inventory to appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
-					for _=0,10 do coroutine.yield() end --wait 10 steps
+					if not operation.no_yield then
+						for _=0,10 do coroutine.yield() end --wait 10 steps
+					else assert(operation.no_yield == true)
+					end
 				end
 			end
 
@@ -644,7 +647,10 @@ function working_villages.villager:manipulate_appliance(appliance_pos, data)
 						target_def.on_metadata_inventory_take(appliance_pos, app_list_name, index, stack, placer) -- index should be 0 ?
 					end
 					log.info("Villager %s moves %s to inventory from appliance's %s on position %s.", self.inventory_name, stack:get_name(), app_list_name, minetest.pos_to_string(appliance_pos))
-					for _=0,10 do coroutine.yield() end --wait 10 steps
+					if not operation.no_yield then
+						for _=0,10 do coroutine.yield() end --wait 10 steps
+					else assert(operation.no_yield == true)
+					end
 				end
 			end
 		end
@@ -824,8 +830,10 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 		is_appliance  = func.is_craft_table,
 		operations    = {},
 	}
+	-- TODO progressing the iteration while the machine is crafting may be causing the craftsman to make incorrect things
 	local recipes = data.recipes
 	local ntarget = #recipes
+	local noop_duration = 20
 	local index = 0
 	for iteration=ntarget,1,-1 do
 		-- TODO handle shapless, small shapes, etc.
@@ -862,6 +870,7 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 						target_index = xy,
 						target_count = 1,
 					},
+					no_yield     = true,
 				}
 			end
 		end
@@ -882,7 +891,7 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 		
 		index = index + 1
 		my_data.operations[index]   = {
-			noop = 300,
+			noop = noop_duration,
 		}
 
 		index = index + 1
@@ -897,6 +906,7 @@ function working_villages.villager:handle_craft_table(craft_table_pos, take_func
 			list      = "rec",
 			is_take   = true,
 			take_func = take_func,
+			no_yield     = true,
 		}
 
 		index = index + 1
@@ -1177,36 +1187,59 @@ function working_villages.villager:handle_fermenting_barrel(craft_table_pos, tak
 	local water  = meta:get_int("water") or 0
 	local status = meta:get_float("status") or 0
 
+	local noop_duration = 100
 
-	if water < 100 then
-	index = index + 1
-	my_data.operations[index]   = {
-		list      = "src_b",
-		is_put    = true,
-		put_func  = put_fuel,
-		--data      = {
-		--	iteration    = iteration,
-		--},
-	}
+
+	if water < 100 then -- don't waste water
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "src_b",
+			is_put    = true,
+			put_func  = put_fuel,
+			--data      = {
+			--	iteration    = iteration,
+			--},
+		}
 	end
 
-	index = index + 1
+	index = index + 1 -- remove empty bucket
 	my_data.operations[index]   = {
 		list      = "src_b",
 		is_take   = true,
 		take_func = take_fuel,
 	}
 
-	if status >= 100 then
-	index = index + 1
-	my_data.operations[index]   = {
-		list      = "src",
-		is_take   = true,
-		take_func = take_func,
-	}
+
+	--if status >= 100 then -- done brewing => clear src
+	if status >= 100 or status <= 0 then -- done brewing => clear src
+
+		index = index + 1
+		my_data.operations[index]   = {
+			noop = noop_duration,
+		}
+
+		index = index + 1 -- remove hooch
+		my_data.operations[index]   = {
+			list      = "dst",
+			is_take   = true,
+			take_func = take_func,
+		}
+
+		index = index + 1
+		my_data.operations[index]   = {
+			noop = noop_duration,
+		}
+
+		index = index + 1
+		my_data.operations[index]   = {
+			list      = "src",
+			is_take   = true,
+			take_func = take_func,
+			no_yield     = true,
+		}
 	end
 
-	if status > 0 then
+	if status > 0 then -- still brewing => don't mess with src
 		self:handle_appliance(my_data)
 		return
 	end
@@ -1215,58 +1248,40 @@ function working_villages.villager:handle_fermenting_barrel(craft_table_pos, tak
 
 		local recipe = recipes[iteration]
 		if recipe ~= nil then
-		local nx     = #recipe
-		--local xy     = 0
-		for x=1,nx,1 do -- 2 X 2 = 4
-			local row = recipe[x]
-			local ny  = #row
-			--for y=1,3,1 do
-			for y=1,ny,1 do
-				--local xy = 2*(x-1)+y
-				local xy = 2*(y-1)+x
-				--xy    = xy    + 1
-				index = index + 1
-				my_data.operations[index]   = {
-					list      = 'src',
-					is_put    = true,
-					put_func  = put_func,
-					data      = {
-						iteration    = iteration,
-						target_x     = x,
-						target_y     = y,
-						target_index = xy,
-						target_count = 1,
-					},
-				}
+			local nx     = #recipe
+			--local xy     = 0
+			for x=1,nx,1 do -- 2 X 2 = 4
+				local row = recipe[x]
+				local ny  = #row
+				--for y=1,3,1 do
+				for y=1,ny,1 do
+					--local xy = 2*(x-1)+y
+					local xy = 2*(y-1)+x
+					--xy    = xy    + 1
+					index = index + 1
+					my_data.operations[index]   = {
+						list      = 'src',
+						is_put    = true,
+						put_func  = put_func,
+						data      = {
+							iteration    = iteration,
+							target_x     = x,
+							target_y     = y,
+							target_index = xy,
+							target_count = 1,
+						},
+						no_yield     = true,
+					}
+				end
 			end
-		end
 
 
-		--index = index + 1
-		--my_data.operations[index]   = {
-		--	list      = "src",
-		--	is_put    = true,
-		--	put_func  = put_func,
-		--	data      = {
-		--		iteration    = iteration,
-		--		--recipe_x     = x,
-		--		--recipe_y     = y,
-		--		--target_index = xy,
-		--	},
-		--}
-	
-		index = index + 1
-		my_data.operations[index]   = { -- there's a bit of a delay before the `status` changes`
-			noop = 10,
-		}
+			index = index + 1
+			my_data.operations[index]   = { -- there's a bit of a delay before the `status` changes`
+				noop = noop_duration,
+			}
 
-		index = index + 1
-		my_data.operations[index]   = {
-			list      = "dst",
-			is_take   = true,
-			take_func = take_func,
-		}
-	end -- nil check
+		end -- nil check
 	end
 	for iteration=1,#my_data.operations,1 do
 		assert(my_data.operations[iteration] ~= nil)
