@@ -155,6 +155,22 @@ local function put_sellable(_,stack)
 	return tradables.is_sellable(stack:get_name())
 end
 
+
+local function can_access_vendor_inv(player, pos)
+    local meta = minetest.get_meta(pos)
+    if minetest.check_player_privs(player, {protection_bypass=true}) or meta:get_string("owner") == player:get_player_name() then return true end
+    --local settings = get_vendor_settings(pos)
+    local settings = minetest.deserialize(meta:get_string("settings"))
+    if not settings then return true end
+    local co_sellers = string.split(settings.co_sellers,",")
+    for i in pairs(co_sellers) do
+        if co_sellers[i] == player:get_player_name() then
+            return true
+        end
+    end
+    return false
+end
+
 working_villages.register_job("working_villages:job_vendor", {
 	description = S("vendor (working_villages)"),
 	long_description = S("I look for a vendor kiosk and start putting the contents of your chest into it."),
@@ -204,19 +220,20 @@ working_villages.register_job("working_villages:job_vendor", {
 					local plant_data = vendorkiosks.get_vendorkiosk(target_def.name);
 					if plant_data then
 						self:set_displayed_action("operating the vendor kiosk")
--- if vendor is configured
---   if we don't own the vendor
---     if it sells what we need
---       do buy
---   if we own the vendor
---       re-configure it to buy what we need (if necessary)
--- if vendor is unconfigured
---   if we own the vendor
---     configure it to buy what we need
---     => player can deposit eg gold to get eg food
---   if we don't own the vendor
---     configure it to sell what we need
---     => villager can deposit eg food to get eg gold
+
+						local can_access = can_access_vendor_inv(self, target)
+						if can_access then
+							-- if vendor is configured then
+							-- reconfigure it if necessary
+							-- else
+							-- configure it to buy what we need
+							-- end
+						else
+							-- if it sells what we need then
+							-- buy
+							-- end
+						end
+
 					end
 				end
 			end
