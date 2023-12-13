@@ -9,59 +9,116 @@ local S = minetest.get_translator("working_villages")
 local trivia = working_villages.require("jobs/trivia")
 
 local recipes = {
-	[1] = { {"default:apple",}, },
---	[1] = {
---		{"wine:agave_syrup", "wine:blue_agave",},
---		{"vessels:drinking_glass"},
---	},
---	[2] = { {"wine:blue_agave",}, },
---	[3] = { {"default:apple",}, },
---	[4] = { {"default:papyrus",}, },
---	[5] = { {"xdecor:honey",}, },
---	[6] = { {"church_candles:honey",}, }, -- TODO only add this if `church_candles`+`iadecor` are present
---	[7] = { {"mobs:honey",}, },
---	[8] = { {"mobs:glass_milk", "farming:wheat"}, },
---	[9] = { {"farming:wheat",}, },
---	[10] = { {"farming:grapes",}, }, -- TODO patch `wine` to distingish between white wine, red wine and blush processes, as well as more types of fortified wines
---	-- TODO patch farming to include grape varietals, such as reisling in cold climates
---	-- TODO okay this needs to be in a WSET/sommelier mod
---	-- geez, imagine a full-blown food safety mod
---	[11] = { {"farming:barley",}, },
---	[12] = { {"farming:rice",}, },
---	[13] = { {"farming:corn",}, },
---	[14] = { {"farming:baked_potato",}, },
---	[15] = { {"wine:glass_rum", "farming:coffee_beans"}, },
---	[16] = { {"wine:glass_wine", "farming:sugar"}, },
+	[1] = {
+		{"wine:agave_syrup", "wine:blue_agave",},
+		{"vessels:drinking_glass",},
+	},
+	[2] = {
+		{"wine:blue_agave",},
+		{"vessels:drinking_glass",},
+	},
+	[3] = {
+		{"default:apple",},
+		{"vessels:drinking_glass",},
+	},
+	[4] = {
+		{"default:papyrus",},
+		{"vessels:drinking_glass",},
+	},
+	[5] = {
+		{"xdecor:honey",},
+		{"vessels:drinking_glass",},
+	},
+	[6] = {
+		{"church_candles:honey",},
+		{"vessels:drinking_glass",},
+	}, -- TODO only add this if `church_candles`+`iadecor` are present
+	[7] = {
+		{"mobs:honey",},
+		{"vessels:drinking_glass",},
+	},
+	-- TODO jar/bottle of honey
+	[8] = {
+		{"mobs:glass_milk", "farming:wheat"},
+	},
+	[9] = {
+		{"farming:wheat",},
+		{"vessels:drinking_glass",},
+	},
+	[10] = {
+		{"farming:grapes",},
+		{"vessels:drinking_glass",},
+	}, -- TODO patch `wine` to distingish between white wine, red wine and blush processes, as well as more types of fortified wines
+	-- TODO patch farming to include grape varietals, such as reisling in cold climates
+	-- TODO okay this needs to be in a WSET/sommelier mod
+	-- geez, imagine a full-blown food safety mod
+	[11] = {
+		{"farming:barley",},
+		{"vessels:drinking_glass",},
+	},
+	[12] = {
+		{"farming:rice",},
+		{"vessels:drinking_glass",},
+	},
+	[13] = {
+		{"farming:corn",},
+		{"vessels:drinking_glass",},
+	},
+	[14] = {
+		{"farming:baked_potato",},
+		{"vessels:drinking_glass",},
+	},
+	[15] = {
+		{"wine:glass_rum", "farming:coffee_beans",},
+	},
+	[16] = {
+		{"wine:glass_wine", "farming:sugar",},
+	},
 --	[17] = {
 --		{"default:apple", "farming:sugar",},
 --		{"vessels:drinking_glass"},
 --	},
---	[18] = {
---		{"farming:carrot", "farming:sugar",},
---		{"vessels:drinking_glass"},
+	[18] = {
+		{"farming:carrot", "farming:sugar",},
+		{"vessels:drinking_glass"},
+	},
+	--[19] = { {"farming:blackberry 2", "farming:sugar", "vessels:drinking_glass"}, },
+	[19] = {
+		{"farming:blackberry", "farming:blackberry",},
+		{"farming:sugar", "vessels:drinking_glass",},
+	},
+	[20] = {
+		{"ethereal_orange",},
+		{"vessels:drinking_glass",},
+	},
+	[21] = {
+		{"wine:glass_cointreau", "wine:glass_tequila",},
+		{"ethereal:lemon",},
+	},
+--	[22] = {
+--		{"mcl_core:apple",},
+--		{"vessels:drinking_glass",},
 --	},
---	--[19] = { {"farming:blackberry 2", "farming:sugar", "vessels:drinking_glass"}, },
---	[19] = {
---		{"farming:blackberry", "farming:blackberry",},
---		{"farming:sugar", "vessels:drinking_glass"},
---	},
---	[20] = { {"ethereal_orange",}, },
---	[21] = {
---		{"wine:glass_cointreau", "wine:glass_tequila",},
---		{"ethereal:lemon"},
---	},
---	[22] = { {"mcl_core:apple",}, },
---	[23] = { {"mcl_core:reeds",}, },
---	[24] = { {"mcl_farming:wheat_item",}, },
---	[25] = { {"mcl_farming:potato_item_baked",}, },
+	[23] = {
+		{"mcl_core:reeds",},
+		{"vessels:drinking_glass",},
+	},
+	[24] = {
+		{"mcl_farming:wheat_item",},
+		{"vessels:drinking_glass",},
+	},
+	[25] = {
+		{"mcl_farming:potato_item_baked",},
+		{"vessels:drinking_glass",},
+	},
 --	[26] = {
 --		{"mcl_core:apple", "mcl_core:sugar",},
 --		{"vessels:drinking_glass"},
 --	},
---	[27] = {
---		{"mcl_farming:carrot_item", "mcl_core:sugar",},
---		{"vessels:drinking_glass"},
---	},
+	[27] = {
+		{"mcl_farming:carrot_item", "mcl_core:sugar",},
+		{"vessels:drinking_glass",},
+	},
 }
 
 
@@ -162,7 +219,7 @@ end
 
 
 -- TODO dedup
-function recipe_requires(recipe, item_name, target_x, target_y)
+function fermentables.recipe_requires(recipe, item_name, target_x, target_y)
 	if type(recipe) ~= "table" then
 		assert(type(recipe) == "string")
 		if recipe == item_name then return 1 end
@@ -173,6 +230,7 @@ function recipe_requires(recipe, item_name, target_x, target_y)
 	or target_y ~= nil then
 		assert(target_x ~= nil)
 		assert(target_y ~= nil)
+		print(dump(recipe))
 		return recipe[target_y][target_x] == item_name
 	end
 	assert(target_x == nil)
@@ -180,7 +238,7 @@ function recipe_requires(recipe, item_name, target_x, target_y)
 
 	local count = 0
 	for _,dep in pairs(recipe) do
-		count = count + recipe_requires(dep, item_name, nil, nil)
+		count = count + fermentables.recipe_requires(dep, item_name, nil, nil)
 	end
 	return count
 end
@@ -190,8 +248,11 @@ function fermentables.get_craftingsupplies(self, item_name, iteration, target_x,
 	assert(item_name ~= nil)
 	assert(iteration ~= nil)
 	local recipe = recipes[iteration]
-	assert(recipe ~= nil)
-	local count = recipe_requires(recipe, item_name, target_x, target_y)
+
+	--assert(recipe ~= nil)
+	if recipe == nil then return nil end
+
+	local count = fermentables.recipe_requires(recipe, item_name, target_x, target_y)
 	if count == 0 then return nil end
 	return count
 end
@@ -213,13 +274,16 @@ local function put_func(villager,stack,data)
 	local target_y
 	if data == nil then target_y = nil else target_y = data.target_y end
 
+	local name = stack:get_name()
+
 	if data ~= nil and data.iteration ~= nil then
-		return not fermentables.is_craftingsupplies(villager,stack:get_name(), data.iteration, target_x, target_y)
+		return not fermentables.is_craftingsupplies(villager,name, data.iteration, target_x, target_y)
 	end
+	assert(data.iteration ~= nil)
 
 	local ntarget = #recipes
 	for iteration=1,ntarget,1 do
-		if fermentables.is_craftingsupplies(villager,stack:get_name(), iteration, target_x, target_y) then
+		if fermentables.is_craftingsupplies(villager,name, iteration, target_x, target_y) then
 			return false
 		end
 	end
@@ -258,6 +322,10 @@ local function put_craftingsupplies(villager,stack,data)
 	if data == nil then target_y = nil else target_y = data.target_y end
 
 	-- TODO allow to specify number to put in each slot
+
+	assert(data     ~= nil)
+	assert(target_x ~= nil)
+	assert(target_y ~= nil)
 	
 	if data ~= nil and data.iteration ~= nil then
 		return fermentables.is_craftingsupplies(villager,stack:get_name(), data.iteration, target_x, target_y)

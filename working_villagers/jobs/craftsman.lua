@@ -33,9 +33,14 @@ local recipes = {
 		{"default:stone", "default:stone",},
 		{"default:stone", "default:stone",},
 	},
+	[3] = {
+		{"default:steel_ingot", "",                    "default:steel_ingot",},
+		{"",                    "default:steel_ingot", "",},
+		{"",                    "",                    "",},
+	},
 }
 
-function recipe_requires(recipe, item_name, target_x, target_y)
+function craft_tables.recipe_requires(recipe, item_name, target_x, target_y)
 	if type(recipe) ~= "table" then
 		assert(type(recipe) == "string")
 		if recipe == item_name then return 1 end
@@ -46,14 +51,16 @@ function recipe_requires(recipe, item_name, target_x, target_y)
 	or target_y ~= nil then
 		assert(target_x ~= nil)
 		assert(target_y ~= nil)
-		return recipe[target_y][target_x] == item_name
+		print(dump(recipe))
+		if recipe[target_y][target_x] == item_name then return 1 end
+		return 0
 	end
 	assert(target_x == nil)
 	assert(target_y == nil)
 
 	local count = 0
 	for _,dep in pairs(recipe) do
-		count = count + recipe_requires(dep, item_name, nil, nil)
+		count = count + craft_tables.recipe_requires(dep, item_name, nil, nil)
 	end
 	return count
 end
@@ -64,7 +71,7 @@ function craft_tables.get_craftingsupplies(self, item_name, iteration, target_x,
 	assert(iteration ~= nil)
 	local recipe = recipes[iteration]
 	assert(recipe ~= nil)
-	local count = recipe_requires(recipe, item_name, target_x, target_y)
+	local count = craft_tables.recipe_requires(recipe, item_name, target_x, target_y)
 	if count == 0 then return nil end
 	return count
 end
@@ -156,14 +163,16 @@ local function put_craftingsupplies(villager,stack,data)
 	if data == nil then target_y = nil else target_y = data.target_y end
 
 	-- TODO allow to specify number to put in each slot
-	
+
+	local name = stack:get_name()
 	if data ~= nil and data.iteration ~= nil then
-		return craft_tables.is_craftingsupplies(villager,stack:get_name(), data.iteration, target_x, target_y)
+		return craft_tables.is_craftingsupplies(villager,name, data.iteration, target_x, target_y)
 	end
+	assert(data.iteration ~= nil)
 
 	local ntarget = #recipes
 	for iteration=1,ntarget,1 do
-		if craft_tables.is_craftingsupplies(villager,stack:get_name(), iteration, target_x, target_y) then
+		if craft_tables.is_craftingsupplies(villager,name, iteration, target_x, target_y) then
 			return true
 		end
 	end
