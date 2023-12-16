@@ -97,6 +97,14 @@ so e.g., composter, wafflemaker, etc., can juggle multiple appliances
 night shift
 
 
+bonemeal job => spawn flora for the plant collector
+
+villagers should check meta when using locked chests/doors/armor stands, etc
+
+some villagers' need to be highly configurable (e.g. the craftsman, the landlord, the vendor, etc.)
+or they should otherwise allow their job function to be narrowed down (e.g., the smelter / chef)
+
+
 
 
 

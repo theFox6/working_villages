@@ -34,7 +34,7 @@ local function spawner(initial_job)
     end
 end
 
-working_villages.require("jobs/plant_collector")
+working_villages.require("jobs/collector/plant_collector")
 
 local herb_names = {}
 for name,_ in pairs(working_villages.herbs.names) do
@@ -65,7 +65,7 @@ minetest.register_abm({
 })
 
 
-working_villages.require("jobs/brush_collector")
+working_villages.require("jobs/collector/brush_collector")
 
 local shrub_names = {}
 for name,_ in pairs(working_villages.shrubs.names) do
@@ -85,7 +85,7 @@ minetest.register_abm({
     action = spawner("working_villages:job_brushcollector"),
 })
 
-working_villages.require("jobs/bug_collector")
+working_villages.require("jobs/collector/bug_collector")
 
 local bug_names = {}
 for name,_ in pairs(working_villages.bugs.names) do
@@ -105,7 +105,7 @@ minetest.register_abm({
     action = spawner("working_villages:job_bugcollector"),
 })
 
-working_villages.require("jobs/bone_collector")
+working_villages.require("jobs/collector/bone_collector")
 
 local bone_names = {}
 for name,_ in pairs(working_villages.bones.names) do
@@ -125,7 +125,7 @@ minetest.register_abm({
     action = spawner("working_villages:job_bonecollector"),
 })
 
-working_villages.require("jobs/landscaper")
+working_villages.require("jobs/miner/landscaper")
 
 local dirt_names = {}
 for name,_ in pairs(working_villages.dirts.names) do
@@ -165,7 +165,7 @@ minetest.register_abm({
     action = spawner("working_villages:job_watercarrier"),
 })
 
-working_villages.require("jobs/miner")
+working_villages.require("jobs/miner/miner")
 
 local stone_names = {}
 for name,_ in pairs(working_villages.stones.names) do
@@ -185,7 +185,7 @@ minetest.register_abm({
     action = spawner("working_villages:job_miner"),
 })
 
-working_villages.require("jobs/gem_miner")
+working_villages.require("jobs/miner/gem_miner")
 
 local gem_names = {}
 for name,_ in pairs(working_villages.gems.names) do
@@ -226,7 +226,7 @@ working_villages.require("jobs/mayor")
 --    action = spawner("working_villages:job_mayor"),
 --})
 
-working_villages.require("jobs/baker")
+working_villages.require("jobs/appliance/baker")
 
 local furnace_names = {}
 for name,_ in pairs(working_villages.furnaces.names) do
@@ -247,7 +247,7 @@ minetest.register_abm({
 })
 
 if minetest.get_modpath("mcg_lockworkshop") then
-    working_villages.require("jobs/locksmith")
+    working_villages.require("jobs/appliance/locksmith")
     
     local lockworkshop_names = {}
     for name,_ in pairs(working_villages.lockworkshops.names) do
@@ -269,7 +269,7 @@ if minetest.get_modpath("mcg_lockworkshop") then
 end
 
 if minetest.get_modpath("fakery") then
-    working_villages.require("jobs/counterfeiter")
+    working_villages.require("jobs/appliance/counterfeiter")
 
     local fakerytable_names = {}
     for name,_ in pairs(working_villages.fakerytables.names) do
@@ -291,7 +291,7 @@ if minetest.get_modpath("fakery") then
 end
 
 if minetest.get_modpath("mcg_dyemixer") then
-    working_villages.require("jobs/dyemixer")
+    working_villages.require("jobs/appliance/dyemixer")
 
     local dyemixer_names = {}
     for name,_ in pairs(working_villages.dyemixers.names) do
@@ -313,7 +313,7 @@ if minetest.get_modpath("mcg_dyemixer") then
 end
 
 if minetest.get_modpath("claycrafter") then
-    working_villages.require("jobs/claycrafter")
+    working_villages.require("jobs/appliance/claycrafter")
 
     local claycrafter_names = {}
     for name,_ in pairs(working_villages.claycrafters.names) do
@@ -335,7 +335,7 @@ if minetest.get_modpath("claycrafter") then
 end
 
 if minetest.get_modpath("decraft") then
-    working_villages.require("jobs/recycler")
+    working_villages.require("jobs/appliance/recycler")
 
     local recycler_names = {}
     for name,_ in pairs(working_villages.recyclers.names) do
@@ -358,7 +358,7 @@ end
 
 if minetest.get_modpath("crafting_bench")
 or minetest.get_modpath("craft_table") then
-    working_villages.require("jobs/craftsman")
+    working_villages.require("jobs/appliance/craftsman")
 
     local craft_table_names = {}
     for name,_ in pairs(working_villages.craft_tables.names) do
@@ -422,7 +422,7 @@ minetest.register_abm({
 })
 
 if minetest.get_modpath("biofuel") then
-working_villages.require("jobs/biofuel")
+working_villages.require("jobs/appliance/biofuel")
 
 local refinery_names = {}
 for name,_ in pairs(working_villages.refineries.names) do
@@ -506,7 +506,7 @@ minetest.register_abm({
 })
 
 if minetest.get_modpath("church_candles") then
-working_villages.require("jobs/beekeeper")
+working_villages.require("jobs/appliance/beekeeper")
 
 local beehive_names = {}
 for name,_ in pairs(working_villages.beehive_nodes.names) do
@@ -567,3 +567,27 @@ minetest.register_abm({
     catch_up = false,
     action = spawner("working_villages:job_landlord"),
 })
+
+if minetest.get_modpath("bonemeal")
+or minetest.get_modpath("basalt_fertilizer") then
+working_villages.require("jobs/bonemeal")
+
+local fertiliz_names = {}
+for name,_ in pairs(working_villages.fertilizing_nodes.names) do
+    fertiliz_names[#fertiliz_names + 1] = name
+end
+for name,_ in pairs(working_villages.fertilizing_nodes.groups) do
+    fertiliz_names[#fertiliz_names + 1] = "group:"..name
+end
+end
+
+minetest.register_abm({
+    label = "Spawn fertilizer",
+    nodenames = fertiliz_names,
+    neighbors = "air",
+    interval = 60,
+    chance = 2048,
+    catch_up = false,
+    action = spawner("working_villages:job_fertilizer"),
+})
+
