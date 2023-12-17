@@ -24,6 +24,7 @@ landlord        -- configure rentals to acquire goods needed by the village
 
 - trasher:
   - needs to drop the item now
+  - TODO hopper seems to work differently than I remember. I really wanna drop items down a hole
 - librarian:
   - need to decide where to keep:
     - unwritten books
@@ -78,6 +79,7 @@ schematics
 - workshops
 - farms & factories
 - graveyard (bone collector => (burglar =>) graveyard => resurrector
+  - could be used for bonemeal
 
 
 
@@ -94,10 +96,12 @@ so e.g., composter, wafflemaker, etc., can juggle multiple appliances
 
 
 
-night shift
+night shift (maybe 1st, 2nd & 3rd shift)
+=> butterfly collector & firefly collector
+=> day & night guards
 
+digilines in schematics don\'t paste well together. maybe create a job that looks for inconsistent connections in the digilines and replaces the nodes (villagers should already emulate the player\'s placing well enough that this fixes the broken connections)
 
-bonemeal job => spawn flora for the plant collector
 
 villagers should check meta when using locked chests/doors/armor stands, etc
 
