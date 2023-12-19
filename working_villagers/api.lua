@@ -1013,6 +1013,19 @@ function working_villages.register_villager(product_name, def)
   -- on_activate is a callback function that is called when the object is created or recreated.
   local function on_activate(self, staticdata)
     -- TODO villager lineage
+   
+    -- TODO it seems that we need some sort of logic for cycling through the textures
+    -- select random texture, set model and size
+    --if not self.base_texture then
+
+    --    -- compatiblity with old simple mobs textures
+    --    if def.textures and type(def.textures[1]) == "string" then
+    --        def.textures = {def.textures}
+    --    end
+
+    --    -- backup a few base settings
+    --    self.base_texture = def.textures and def.textures[random(#def.textures)]
+    --end
 
     -- parse the staticdata, and compose a inventory.
     if staticdata == "" then

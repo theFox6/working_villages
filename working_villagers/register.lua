@@ -5,14 +5,18 @@ local texture_name = "villager_female.png"
 local egg_img_name = "villager_female_egg.png"
 local female_textures = {texture_name,}
 
+-- TODO testing
+--local male_textures   = {}
+--local female_textures = {}
+
 
 
 -- TODO check whether I sorted the male/female textures properly... I'm doing this by looking at the previews in the file manager
 if minetest.get_modpath("airutils") then
-	table.insert(  male_textures, "pilot_clothes1.png")
-	table.insert(  male_textures, "pilot_clothes2.png")
-	table.insert(  male_textures, "pilot_clothes3.png")
-	table.insert(  male_textures, "pilot_clothes4.png")
+	--table.insert(  male_textures, "pilot_clothes1.png")
+	--table.insert(  male_textures, "pilot_clothes2.png")
+	--table.insert(  male_textures, "pilot_clothes3.png")
+	--table.insert(  male_textures, "pilot_clothes4.png")
 
 	table.insert(female_textures, "pilot_novaskin_girl.png")
 	table.insert(female_textures, "pilot_novaskin_girl_2.png")
@@ -89,6 +93,9 @@ end
 --	table.insert(  male_textures, "spacesuit_sp2.png")
 --	table.insert(female_textures, "spacesuit_sp2.png")
 --end
+
+assert(#male_textures ~= 0)
+assert(#female_textures ~= 0)
 
 working_villages.register_villager("working_villages:villager_male", {
 	hp_max     = 30,
