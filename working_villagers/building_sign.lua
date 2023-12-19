@@ -24,6 +24,9 @@ building_sign.register_schematic("hobbit_bunker.we")
 -- wooden duplex with crosswalk, light tower, fishing hole and space for appliance
 building_sign.register_schematic("dock.we")
 
+-- has a decent view
+building_sign.register_schematic("spawn_ship.we")
+
 -- camping
 if minetest.get_modpath("sleeping_mat")
 and minetest.get_modpath("new_campfire") then
