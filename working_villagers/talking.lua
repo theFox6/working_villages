@@ -186,4 +186,5 @@ forms.put_link("working_villages:talking_menu", "working_villages:biome",
 -- TODO history of village/villager
 -- TODO lineage support via a separate mod
 -- TODO if the villager passes by a node with infotext or description or reads a book, etc., then we can add some trivia/facts. "I just read..", "did you know.."
+-- TODO ^^^ maybe add a gossip field; these trivia should be able to propagate through villagers who are in proximity to each other
 -- TODO I might copy the multi-page handling from books since none of us seem to know how to do scrollbars
