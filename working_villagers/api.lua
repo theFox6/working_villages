@@ -1051,6 +1051,7 @@ function working_villages.register_villager(product_name, def)
 	self.nametag = getname.genderlessName()
 	-- TODO family names
 	-- TODO now that we've got a "username," we can register with HB-type mods
+	-- TODO we're also going to need to register with iaspawn here, since there doesn't seem a way for iaspawn to hook into every entities' on_activate
       end
 
       -- attach dummy item to new villager.

@@ -140,14 +140,50 @@ end)
 
 forms.put_link("working_villages:talking_menu", "working_villages:fave_color",
 	"What's your favorite color?")
+forms.register_text_page("working_villages:biome",
+  function(villager)
+    assert(villager ~= nil)
+    local pos            = villager:get_pos()
+    local biome_data     = minetest.get_biome_data(pos)
+    local biome_name     = minetest.get_biome_name(biome_data.biome)
+    local biome_temp     = biome_data.heat
+    local biome_humidity = biome_data.humidity
 
--- TODO where do you live/work -- how to get there
+    return "This area is in the biome: " .. biome_name .. "\n" ..
+           "The temperature here is: " .. biome_temp .. "\n" ..
+           "The humidity here is: " .. biome_humidity .. "\n"
+end)
+forms.put_link("working_villages:talking_menu", "working_villages:biome",
+	"Tell me about the area.")
+-- TODO which mod provides get_weather() ?
+--forms.register_text_page("working_villages:weather",
+--  function(villager)
+--    assert(villager ~= nil)
+--    local weather_type, weather_intensity = minetest.get_weather()
+--
+--    local message = ""
+--    if weather_type == 0 then
+--      message = "The weather is clear"
+--    elseif weather_type == 1 then
+--      message = "It is raining"
+--    elseif weather_type == 2 then
+--      message = "It is snowing"
+--    end
+--
+--    message = message .. "\n" ..
+--              "The weather intensity is: " .. weather_intensity
+--    return message
+--end)
+--forms.put_link("working_villages:talking_menu", "working_villages:weather",
+--	"How's the weather?")
+
+-- TODO where do you live/work -- how to get there -- but in human directions
 -- TODO Who's your daddy and what does he do
 -- TODO what do you need to do your job -- ie in general & rn specifically
--- TODO where is...
+-- TODO where is... (generalization of "where do you live/work")
 -- TODO info about mod & server
 -- TODO procedurally generated garbage 
 -- TODO history of village/villager
 -- TODO lineage support via a separate mod
--- TODO tell about the land / biome
--- TODO tell about the weather
+-- TODO if the villager passes by a node with infotext or description or reads a book, etc., then we can add some trivia/facts. "I just read..", "did you know.."
+-- TODO I might copy the multi-page handling from books since none of us seem to know how to do scrollbars

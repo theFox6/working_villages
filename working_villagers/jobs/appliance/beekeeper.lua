@@ -148,4 +148,4 @@ working_villages.register_job("working_villages:job_beekeeper", {
 	end,
 })
 
-working_villages.beehive_names = beehive_names
+working_villages.beehive_names = beehives.names
