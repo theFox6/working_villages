@@ -21,7 +21,10 @@ local spellbooks = {
 		["default:book_open"]   = 1,
 		["default:book_closed"] = 1,
 	},
-	-- TODO group:book
+	groups = {
+		["spellbook"] = 1,
+		--["book"] = 1,
+	},
 }
 
 local spellcasting_demands = {
@@ -30,6 +33,12 @@ local spellcasting_demands = {
 }
 
 function spellbooks.get_book(item_name)
+	-- usually groups are less priority but magic (tm)
+	for key, value in pairs(spellbooks.groups) do
+		if minetest.get_item_group(item_name, key) > 0 then
+			return value;
+		end
+	end
 	-- check more priority definitions
 	for key, value in pairs(spellbooks.names) do
 		if item_name==key then

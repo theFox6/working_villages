@@ -311,15 +311,45 @@ function func.is_protected(self, pos)
 end
 
 -- chest manipulation support functions
+func.chest_names = {
+	["default:chest"]             = true,
+	["default:chest_open"]        = true,
+	["default:chest_locked"]      = true,
+	["default:chest_locked_open"] = true,
+}
+if minetest.get_modpath("homedecor_office") then
+	func.chest_names["homedecor_office:desk"]           = true
+	func.chest_names["homedecor_office:filing_cabinet"] = true
+end
+if minetest.get_modpath("homedecor_kitchen") then
+  -- TODO homedecor_kitchen:kitchen_cabinet_colorable..material
+  -- TODO homedecor_kitchen:kitchen_cabinet_colored..material
+  -- TODO homedecor_kitchen:kitchen_cabinet_colorable_with_drawers..material
+  -- TODO homedecor_kitchen:kitchen_cabinet_colored_with_drawers..material
+  -- TODO homedecor_kitchen:kitchen_cabinet_colorable_half..material
+  -- TODO homedecor_kitchen:kitchen_cabinet_colored_half..material
+  -- TODO homedecor_kitchen:kitchen_cabinet_colorable_with_sink..material
+  -- TODO homedecor_kitchen:kitchen_cabinet_colored_with_sink..material
+  -- TODO homedecor_kitchen:refrigerator_white
+  -- TODO homedecor_kitchen:refrigerator_steel
+end
+if minetest.get_modpath("homedecor_bedroom") then
+  -- TODO homedecor_bedroom:nightstand_..w.._one_drawer
+  -- TODO homedecor_bedroom:nightstand_..w.._two_drawers
+end
+if minetest.get_modpath("homedecor_misc") then
+	func.chest_names["homedecor_misc:cardboard_box"]     = true
+	func.chest_names["homedecor_misc:cardboard_box_big"] = true
+end
+if minetest.get_modpath("homedecor_bathroom") then
+	func.chest_names["homedecor_bathroom:medicine_cabinet"] = true
+end
 function func.is_chest(pos)
 	local node = minetest.get_node(pos)
   if (node==nil) then
     return false;
   end
-  if node.name=="default:chest"
-  or node.name=="default:chest_open" -- fix error when villager tries to use same chest as player
-  or node.name=="default:chest_locked" -- villagers should protect their stuff... there are thieves, you know
-  or node.name=="default:chest_locked_open" then
+  if func.chest_names[node.name] then
     return true;
   end
   local is_chest = minetest.get_item_group(node.name, "chest");
@@ -329,13 +359,24 @@ function func.is_chest(pos)
   return false;
 end
 
+func.furnace_names = {
+	["default:furnace"]        = true,
+	["default:furnace_active"] = true,
+}
+if minetest.get_modpath("homedecor_kitchen") then
+	func.furnace_names["homedecor_kitchen:oven"]              = true
+	func.furnace_names["homedecor_kitchen:oven_active"]       = true
+	func.furnace_names["homedecor_kitchen:oven_steel"]        = true
+	func.furnace_names["homedecor_kitchen:oven_steel_active"] = true
+	func.furnace_names["homedecor:microwave_oven"]            = true
+	func.furnace_names["homedecor:microwave_oven_active"]     = true
+end
 function func.is_furnace(pos)
 	local node = minetest.get_node(pos)
   if (node==nil) then
     return false;
   end
-  if node.name=="default:furnace"
-  or node.name=="default:furnace_active" then
+  if func.furnace_names[node.name] then
     return true;
   end
   local is_furnace = minetest.get_item_group(node.name, "furnace"); -- oven ? idk
