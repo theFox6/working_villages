@@ -3,6 +3,7 @@
 
 -- TODO mana regen
 -- TODO cleaner integration with mana mod
+-- TODO wizard can compute hashes ==> wizard can generate better guesses
 
 
 local func = working_villages.require("jobs/util")
@@ -20,6 +21,7 @@ local spellbooks = {
 		["default:book_open"]   = 1,
 		["default:book_closed"] = 1,
 	},
+	-- TODO group:book
 }
 
 local spellcasting_demands = {

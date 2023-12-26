@@ -1045,13 +1045,24 @@ function working_villages.register_villager(product_name, def)
 
       -- randomized name
       if minetest.get_modpath("getname") then
-        -- TODO get gender
-        --getname.masculineName()
-        --getname.feminineName()
-	self.nametag = getname.genderlessName()
-	-- TODO family names
+        self.nametag = nil
+        while self.nametag == nil do
+	  -- TODO family names
+          -- TODO get gender
+          --getname.masculineName()
+          --getname.feminineName()
+	  self.nametag = getname.genderlessName()
+	  if minetest.get_player_by_name(self.nametag) then -- don't collide with player names
+	    self.nametag = nil
+	  elseif minetest.get_modpath("iaspawn") then -- there's not an easy way to hook into entity creation globally
+	    local mother = nil
+	    local father = nil
+	    if not iaspawn.register_soul(self, mother, father) then -- don't collide with player or entity names
+	      self.nametag = nil
+	    end
+	  end
+	end
 	-- TODO now that we've got a "username," we can register with HB-type mods
-	-- TODO we're also going to need to register with iaspawn here, since there doesn't seem a way for iaspawn to hook into every entities' on_activate
       end
 
       -- attach dummy item to new villager.

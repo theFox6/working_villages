@@ -12,6 +12,7 @@ local dyemixers = {
 
 local wools = {
 	dye_groups = {
+		--["dye"]=99
 	},
 	groups = {
 		["wool"]=99,

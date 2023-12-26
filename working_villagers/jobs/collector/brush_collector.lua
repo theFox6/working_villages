@@ -15,6 +15,7 @@ local shrubs = {
   -- less priority definitions
 	groups = {
 		["leaves"]={},
+		["stick"]={},
 		--["wood"]={},
 	},
 }

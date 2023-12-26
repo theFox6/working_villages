@@ -1,4 +1,3 @@
-
 local func = working_villages.require("jobs/util")
 local S = minetest.get_translator("working_villages")
 local trivia = working_villages.require("jobs/trivia")
@@ -10,6 +9,8 @@ local liquids = {
 		["default:river_water_source"]="bucket:bucket_river_water",
 		["default:lava_source"]       ="bucket:bucket_lava",
 	},
+	-- TODO groups liquid,water
+	-- TODO groups water_bucket
 }
 
 local bucketing_demands = {

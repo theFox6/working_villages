@@ -15,6 +15,9 @@ local herbs = {
   -- less priority definitions
 	groups = {
 		["flora"]={responsible_foraging=true},
+		--sapling
+		["plant"]={},
+		["flower"]={},
 	},
 }
 
