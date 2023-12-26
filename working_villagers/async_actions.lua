@@ -817,7 +817,10 @@ function working_villages.villager:handle_claycrafter(furnace_pos, take_func, pu
 end
 
 function working_villages.villager:handle_craft_table(craft_table_pos, take_func, put_func, data)
-	-- TODO if self:player_name() is nil then craft_table crashes
+	if self:player_name() is nil then -- if this works, then it's better
+		self:set_displayed_action("I need a name to operate the crafting table")
+		return
+	end
 	assert(craft_table_pos     ~= nil)
 	assert(take_func        ~= nil)
 	assert(put_func         ~= nil)
