@@ -123,6 +123,7 @@ working_villages.register_job("working_villages:job_gardener", {
 			self:handle_chest(take_func, put_func)
 		--end
 		if stack:is_empty() then
+			-- TODO stack wear needs to be addressed here somehow or in move_main_to_wield
 			self:move_main_to_wield(function(name)
   				return gardening_tools[name] ~= nil
 			end)
