@@ -230,13 +230,18 @@ working_villages.register_job("working_villages:job_craftsman", {
 					local target_def = minetest.get_node(target)
 					local plant_data = craft_tables.get_craft_table(target_def.name);
 					if plant_data then
-						self:set_displayed_action("operating the crafting table")
-						self:handle_craft_table(
-						        target,
-							func.take_everything, -- take everything
-							put_craftingsupplies,
-							{ recipes = recipes, }
-						)
+						if self:get_player_name() == nil then
+							self:set_displayed_action("I need a name to operate the crafting table")
+							self:delay(100)
+						else
+							self:set_displayed_action("operating the crafting table")
+							self:handle_craft_table(
+							        target,
+								func.take_everything, -- take everything
+								put_craftingsupplies,
+								{ recipes = recipes, }
+							)
+						end
 					end
 				end
 			end
