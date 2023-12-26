@@ -12,7 +12,7 @@ if minetest.get_modpath("sleeping_mat")
 and minetest.get_modpath("claycrafter")
 and minetest.get_modpath("homedecor_doors_and_gates")
 and minetest.get_modpath("homedecor_misc") then
-	-- TODO handle_chest should handle all sorts of inventory types
+	-- use this to test the hobo patch
 	building_sign.register_schematic("hobo_hut.we")
 end
 

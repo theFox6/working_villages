@@ -1,8 +1,9 @@
 --TODO: split this into single modules
 
-local log = working_villages.require("log")
-local cmnp = modutil.require("check_prefix","venus")
+local log    = working_villages.require("log")
+local cmnp   = modutil.require("check_prefix","venus")
 local colors = working_villages.require("jobs/dyemixer_recipes").colors
+local aggro  = working_villages.require("aggro")
 assert(#colors > 0)
 
 working_villages.animation_frames = {
@@ -16,9 +17,9 @@ working_villages.animation_frames = {
 
 working_villages.registered_villagers = {}
 
-working_villages.registered_jobs = {}
+working_villages.registered_jobs      = {}
 
-working_villages.registered_eggs = {}
+working_villages.registered_eggs      = {}
 
 -- records failed node place attempts to prevent repeating mistakes
 -- key=minetest.pos_to_string(pos) val=(os.clock()+180)
@@ -120,8 +121,21 @@ end
 -- working_villages.villager.is_enemy returns if an object is an enemy.
 function working_villages.villager:is_enemy(obj)
   log.verbose("villager %s checks if %s is hostile",self.inventory_name,obj)
-  --TODO
-  return false
+  --return false
+  if self.aggro         == nil then return false end
+  if self.aggro.players == nil then return false end
+  -- TODO entity name if no player name ?
+  local name = obj:get_player_name()
+  local like = self.aggro.players[name] 
+  if like == nil then return false end
+  -- TODO check other villagers' aggro & village's aggro
+  -- local village_name = self.village_name
+  -- local village      = working_villages.get_village(village_name)
+  -- for _,villager in ipairs(village.villagers) do
+  --   like += villager.aggro.players[name] * self.aggro.transitive_factor
+  -- end
+  -- like += village.aggro.players[name] * self.aggro.transitive_factor
+  return like < 0
 end
 
 -- working_villages.villager.get_nearest_player returns a player object who
@@ -693,6 +707,11 @@ function working_villages.villager:is_player()
   -- TODO I think we're supposed to return true here:
   --if player and player:is_player() and not player.is_fake_player then
   --return false
+  assert(self.is_fake_player)
+  local name = self:get_player_name()
+  if name == nil or name == "" then
+	  return false
+  end
   return true
 end
 
@@ -907,6 +926,7 @@ function working_villages.register_villager(product_name, def)
         return stack:get_count()
       elseif listname == "wield_item" then
         return 0
+      -- TODO other lists
       end
       return 0
       end,
@@ -1065,25 +1085,28 @@ function working_villages.register_villager(product_name, def)
 	-- TODO now that we've got a "username," we can register with HB-type mods
       end
 
+      self.aggro = aggro.default_aggro_table()
+
       -- attach dummy item to new villager.
       minetest.add_entity(self.object:get_pos(), "working_villages:dummy_item")
     else
       -- if static data is not empty string, this object has beed already created.
       local data = minetest.deserialize(staticdata)
 
-      self.product_name = data["product_name"]
+      self.product_name         = data["product_name"]
       self.manufacturing_number = data["manufacturing_number"]
-      self.nametag = data["nametag"]
-      self.owner_name = data["owner_name"]
-      self.pause = data["pause"]
-      self.job_data = data["job_data"]
-      self.state_info = data["state_info"]
-      self.pos_data = data["pos_data"]
+      self.nametag              = data["nametag"]
+      self.owner_name           = data["owner_name"]
+      self.pause                = data["pause"]
+      self.job_data             = data["job_data"]
+      self.state_info           = data["state_info"]
+      self.pos_data             = data["pos_data"]
       -- personality
-      self.dob = data["dob"]
-      self.tod = data["tod"]
-      self.day_count = data["day_count"]
-      self.fave_color = data["fave_color"]
+      self.dob                  = data["dob"]
+      self.tod                  = data["tod"]
+      self.day_count            = data["day_count"]
+      self.fave_color           = data["fave_color"]
+      self.aggro                = data["aggro"]
 
       local inventory = create_inventory(self)
       for list_name, list in pairs(data["inventory"]) do
@@ -1128,20 +1151,21 @@ function working_villages.register_villager(product_name, def)
   local function get_staticdata(self)
     local inventory = self:get_inventory()
     local data = {
-      ["product_name"] = self.product_name,
+      ["product_name"]         = self.product_name,
       ["manufacturing_number"] = self.manufacturing_number,
-      ["nametag"] = self.nametag,
-      ["owner_name"] = self.owner_name,
-      ["inventory"] = {},
-      ["pause"] = self.pause,
-      ["job_data"] = self.job_data,
-      ["state_info"] = self.state_info,
-      ["pos_data"] = self.pos_data,
+      ["nametag"]              = self.nametag,
+      ["owner_name"]           = self.owner_name,
+      ["inventory"]            = {},
+      ["pause"]                = self.pause,
+      ["job_data"]             = self.job_data,
+      ["state_info"]           = self.state_info,
+      ["pos_data"]             = self.pos_data,
 
-      ["dob"] = self.dob,
-      ["tod"] = self.tod,
-      ["day_count"] = self.day_count,
-      ["fave_color"] = self.fave_color,
+      ["dob"]                  = self.dob,
+      ["tod"]                  = self.tod,
+      ["day_count"]            = self.day_count,
+      ["fave_color"]           = self.fave_color,
+      ["aggro"]                = self.aggro,
     }
 
     -- set lists.
@@ -1266,4 +1290,48 @@ function working_villages.register_villager(product_name, def)
     inventory_image = def.egg_image,
     product_name    = name,
   })
+end
+
+
+
+
+
+
+
+
+
+
+-- TODO
+--function working_villages.is_village(name)
+--  if working_villages.registered_villager[name] then
+--    return true
+--  end
+--  return false
+--end
+function working_villages.register_village(village_name, def)
+  assert(type(village_name) == "string")
+  assert(type(def)          == "table")
+
+  -- TODO don't reregister village
+  -- TODO getter
+
+  local name = cmnp(product_name)
+  local tbl  = "_villages"
+  local vils = working_villagers.get_stored_table(tbl)
+  if    vils == nil then
+    vils = {}
+  end
+
+  def["product_name"] = village_name
+  --def["owner_name"]   = 
+  --def["pause"]        = 
+  --def["state_info"]   =
+  --def["pos_data"]     = 
+  def["dob"]          = minetest.get_day_count()
+  def["tod"]          = minetest.get_timeofday()
+  --def["fave_color"]   = 
+  def["aggro"]        = aggro.default_aggro_table()
+
+  vils[name] = def
+  working_villagers.set_stored_table(tbl, def)
 end

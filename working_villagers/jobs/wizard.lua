@@ -134,6 +134,11 @@ working_villages.register_job("working_villages:job_wizard", {
 		end
 		self:handle_job_pos()
 
+		-- TODO iterate spell guesses
+		-- TODO remember cracked books and don't recast those spells
+		-- TODO cracked books should be kept somewhere that other villagers can use them
+		-- TODO other villagers should use magick
+
 		self:count_timer("wizard:search")
 		self:count_timer("wizard:change_dir")
 		self:handle_obstacles()

@@ -817,7 +817,7 @@ function working_villages.villager:handle_claycrafter(furnace_pos, take_func, pu
 end
 
 function working_villages.villager:handle_craft_table(craft_table_pos, take_func, put_func, data)
-	if self:player_name() is nil then -- if this works, then it's better
+	if self:player_name() == nil then -- if this works, then it's better
 		self:set_displayed_action("I need a name to operate the crafting table")
 		return
 	end
