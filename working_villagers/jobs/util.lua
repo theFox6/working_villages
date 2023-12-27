@@ -344,6 +344,10 @@ end
 if minetest.get_modpath("homedecor_bathroom") then
 	func.chest_names["homedecor_bathroom:medicine_cabinet"] = true
 end
+if minetest.get_modpath("castle_storage") then
+	func.chest_names["castle_storage:crate"]            = true
+	func.chest_names["castle_storage:iron_bound_chest"] = true
+end
 function func.is_chest(pos)
 	local node = minetest.get_node(pos)
   if (node==nil) then
