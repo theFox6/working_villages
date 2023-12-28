@@ -5,7 +5,6 @@
 - weather
 - factory
 - useful_contraptions
-- journal
 
 burglar/courier -- move stuff between villagers' chests
 trash collector -- simple item pickup
