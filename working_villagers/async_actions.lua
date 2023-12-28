@@ -429,7 +429,19 @@ end
 
 function working_villages.villager:handle_night()
 	local tod = minetest.get_timeofday()
-	if	tod < 0.2 or tod > 0.76 then
+	if	tod < 0.2 or tod > 0.76 then -- 0.2 + 0.24 = 0.44
+		if (self.job_data.in_work == true) then
+			self.job_data.in_work = false;
+		end
+		self:goto_bed()
+		self.job_data.manipulated_chest = false;
+	end
+end
+
+-- for night-shift workers
+function working_villages.villager:handle_day()
+	local tod = minetest.get_timeofday()
+	if	tod >= 0.2 + 0.06 and tod <= 0.76 - 0.06 then -- 0.56 - 0.44 = 0.12 ; 0.12 / 2 = 0.06
 		if (self.job_data.in_work == true) then
 			self.job_data.in_work = false;
 		end

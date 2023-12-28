@@ -92,15 +92,17 @@ working_villages.register_job("working_villages:job_bugcollector", {
 	},
 	inventory_image  = "default_paper.png^working_villages_herb_collector.png",
 	jobfunc = function(self)
-		-- TODO night-shift version of handle_night
-		-- TODO more reasonable sleep schedule
-		-- need to be up at night for fireflies
-		-- and also during the day for butterflies
-		if minetest.get_day_count() % 2 == 0 then
+		local shift_mode = self:get_job_data("mode") or "dayshift"
+
+		if shift_mode == "dayshift" then
 			self:handle_night()
+		elseif shift_mode == "nightshift" then
+			self.handle_day()
 		else
-			--self:handle_siesta()
+			self:set_displayed_action("No sleep schedule assigned!")
+			assert(false)
 		end
+			
 		self:handle_chest(take_func, put_func)
 		local stack  = self:get_wield_item_stack()
 		if stack:is_empty() then
