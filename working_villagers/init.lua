@@ -34,6 +34,7 @@ working_villages.require("storage")
 
 --base
 working_villages.require("api")
+working_villages.require("fake_player")
 working_villages.require("register")
 working_villages.require("commanding_sceptre")
 
@@ -46,12 +47,75 @@ working_villages.require("jobs/empty")
 working_villages.require("jobs/builder")
 working_villages.require("jobs/follow_player")
 working_villages.require("jobs/guard")
-working_villages.require("jobs/plant_collector")
+working_villages.require("jobs/collector/plant_collector")
 working_villages.require("jobs/farmer")
 working_villages.require("jobs/woodcutter")
 --testing jobs
 working_villages.require("jobs/torcher")
 working_villages.require("jobs/snowclearer")
+-- IA jobs
+working_villages.require("jobs/thief")
+working_villages.require("jobs/collector/brush_collector")
+working_villages.require("jobs/collector/bug_collector")
+working_villages.require("jobs/collector/bone_collector")
+working_villages.require("jobs/miner/landscaper")
+working_villages.require("jobs/watercarrier")
+working_villages.require("jobs/miner/miner")
+working_villages.require("jobs/miner/gem_miner")
+working_villages.require("jobs/mayor")
+working_villages.require("jobs/appliance/baker")
+--working_villages.require("jobs/hider")
+if minetest.get_modpath("mcg_lockworkshop") then
+	working_villages.require("jobs/appliance/locksmith")
+end
+if minetest.get_modpath("fakery") then
+	working_villages.require("jobs/appliance/counterfeiter")
+end
+if minetest.get_modpath("mcg_dyemixer") then
+	working_villages.require("jobs/appliance/dyemixer")
+end
+if minetest.get_modpath("claycrafter") then
+	working_villages.require("jobs/appliance/claycrafter")
+end
+if minetest.get_modpath("decraft") then
+	working_villages.require("jobs/appliance/recycler")
+end
+if minetest.get_modpath("crafting_bench")
+or minetest.get_modpath("craft_table") then
+	working_villages.require("jobs/appliance/craftsman")
+end
+if minetest.get_modpath("iadiscordia") then
+	working_villages.require("jobs/wizard")
+end
+working_villages.require("jobs/gardener")
+if minetest.get_modpath("biofuel") then
+	working_villages.require("jobs/appliance/biofuel")
+end
+if minetest.get_modpath("composting") then
+	working_villages.require("jobs/composter")
+end
+if minetest.get_modpath("snowcone") then
+	working_villages.require("jobs/snowcone")
+end
+if minetest.get_modpath("waffles") then
+	working_villages.require("jobs/waffle")
+end
+if minetest.get_modpath("church_candles") then
+	working_villages.require("jobs/appliance/beekeeper")
+end
+if minetest.get_modpath("hopper") then
+	working_villages.require("jobs/trasher")
+end
+if minetest.get_modpath("wine") then
+	working_villages.require("jobs/appliance/brewer")
+end
+if minetest.get_modpath("smartrenting") then
+	working_villages.require("jobs/landlord")
+end
+if minetest.get_modpath("bonemeal")
+or minetest.get_modpath("basalt_fertilizer") then
+	working_villages.require("jobs/bonemeal")
+end
 
 if working_villages.setting_enabled("spawn",false) then
   working_villages.require("spawn")

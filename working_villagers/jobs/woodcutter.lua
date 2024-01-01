@@ -1,14 +1,18 @@
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
-local function find_tree(p)
-	local adj_node = minetest.get_node(p)
-	if minetest.get_item_group(adj_node.name, "tree") > 0 then
-		-- FIXME: need a player name if villagers can own a protected area
-		if minetest.is_protected(p, "") then return false end
-		if working_villages.failed_pos_test(p) then return false end
-		return true
+local function find_tree(self)
+	return function(p)
+		local adj_node = minetest.get_node(p)
+		if minetest.get_item_group(adj_node.name, "tree") > 0 then
+			-- FIXME: need a player name if villagers can own a protected area
+			if minetest.is_protected(p, self:get_player_name()) then return false end
+			if working_villages.failed_pos_test(p) then return false end
+			return true
+		end
+		return false
 	end
-	return false
 end
 
 local function is_sapling(n)
@@ -61,14 +65,32 @@ end
 local searching_range = {x = 10, y = 10, z = 10, h = 5}
 
 working_villages.register_job("working_villages:job_woodcutter", {
-	description      = "woodcutter (working_villages)",
-	long_description = "I look for any Tree trunks around and chop them down.\
+	description      = S("woodcutter (working_villages)"),
+	long_description = S("I look for any Tree trunks around and chop them down.\
 I might also chop down a house. Don't get angry please I'm not the best at my job.\
-When I find a sappling I'll plant it on some soil near a bright place so a new tree can grow from it.",
+When I find a sappling I'll plant it on some soil near a bright place so a new tree can grow from it."),
+	trivia = trivia.get_trivia({}, { trivia.og, }),
+	workflow = {
+		S("Wake up"),
+		S("Handle my chest"),
+		S("Equip my tool"),
+		S("Go to work"),
+		S("Search for trees"),
+		S("Go to tree"),
+		S("Dig tree"),
+		S("Replant"),
+		S("Periodically look away thoughtfully"),
+	},
 	inventory_image  = "default_paper.png^working_villages_woodcutter.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)
+		local stack  = self:get_wield_item_stack()
+		if stack:is_empty() then
+		self:move_main_to_wield(function(name)
+  			return (minetest.get_item_group(name, "axe")~=0)
+		end)
+		end
 		self:handle_job_pos()
 
 		self:count_timer("woodcutter:search")
@@ -95,7 +117,7 @@ When I find a sappling I'll plant it on some soil near a bright place so a new t
 					end
 				end
 			end
-			local target = func.search_surrounding(self.object:get_pos(), find_tree, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_tree(self), searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				destination = func.find_ground_below(destination)

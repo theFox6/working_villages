@@ -1,7 +1,10 @@
 --TODO: split this into single modules
 
-local log = working_villages.require("log")
-local cmnp = modutil.require("check_prefix","venus")
+local log    = working_villages.require("log")
+local cmnp   = modutil.require("check_prefix","venus")
+local colors = working_villages.require("jobs/dyemixer_recipes").colors
+local aggro  = working_villages.require("aggro")
+assert(#colors > 0)
 
 working_villages.animation_frames = {
   STAND     = { x=  0, y= 79, },
@@ -14,9 +17,9 @@ working_villages.animation_frames = {
 
 working_villages.registered_villagers = {}
 
-working_villages.registered_jobs = {}
+working_villages.registered_jobs      = {}
 
-working_villages.registered_eggs = {}
+working_villages.registered_eggs      = {}
 
 -- records failed node place attempts to prevent repeating mistakes
 -- key=minetest.pos_to_string(pos) val=(os.clock()+180)
@@ -118,8 +121,21 @@ end
 -- working_villages.villager.is_enemy returns if an object is an enemy.
 function working_villages.villager:is_enemy(obj)
   log.verbose("villager %s checks if %s is hostile",self.inventory_name,obj)
-  --TODO
-  return false
+  --return false
+  if self.aggro         == nil then return false end
+  if self.aggro.players == nil then return false end
+  -- TODO entity name if no player name ?
+  local name = obj:get_player_name()
+  local like = self.aggro.players[name] 
+  if like == nil then return false end
+  -- TODO check other villagers' aggro & village's aggro
+  -- local village_name = self.village_name
+  -- local village      = working_villages.get_village(village_name)
+  -- for _,villager in ipairs(village.villagers) do
+  --   like += villager.aggro.players[name] * self.aggro.transitive_factor
+  -- end
+  -- like += village.aggro.players[name] * self.aggro.transitive_factor
+  return like < 0
 end
 
 -- working_villages.villager.get_nearest_player returns a player object who
@@ -132,6 +148,52 @@ function working_villages.villager:get_nearest_player(range_distance,pos)
   local all_objects = minetest.get_objects_inside_radius(position, range_distance)
   for _, object in pairs(all_objects) do
     if object:is_player() then
+      local player_position = object:get_pos()
+      local distance = vector.distance(position, player_position)
+
+      if distance < min_distance then
+        min_distance = distance
+        player = object
+        ppos = player_position
+      end
+    end
+  end
+  return player,ppos,min_distance
+end
+function working_villages.villager:get_near_players(range_distance,pos)
+  local min_distance = range_distance
+  local result   = {}
+  local position = pos or self.object:get_pos()
+
+  local all_objects = minetest.get_objects_inside_radius(position, range_distance)
+  for _, object in pairs(all_objects) do
+    if object:is_player() then
+      local player_position = object:get_pos()
+      local distance = vector.distance(position, player_position)
+      if distance < min_distance then
+        min_distance = distance
+      end
+      local data = {
+        player  =object,
+        position=player_position,
+        distance=distance,
+      }
+      table.insert(result, data)
+    end
+  end
+  return result,min_distance
+end
+function working_villages.villager:get_nearest_player_with_condition(range_distance,pos, condition)
+  local min_distance = range_distance
+  local player,ppos
+  local position = pos or self.object:get_pos()
+
+  local all_objects = minetest.get_objects_inside_radius(position, range_distance)
+  for _, object in pairs(all_objects) do
+    local inv = object:get_inventory()
+    if --object:is_player() and -- ehh, is there a reason why a thief shouldn't rob a non-player ?
+       condition(inv)
+    then
       local player_position = object:get_pos()
       local distance = vector.distance(position, player_position)
 
@@ -320,6 +382,12 @@ function working_villages.villager:move_main_to_wield(pred)
   end
   return false
 end
+function working_villages.villager:get_wielded_item()
+  return self:get_wield_item_stack()
+end
+function working_villages.villager:set_wielded_item(item)
+  return self:set_wield_item_stack(item)
+end
 
 -- working_villages.villager.is_named reports the villager is still named.
 function working_villages.villager:is_named()
@@ -357,6 +425,7 @@ function working_villages.villager:change_direction_randomly()
     y = 0,
     z = math.random(0, 5) * 2 - 5,
   }
+  -- TODO check whether it's safe so we don't wander off a cliff #49
   local velocity = vector.multiply(vector.normalize(direction), 1.5)
   self.object:set_velocity(velocity)
   self:set_yaw_by_direction(direction)
@@ -464,6 +533,18 @@ function working_villages.villager:jump()
   ctrl:set_velocity{x = velocity.x, y = jump_force, z = velocity.z}
 end
 
+local function walkable(node)
+	-- copied from pathfinder
+	--if string.find(node.name,"doors:") then
+	--	return false
+	--else
+	if minetest.registered_nodes[node.name]~= nil then
+		return minetest.registered_nodes[node.name].walkable
+	else
+		return true
+	end
+	--end
+end
 --working_villages.villager.handle_obstacles(ignore_fence,ignore_doors)
 --if the villager hits a walkable he wil jump
 --if ignore_fence is false the villager will not jump over fences
@@ -480,7 +561,8 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
     local front_node = minetest.get_node(front_pos)
     above_node = vector.add(above_node,{x=0,y=1,z=0})
     above_node = minetest.get_node(above_node)
-    if minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence) then
+    if --string.find(front_node.name, "mobs:fence") or -- #42
+    (minetest.get_item_group(front_node.name, "fence") > 0 and not(ignore_fence)) then
       self:change_direction_randomly()
     elseif string.find(front_node.name,"doors:door") and not(ignore_doors) then
       local door = doors.get(front_pos)
@@ -493,10 +575,12 @@ function working_villages.villager:handle_obstacles(ignore_fence,ignore_doors)
           door:open()
         end
       end
-    elseif minetest.registered_nodes[front_node.name].walkable
-      and not(minetest.registered_nodes[above_node.name].walkable) then
+    -- TODO trap doors & ladders
+    elseif walkable(front_node) --minetest.registered_nodes[front_node.name].walkable
+      and not(walkable(above_node)) then --not(minetest.registered_nodes[above_node.name].walkable) then
       if velocity.y == 0 then
-        local nBox = minetest.registered_nodes[front_node.name].node_box
+        local nBox = minetest.registered_nodes[front_node.name]
+        if nBox ~= nil then nBox = nBox.node_box end
         if (nBox == nil) then
           nBox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
         else
@@ -600,11 +684,35 @@ working_villages.require("async_actions")
 
 -- compatibility with like player object
 function working_villages.villager:get_player_name()
-  return self.object:get_player_name()
+  --return self.object:get_player_name()
+  return self.nametag
+end
+function working_villages.villager:get_properties()
+	return self.object:get_properties()
+end
+function working_villages.villager:get_hp()
+	return self.object:get_hp()
+end
+function working_villages.villager:set_hp(hp)
+	return self.object:set_hp(hp)
 end
 
+-- TODO we need ref:is_player() to return true
+--if pointed_thing.type == "object" then
+--local ref = pointed_thing.ref
+--local ent = ref:get_luaentity()
+--ref:is_player() => false
+--ent:is_player() => true
 function working_villages.villager:is_player()
-  return false
+  -- TODO I think we're supposed to return true here:
+  --if player and player:is_player() and not player.is_fake_player then
+  --return false
+  assert(self.is_fake_player)
+  local name = self:get_player_name()
+  if name == nil or name == "" then
+	  return false
+  end
+  return true
 end
 
 function working_villages.villager:get_wield_index()
@@ -722,12 +830,13 @@ working_villages.job_inv = minetest.create_detached_inventory("working_villages:
   end,
   on_put = function(inv, listname, _, stack)
     if inv:contains_item(listname, stack:peek_item(1)) then
+      -- #48
       --inv:remove_item(listname, stack)
       stack:clear()
     end
   end,
 })
-working_villages.job_inv:set_size("main", 32)
+working_villages.job_inv:set_size("main", 64)
 
 -- working_villages.register_job registers a definition of a new job.
 function working_villages.register_job(job_name, def)
@@ -741,6 +850,8 @@ function working_villages.register_job(job_name, def)
     groups          = {not_in_creative_inventory = 1}
   })
 
+  --local new_size = math.max(working_villages.job_inv:get_size("main"), #working_villages.registered_jobs)
+  --working_villages.job_inv:set_size("main", new_size)
   --working_villages.job_inv:set_size("main", #working_villages.registered_jobs)
   working_villages.job_inv:add_item("main", ItemStack(name))
 end
@@ -815,6 +926,7 @@ function working_villages.register_villager(product_name, def)
         return stack:get_count()
       elseif listname == "wield_item" then
         return 0
+      -- TODO other lists
       end
       return 0
       end,
@@ -887,6 +999,7 @@ function working_villages.register_villager(product_name, def)
     inventory:set_size("main", 16)
     inventory:set_size("job",  1)
     inventory:set_size("wield_item", 1)
+    -- TODO armor, clothes, upgrades
 
     return inventory
   end
@@ -904,6 +1017,14 @@ function working_villages.register_villager(product_name, def)
       --if village then
         --self.pos_data = village:get_villager_pos_data(self.inventory_name)
       --end
+      -- TODO need a global table of {[village_name] = village,}
+      -- village needs a register_citizen() that can be called by a villager when he spawns
+      -- then during his job, the burglar/courier can get his own village name,
+      -- lookup his village object in the global table
+      -- get the set of that village's registered villagers
+      -- solve the traveling salesman problem
+      -- and then we've gotta figure out some strategy so that the workers and burglars don't contend over the square in front of their chest... I'm envisioning a drop box system
+      --
       -- remove this later
       return -- do semething for luacheck
     end
@@ -911,6 +1032,21 @@ function working_villages.register_villager(product_name, def)
 
   -- on_activate is a callback function that is called when the object is created or recreated.
   local function on_activate(self, staticdata)
+    -- TODO villager lineage
+   
+    -- TODO it seems that we need some sort of logic for cycling through the textures
+    -- select random texture, set model and size
+    --if not self.base_texture then
+
+    --    -- compatiblity with old simple mobs textures
+    --    if def.textures and type(def.textures[1]) == "string" then
+    --        def.textures = {def.textures}
+    --    end
+
+    --    -- backup a few base settings
+    --    self.base_texture = def.textures and def.textures[random(#def.textures)]
+    --end
+
     -- parse the staticdata, and compose a inventory.
     if staticdata == "" then
       self.product_name = name
@@ -918,20 +1054,59 @@ function working_villages.register_villager(product_name, def)
       working_villages.manufacturing_data[name] = working_villages.manufacturing_data[name] + 1
       create_inventory(self)
 
+      -- birthday
+      self.dob = minetest.get_day_count()
+      self.tod = minetest.get_timeofday()
+      self.day_count = minetest.get_day_count()
+
+      -- favorite color
+      self.fave_color = colors[math.random(#colors)]
+      assert(self.fave_color ~= nil)
+
+      -- randomized name
+      if minetest.get_modpath("getname") then
+        self.nametag = nil
+        while self.nametag == nil do
+	  -- TODO family names
+          -- TODO get gender
+          --getname.masculineName()
+          --getname.feminineName()
+	  self.nametag = getname.genderlessName()
+	  if minetest.get_player_by_name(self.nametag) then -- don't collide with player names
+	    self.nametag = nil
+	  elseif minetest.get_modpath("iaspawn") then -- there's not an easy way to hook into entity creation globally
+	    local mother = nil
+	    local father = nil
+	    if not iaspawn.register_soul(self, mother, father) then -- don't collide with player or entity names
+	      self.nametag = nil
+	    end
+	  end
+	end
+	-- TODO now that we've got a "username," we can register with HB-type mods
+      end
+
+      self.aggro = aggro.default_aggro_table()
+
       -- attach dummy item to new villager.
       minetest.add_entity(self.object:get_pos(), "working_villages:dummy_item")
     else
       -- if static data is not empty string, this object has beed already created.
       local data = minetest.deserialize(staticdata)
 
-      self.product_name = data["product_name"]
+      self.product_name         = data["product_name"]
       self.manufacturing_number = data["manufacturing_number"]
-      self.nametag = data["nametag"]
-      self.owner_name = data["owner_name"]
-      self.pause = data["pause"]
-      self.job_data = data["job_data"]
-      self.state_info = data["state_info"]
-      self.pos_data = data["pos_data"]
+      self.nametag              = data["nametag"]
+      self.owner_name           = data["owner_name"]
+      self.pause                = data["pause"]
+      self.job_data             = data["job_data"]
+      self.state_info           = data["state_info"]
+      self.pos_data             = data["pos_data"]
+      -- personality
+      self.dob                  = data["dob"]
+      self.tod                  = data["tod"]
+      self.day_count            = data["day_count"]
+      self.fave_color           = data["fave_color"]
+      self.aggro                = data["aggro"]
 
       local inventory = create_inventory(self)
       for list_name, list in pairs(data["inventory"]) do
@@ -976,15 +1151,21 @@ function working_villages.register_villager(product_name, def)
   local function get_staticdata(self)
     local inventory = self:get_inventory()
     local data = {
-      ["product_name"] = self.product_name,
+      ["product_name"]         = self.product_name,
       ["manufacturing_number"] = self.manufacturing_number,
-      ["nametag"] = self.nametag,
-      ["owner_name"] = self.owner_name,
-      ["inventory"] = {},
-      ["pause"] = self.pause,
-      ["job_data"] = self.job_data,
-      ["state_info"] = self.state_info,
-      ["pos_data"] = self.pos_data,
+      ["nametag"]              = self.nametag,
+      ["owner_name"]           = self.owner_name,
+      ["inventory"]            = {},
+      ["pause"]                = self.pause,
+      ["job_data"]             = self.job_data,
+      ["state_info"]           = self.state_info,
+      ["pos_data"]             = self.pos_data,
+
+      ["dob"]                  = self.dob,
+      ["tod"]                  = self.tod,
+      ["day_count"]            = self.day_count,
+      ["fave_color"]           = self.fave_color,
+      ["aggro"]                = self.aggro,
     }
 
     -- set lists.
@@ -1035,6 +1216,7 @@ function working_villages.register_villager(product_name, def)
   -- on_punch is a callback function that is called when a player punches a villager.
   local function on_punch()--self, puncher, time_from_last_punch, tool_capabilities, dir
   --TODO: aggression (add player ratings table)
+  -- the whole village should coordinate
   end
 
   -- register a definition of a new villager.
@@ -1083,6 +1265,7 @@ function working_villages.register_villager(product_name, def)
   villager_def.on_rightclick               = on_rightclick
   villager_def.on_punch                    = on_punch
   villager_def.get_staticdata              = get_staticdata
+  -- TODO drop inventory, bones on death
 
   -- storage methods
   villager_def.get_stored_table            = working_villages.get_stored_villager_table
@@ -1095,6 +1278,9 @@ function working_villages.register_villager(product_name, def)
   villager_def.set_home                    = working_villages.set_home
   villager_def.remove_home                 = working_villages.remove_home
 
+  villager_def.is_fake_player              = true
+
+  -- TODO optional villager/player lineage
 
   minetest.register_entity(name, villager_def)
 
@@ -1106,3 +1292,46 @@ function working_villages.register_villager(product_name, def)
   })
 end
 
+
+
+
+
+
+
+
+
+
+-- TODO
+--function working_villages.is_village(name)
+--  if working_villages.registered_villager[name] then
+--    return true
+--  end
+--  return false
+--end
+function working_villages.register_village(village_name, def)
+  assert(type(village_name) == "string")
+  assert(type(def)          == "table")
+
+  -- TODO don't reregister village
+  -- TODO getter
+
+  local name = cmnp(product_name)
+  local tbl  = "_villages"
+  local vils = working_villagers.get_stored_table(tbl)
+  if    vils == nil then
+    vils = {}
+  end
+
+  def["product_name"] = village_name
+  --def["owner_name"]   = 
+  --def["pause"]        = 
+  --def["state_info"]   =
+  --def["pos_data"]     = 
+  def["dob"]          = minetest.get_day_count()
+  def["tod"]          = minetest.get_timeofday()
+  --def["fave_color"]   = 
+  def["aggro"]        = aggro.default_aggro_table()
+
+  vils[name] = def
+  working_villagers.set_stored_table(tbl, def)
+end

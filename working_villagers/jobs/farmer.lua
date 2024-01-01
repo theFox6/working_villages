@@ -1,5 +1,6 @@
-
 local func = working_villages.require("jobs/util")
+local S = minetest.get_translator("working_villages")
+local trivia = working_villages.require("jobs/trivia")
 
 -- limited support to two replant definitions
 local farming_plants = {
@@ -47,6 +48,15 @@ local farming_plants = {
 local farming_demands = {
 	["farming:beanpole"] = 99,
 	["farming:trellis"] = 99,
+	--["farming:hoe_wood"] = 99,
+	--["farming:hoe_stone"] = 99,
+	--["farming:hoe_steel"] = 99,
+}
+local farming_tools = {
+	-- the gardener handles this logic now
+	--["farming:hoe_wood"] = 99,
+	--["farming:hoe_stone"] = 99,
+	--["farming:hoe_steel"] = 99,
 }
 
 function farming_plants.get_plant(item_name)
@@ -67,13 +77,18 @@ function farming_plants.is_plant(item_name)
 	return true;
 end
 
-local function find_plant_node(pos)
-	local node = minetest.get_node(pos);
-	local data = farming_plants.get_plant(node.name);
-	if (not data) then
-		return false;
+local function find_plant_node(self)
+	return function(pos)
+		if minetest.is_protected(pos, self:get_player_name()) then return false end
+		if working_villages.failed_pos_test(pos) then return false end
+
+		local node = minetest.get_node(pos);
+		local data = farming_plants.get_plant(node.name);
+		if (not data) then
+			return false;
+		end
+		return true;
 	end
-	return true;
 end
 
 local searching_range = {x = 10, y = 3, z = 10}
@@ -98,12 +113,30 @@ local function take_func(villager,stack)
 end
 
 working_villages.register_job("working_villages:job_farmer", {
-	description			= "farmer (working_villages)",
-	long_description = "I look for farming plants to collect and replant them.",
+	description = S("farmer (working_villages)"),
+	long_description = S("I look for farming plants to collect and replant them."),
+	trivia = trivia.get_trivia({ }, {trivia.og, trivia.bread_basket,}),
+	workflow = {
+		S("Wake up"),
+		S("Handle my chest"),
+		--S("Equip my tool"),
+		S("Go to work"),
+		S("Search for plants"),
+		S("Go to plant"),
+		S("Dig plant"),
+		S("Replant"),
+		S("Periodically look away thoughtfully"),
+	},
 	inventory_image	= "default_paper.png^working_villages_farmer.png",
 	jobfunc = function(self)
 		self:handle_night()
 		self:handle_chest(take_func, put_func)
+		--local stack  = self:get_wield_item_stack()
+		--if stack:is_empty() then
+		--self:move_main_to_wield(function(name)
+  		--	return farming_tools[name] ~= nil
+		--end)
+		--end
 		self:handle_job_pos()
 
 		self:count_timer("farmer:search")
@@ -111,7 +144,7 @@ working_villages.register_job("working_villages:job_farmer", {
 		self:handle_obstacles()
 		if self:timer_exceeded("farmer:search",20) then
 			self:collect_nearest_item_by_condition(farming_plants.is_plant, searching_range)
-			local target = func.search_surrounding(self.object:get_pos(), find_plant_node, searching_range)
+			local target = func.search_surrounding(self.object:get_pos(), find_plant_node(self), searching_range)
 			if target ~= nil then
 				local destination = func.find_adjacent_clear(target)
 				if destination then
@@ -121,12 +154,29 @@ working_villages.register_job("working_villages:job_farmer", {
 					print("failure: no adjacent walkable found")
 					destination = target
 				end
-				self:go_to(destination)
-				local plant_data = farming_plants.get_plant(minetest.get_node(target).name);
-				self:dig(target,true)
-				if plant_data and plant_data.replant then
-					for index, value in ipairs(plant_data.replant) do
-						self:place(value, vector.add(target, vector.new(0,index-1,0)))
+				local plant_name = minetest.get_node(target).name
+				self:set_displayed_action("farming some "..plant_name)
+
+				local success, ret = self:go_to(destination)
+				if not success then
+					assert(target ~= nil)
+					working_villages.failed_pos_record(target)
+					self:set_displayed_action("looking at the unreachable plants")
+					self:delay(100)
+				else
+					local plant_data = farming_plants.get_plant(plant_name);
+					success, ret = self:dig(target,true)
+					if not success then
+						assert(target ~= nil)
+						working_villages.failed_pos_record(target)
+						self:set_displayed_action("confused as to why farming failed")
+						self:delay(100)
+					else
+						if plant_data and plant_data.replant then
+							for index, value in ipairs(plant_data.replant) do
+								self:place(value, vector.add(target, vector.new(0,index-1,0)))
+							end
+						end
 					end
 				end
 			end

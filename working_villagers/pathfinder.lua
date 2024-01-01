@@ -47,7 +47,9 @@ local function get_distance_to_neighbor(start_pos, end_pos)
 	end
 end
 local function walkable(node)
-		if string.find(node.name,"doors:") then
+		if string.find(node.name,"doors:")
+		--or string.find(node.name, "mobs:fence") -- #42
+		then
 			return false
 		else
 			if minetest.registered_nodes[node.name]~= nil then
@@ -58,6 +60,7 @@ local function walkable(node)
 		end
 end
 
+-- TODO #9
 local function check_clearance(cpos, x, z, height) --TODO: this is unused
 	for i = 1, height do
 		local n_name = minetest.get_node({x = cpos.x + x, y = cpos.y + i, z = cpos.z + z}).name
@@ -75,6 +78,11 @@ assert(check_clearance)
 local function get_neighbor_ground_level(pos, jump_height, fall_height)
 	local node = minetest.get_node(pos)
 	local height = 0
+	if string.find(node.name, "mobs:fence") then -- #42
+		return nil
+	end
+	-- TODO can we route via climbable by playing with this logic ?
+	-- TODO #9: `1` should not be hard-coded
 	if walkable(node) then
 		repeat
 			height = height + 1
@@ -97,6 +105,8 @@ local function get_neighbor_ground_level(pos, jump_height, fall_height)
 		return {x = pos.x, y = pos.y + 1, z = pos.z}
 	end
 end
+
+-- TODO need to check for impassable entities
 
 local function get_neighbors(current_pos, entity_height, entity_jump_height, entity_fear_height)
 	local neighbors = {}
