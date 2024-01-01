@@ -136,6 +136,15 @@ building_sign.register_schematic("farm_2h_no_light.we")
 building_sign.register_schematic("wall_segment.we")
 building_sign.register_schematic("wall_gate.we")
 
+-- use these to create a well-manicured buffer zone inside the perimeter wall
+building_sign.register_schematic("park_v.we")
+building_sign.register_schematic("park_h.we")
+building_sign.register_schematic("crossroads.we")
+
+-- space stations
+building_sign.register_schematic("ring.we")
+building_sign.register_schematic("kolab.we")
+
 --
 -- miscellaneous / extra
 --
